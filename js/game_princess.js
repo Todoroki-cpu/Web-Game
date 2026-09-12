@@ -129,16 +129,16 @@ class GamePrincess {
 
       // 7. くつ・ガラスの靴 (10種)
       shoes: [
-        { id: 'shoe_1', name: 'シンデレラガラスの靴', icon: '🥿', color: '#a4b0be', gem: '✨' },
-        { id: 'shoe_2', name: 'ローズリボンパンプス', icon: '👠', color: '#ff7597', gem: '🎀' },
-        { id: 'shoe_3', name: 'ダイヤモンドストラップ', icon: '👡', color: '#74b9ff', gem: '💎' },
-        { id: 'shoe_4', name: 'ゴールドラメヒール', icon: '👠', color: '#f1c40f', gem: '🌟' },
-        { id: 'shoe_5', name: 'レースアップシアーブーツ', icon: '👢', color: '#ffffff', gem: '🤍' },
-        { id: 'shoe_6', name: 'アイスクリスタルミュール', icon: '🥿', color: '#81ecec', gem: '❄️' },
-        { id: 'shoe_7', name: 'ベルベットルビーヒール', icon: '👠', color: '#c0392b', gem: '🔴' },
-        { id: 'shoe_8', name: 'パールフラットシューズ', icon: '🩰', color: '#f5cd79', gem: '⚪' },
-        { id: 'shoe_9', name: 'バタフライアンクル靴', icon: '👡', color: '#a29bfe', gem: '🦋' },
-        { id: 'shoe_10', name: 'スターダストプラットフォーム', icon: '👠', color: '#2f3542', gem: '🌠' }
+        { id: 'shoe_1', name: 'シンデレラガラスの靴', icon: '🥿', color: '#a4b0be', gem: '✨', type: 'glass_slippers' },
+        { id: 'shoe_2', name: 'ローズリボンパンプス', icon: '👠', color: '#ff7597', gem: '🎀', type: 'rose_pumps' },
+        { id: 'shoe_3', name: 'ダイヤモンドストラップ', icon: '👡', color: '#74b9ff', gem: '💎', type: 'diamond_sandals' },
+        { id: 'shoe_4', name: 'ゴールドラメヒール', icon: '👠', color: '#f1c40f', gem: '🌟', type: 'gold_heels' },
+        { id: 'shoe_5', name: 'レースアップシアーブーツ', icon: '👢', color: '#ffffff', gem: '🤍', type: 'laceup_boots' },
+        { id: 'shoe_6', name: 'アイスクリスタルミュール', icon: '🥿', color: '#81ecec', gem: '❄️', type: 'ice_mules' },
+        { id: 'shoe_7', name: 'ベルベットルビーヒール', icon: '👠', color: '#c0392b', gem: '🔴', type: 'ruby_heels' },
+        { id: 'shoe_8', name: 'パールフラットシューズ', icon: '🩰', color: '#f5cd79', gem: '⚪', type: 'ballet_flats' },
+        { id: 'shoe_9', name: 'バタフライアンクル靴', icon: '👡', color: '#a29bfe', gem: '🦋', type: 'butterfly_anklet' },
+        { id: 'shoe_10', name: 'スターダストプラットフォーム', icon: '👠', color: '#2f3542', gem: '🌠', type: 'stardust_platform' }
       ],
 
       // 8. 3D背景ステージ＆ライティング (10種)
@@ -352,6 +352,8 @@ class GamePrincess {
         thumbPreview = `<div class="item-thumb-color" style="padding:0; overflow:hidden; border:1.5px solid #ffbe76;">${this.getStageSvg(item)}</div>`;
       } else if (categoryId === 'makeup') {
         thumbPreview = `<div class="item-thumb-color" style="background: #ffeaa7;">${item.mood === 'wink' ? '😉' : (item.mood === 'heart' ? '😍' : '✨')}</div>`;
+      } else if (categoryId === 'shoes') {
+        thumbPreview = `<div class="item-thumb-color" style="padding:0; overflow:hidden; border:1.5px solid ${item.color || '#ff9f1a'};">${this.getShoesSvgThumbnail(item)}</div>`;
       } else {
         thumbPreview = `<div class="item-thumb-color" style="background: #ffffff; border-color: ${item.color || '#ff9f1a'};">${item.icon || '✨'}</div>`;
       }
@@ -666,24 +668,353 @@ class GamePrincess {
     `;
   }
 
+  getShoesSvgThumbnail(shoe) {
+    const t = shoe.type || 'glass_slippers';
+    const c = shoe.color || '#a4b0be';
+
+    if (t === 'glass_slippers') {
+      return `
+        <svg viewBox="0 0 40 40" class="stage-thumb-svg">
+          <rect width="40" height="40" fill="#f1f2f6"/>
+          <path d="M8 26 Q12 16 26 18 L34 24 Q36 28 32 29 L10 29 Z" fill="rgba(164, 176, 190, 0.4)" stroke="#74b9ff" stroke-width="1.5"/>
+          <path d="M10 29 L8 35 L12 35 L13 29 Z" fill="#74b9ff"/>
+          <circle cx="28" cy="22" r="4" fill="#ffffff"/>
+          <text x="24" y="25" font-size="9">✨</text>
+        </svg>
+      `;
+    } else if (t === 'rose_pumps') {
+      return `
+        <svg viewBox="0 0 40 40" class="stage-thumb-svg">
+          <rect width="40" height="40" fill="#fff0f5"/>
+          <path d="M8 26 Q12 16 26 18 L34 24 Q36 28 32 29 L10 29 Z" fill="${c}" stroke="#ff4757" stroke-width="1.5"/>
+          <path d="M10 29 L8 35 L11 35 L12 29 Z" fill="#ff4757"/>
+          <circle cx="28" cy="21" r="5" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
+          <text x="24" y="25" font-size="9">🎀</text>
+        </svg>
+      `;
+    } else if (t === 'diamond_sandals') {
+      return `
+        <svg viewBox="0 0 40 40" class="stage-thumb-svg">
+          <rect width="40" height="40" fill="#e8f4f8"/>
+          <path d="M10 28 L32 28 Q34 30 30 31 L10 31 Z" fill="${c}" stroke="#2f3542" stroke-width="1.2"/>
+          <path d="M10 31 L8 36 L11 36 L12 31 Z" fill="#2f3542"/>
+          <path d="M14 28 L20 18 L26 28 M18 18 L22 18" stroke="${c}" stroke-width="2" fill="none"/>
+          <text x="22" y="24" font-size="9">💎</text>
+        </svg>
+      `;
+    } else if (t === 'gold_heels') {
+      return `
+        <svg viewBox="0 0 40 40" class="stage-thumb-svg">
+          <rect width="40" height="40" fill="#fffbe6"/>
+          <path d="M8 25 Q12 15 26 17 L34 23 Q36 27 32 28 L10 28 Z" fill="${c}" stroke="#d35400" stroke-width="1.5"/>
+          <path d="M10 28 L7 36 L10 36 L12 28 Z" fill="#d35400"/>
+          <polygon points="28,17 30,22 34,22 31,25 32,29 28,26 24,29 25,25 22,22 26,22" fill="#ffffff" stroke="#e67e22" stroke-width="0.8"/>
+        </svg>
+      `;
+    } else if (t === 'laceup_boots') {
+      return `
+        <svg viewBox="0 0 40 40" class="stage-thumb-svg">
+          <rect width="40" height="40" fill="#f8f9fa"/>
+          <path d="M14 8 L24 8 L24 22 L34 26 Q35 30 31 31 L14 31 Z" fill="${c}" stroke="#2f3542" stroke-width="1.5"/>
+          <path d="M14 31 L12 36 L17 36 L18 31 Z" fill="#2f3542"/>
+          <path d="M18 10 L24 16 M24 12 L18 18 M18 18 L24 24" stroke="#ff4757" stroke-width="1.5"/>
+          <circle cx="14" cy="8" r="2" fill="#ff7675"/><circle cx="19" cy="8" r="2" fill="#ff7675"/><circle cx="24" cy="8" r="2" fill="#ff7675"/>
+        </svg>
+      `;
+    } else if (t === 'ice_mules') {
+      return `
+        <svg viewBox="0 0 40 40" class="stage-thumb-svg">
+          <rect width="40" height="40" fill="#e0f7fa"/>
+          <path d="M16 26 L26 18 L34 24 Q36 28 32 29 L18 29 Z" fill="${c}" stroke="#00bcd4" stroke-width="1.5"/>
+          <path d="M18 29 L16 35 L19 35 L20 29 Z" fill="#00bcd4"/>
+          <text x="22" y="24" font-size="10">❄️</text>
+        </svg>
+      `;
+    } else if (t === 'ruby_heels') {
+      return `
+        <svg viewBox="0 0 40 40" class="stage-thumb-svg">
+          <rect width="40" height="40" fill="#ffebee"/>
+          <path d="M8 25 Q12 15 26 17 L34 23 Q36 27 32 28 L10 28 Z" fill="${c}" stroke="#2f3542" stroke-width="1.5"/>
+          <path d="M10 28 L8 35 L11 35 L12 28 Z" fill="#f1c40f"/>
+          <polygon points="28,19 32,22 30,26 26,26 24,22" fill="#ff4757" stroke="#f1c40f" stroke-width="1.2"/>
+        </svg>
+      `;
+    } else if (t === 'ballet_flats') {
+      return `
+        <svg viewBox="0 0 40 40" class="stage-thumb-svg">
+          <rect width="40" height="40" fill="#fff9db"/>
+          <path d="M10 26 Q18 24 28 24 Q35 26 34 31 L10 31 Z" fill="${c}" stroke="#e67e22" stroke-width="1.5"/>
+          <path d="M15 10 L25 24 M25 10 L15 24" stroke="#ffb8b8" stroke-width="1.8"/>
+          <circle cx="20" cy="24" r="2" fill="#ffffff"/><circle cx="24" cy="24" r="2" fill="#ffffff"/><circle cx="28" cy="25" r="2" fill="#ffffff"/>
+        </svg>
+      `;
+    } else if (t === 'butterfly_anklet') {
+      return `
+        <svg viewBox="0 0 40 40" class="stage-thumb-svg">
+          <rect width="40" height="40" fill="#f3e5f5"/>
+          <path d="M8 26 Q12 16 26 18 L34 24 Q36 28 32 29 L10 29 Z" fill="${c}" stroke="#6c5ce7" stroke-width="1.5"/>
+          <path d="M10 29 L8 35 L11 35 L12 29 Z" fill="#6c5ce7"/>
+          <path d="M14 18 Q6 10 12 6 Q20 12 16 18 Z" fill="#a29bfe" stroke="#ffffff" stroke-width="1"/>
+          <text x="24" y="24" font-size="9">🦋</text>
+        </svg>
+      `;
+    } else {
+      // stardust_platform
+      return `
+        <svg viewBox="0 0 40 40" class="stage-thumb-svg">
+          <rect width="40" height="40" fill="#2f3542"/>
+          <path d="M8 22 Q12 14 26 16 L34 21 Q36 24 32 25 L10 25 Z" fill="#57606f" stroke="#feca57" stroke-width="1.2"/>
+          <rect x="8" y="25" width="26" height="7" rx="2" fill="#1e272e" stroke="#feca57" stroke-width="1.2"/>
+          <circle cx="14" cy="28" r="1.5" fill="#feca57"/><circle cx="21" cy="28" r="1.5" fill="#feca57"/><circle cx="28" cy="28" r="1.5" fill="#feca57"/>
+          <text x="24" y="20" font-size="9">⭐</text>
+        </svg>
+      `;
+    }
+  }
+
   getShoesSvg(shoe) {
-    return `
-      <svg viewBox="0 0 280 400" class="doll-svg">
-        <!-- 左足の靴（ガラスの靴・ストラップパンプス） -->
-        <path d="M114 340 L132 340 L134 354 Q123 358 112 352 Z" fill="${shoe.color}" stroke="#2f3542" stroke-width="1.5"/>
-        <ellipse cx="123" cy="348" rx="8" ry="4" fill="${shoe.color}"/>
-        <path d="M115 342 Q123 338 131 342" stroke="#ffffff" stroke-width="2" fill="none"/>
-        <circle cx="123" cy="347" r="3" fill="#ffffff"/>
-        <text x="119" y="350" font-size="8">${shoe.gem || '✨'}</text>
-        
-        <!-- 右足の靴（ガラスの靴・ストラップパンプス） -->
-        <path d="M148 340 L166 340 L168 352 Q157 358 146 354 Z" fill="${shoe.color}" stroke="#2f3542" stroke-width="1.5"/>
-        <ellipse cx="157" cy="348" rx="8" ry="4" fill="${shoe.color}"/>
-        <path d="M149 342 Q157 338 165 342" stroke="#ffffff" stroke-width="2" fill="none"/>
-        <circle cx="157" cy="347" r="3" fill="#ffffff"/>
-        <text x="153" y="350" font-size="8">${shoe.gem || '✨'}</text>
-      </svg>
-    `;
+    const t = shoe.type || 'glass_slippers';
+    const c = shoe.color || '#a4b0be';
+
+    if (t === 'glass_slippers') {
+      // 1. シンデレラガラスの靴（透明クリスタルグラデーション＆星屑ジュエル＆ガラスヒール）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          <defs>
+            <linearGradient id="glassGradLeft" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0.95)"/>
+              <stop offset="50%" stop-color="rgba(116, 185, 255, 0.6)"/>
+              <stop offset="100%" stop-color="rgba(223, 230, 233, 0.9)"/>
+            </linearGradient>
+            <linearGradient id="glassGradRight" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="rgba(255,255,255,0.95)"/>
+              <stop offset="50%" stop-color="rgba(116, 185, 255, 0.6)"/>
+              <stop offset="100%" stop-color="rgba(223, 230, 233, 0.9)"/>
+            </linearGradient>
+          </defs>
+          <!-- 左足ガラスの靴 -->
+          <path d="M114 340 L132 340 L136 354 Q123 358 110 352 Z" fill="url(#glassGradLeft)" stroke="#74b9ff" stroke-width="1.8"/>
+          <path d="M112 352 L110 357 L115 357 L116 353 Z" fill="rgba(116,185,255,0.8)" stroke="#74b9ff" stroke-width="1"/>
+          <path d="M115 342 Q123 338 131 342" stroke="#ffffff" stroke-width="2.5" fill="none"/>
+          <polygon points="124,342 126,346 130,346 127,349 128,353 124,350 120,353 121,349 118,346 122,346" fill="#ffffff" stroke="#74b9ff" stroke-width="0.8"/>
+          <circle cx="124" cy="348" r="2" fill="#74b9ff"/>
+
+          <!-- 右足ガラスの靴 -->
+          <path d="M148 340 L166 340 L170 352 Q157 358 144 354 Z" fill="url(#glassGradRight)" stroke="#74b9ff" stroke-width="1.8"/>
+          <path d="M164 353 L165 357 L170 357 L168 352 Z" fill="rgba(116,185,255,0.8)" stroke="#74b9ff" stroke-width="1"/>
+          <path d="M149 342 Q157 338 165 342" stroke="#ffffff" stroke-width="2.5" fill="none"/>
+          <polygon points="158,342 160,346 164,346 161,349 162,353 158,350 154,353 155,349 152,346 156,346" fill="#ffffff" stroke="#74b9ff" stroke-width="0.8"/>
+          <circle cx="158" cy="348" r="2" fill="#74b9ff"/>
+        </svg>
+      `;
+    } else if (t === 'rose_pumps') {
+      // 2. ローズリボンパンプス（つま先リボン＆ピンクローズコサージュ＆ピンヒール）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          <!-- 左足パンプス -->
+          <path d="M112 338 L132 338 L136 355 Q123 360 108 353 Z" fill="${c}" stroke="#ff4757" stroke-width="1.8"/>
+          <path d="M110 353 L108 358 L113 358 L114 353 Z" fill="#ff4757" stroke="#2f3542" stroke-width="1"/>
+          <path d="M116 340 Q123 336 130 340" stroke="#ffffff" stroke-width="2" fill="none"/>
+          <!-- リボン＆ローズ -->
+          <path d="M118 348 Q113 343 118 340 Q124 345 124 348 Z" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
+          <path d="M130 348 Q135 343 130 340 Q124 345 124 348 Z" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
+          <circle cx="124" cy="348" r="3.5" fill="#ff4757" stroke="#ffffff" stroke-width="1"/>
+
+          <!-- 右足パンプス -->
+          <path d="M148 338 L168 338 L172 353 Q157 360 144 355 Z" fill="${c}" stroke="#ff4757" stroke-width="1.8"/>
+          <path d="M166 353 L167 358 L172 358 L170 353 Z" fill="#ff4757" stroke="#2f3542" stroke-width="1"/>
+          <path d="M150 340 Q157 336 164 340" stroke="#ffffff" stroke-width="2" fill="none"/>
+          <!-- リボン＆ローズ -->
+          <path d="M152 348 Q147 343 152 340 Q158 345 158 348 Z" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
+          <path d="M164 348 Q169 343 164 340 Q158 345 158 348 Z" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
+          <circle cx="158" cy="348" r="3.5" fill="#ff4757" stroke="#ffffff" stroke-width="1"/>
+        </svg>
+      `;
+    } else if (t === 'diamond_sandals') {
+      // 3. ダイヤモンドストラップ（足首クロスストラップ＆大粒ダイヤスタッズ）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          <!-- 左足ストラップサンダル -->
+          <rect x="114" y="330" width="16" height="3" rx="1.5" fill="${c}" stroke="#2f3542" stroke-width="1"/>
+          <line x1="116" y1="333" x2="128" y2="346" stroke="${c}" stroke-width="2.5"/>
+          <line x1="128" y1="333" x2="116" y2="346" stroke="${c}" stroke-width="2.5"/>
+          <path d="M110 348 L134 348 L135 355 Q123 358 108 354 Z" fill="#dfe4ea" stroke="#2f3542" stroke-width="1.5"/>
+          <path d="M110 354 L108 358 L112 358 L113 354 Z" fill="#2f3542"/>
+          <polygon points="122,333 124,330 126,333 124,336" fill="#74b9ff" stroke="#ffffff" stroke-width="1"/>
+          <polygon points="122,347 124,344 126,347 124,350" fill="#74b9ff" stroke="#ffffff" stroke-width="1"/>
+
+          <!-- 右足ストラップサンダル -->
+          <rect x="150" y="330" width="16" height="3" rx="1.5" fill="${c}" stroke="#2f3542" stroke-width="1"/>
+          <line x1="152" y1="333" x2="164" y2="346" stroke="${c}" stroke-width="2.5"/>
+          <line x1="164" y1="333" x2="152" y2="346" stroke="${c}" stroke-width="2.5"/>
+          <path d="M146 348 L170 348 L172 354 Q157 358 144 355 Z" fill="#dfe4ea" stroke="#2f3542" stroke-width="1.5"/>
+          <path d="M168 354 L169 358 L173 358 L171 354 Z" fill="#2f3542"/>
+          <polygon points="156,333 158,330 160,333 158,336" fill="#74b9ff" stroke="#ffffff" stroke-width="1"/>
+          <polygon points="156,347 158,344 160,347 158,350" fill="#74b9ff" stroke="#ffffff" stroke-width="1"/>
+        </svg>
+      `;
+    } else if (t === 'gold_heels') {
+      // 4. ゴールドラメヒール（黄金の王冠バックル＆ゴールドスティレットヒール）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          <!-- 左足ゴールドヒール -->
+          <path d="M112 338 L132 338 L136 355 Q123 360 108 353 Z" fill="${c}" stroke="#d35400" stroke-width="1.8"/>
+          <path d="M110 353 L107 359 L112 359 L114 353 Z" fill="#d35400" stroke="#f1c40f" stroke-width="1"/>
+          <!-- 王冠バックル -->
+          <polygon points="118,348 120,343 124,345 128,343 130,348" fill="#ffffff" stroke="#d35400" stroke-width="1.2"/>
+          <circle cx="120" cy="343" r="1" fill="#ff4757"/><circle cx="124" cy="345" r="1" fill="#74b9ff"/><circle cx="128" cy="343" r="1" fill="#ff4757"/>
+
+          <!-- 右足ゴールドヒール -->
+          <path d="M148 338 L168 338 L172 353 Q157 360 144 355 Z" fill="${c}" stroke="#d35400" stroke-width="1.8"/>
+          <path d="M166 353 L167 359 L172 359 L170 353 Z" fill="#d35400" stroke="#f1c40f" stroke-width="1"/>
+          <!-- 王冠バックル -->
+          <polygon points="152,348 154,343 158,345 162,343 164,348" fill="#ffffff" stroke="#d35400" stroke-width="1.2"/>
+          <circle cx="154" cy="343" r="1" fill="#ff4757"/><circle cx="158" cy="345" r="1" fill="#74b9ff"/><circle cx="162" cy="343" r="1" fill="#ff4757"/>
+        </svg>
+      `;
+    } else if (t === 'laceup_boots') {
+      // 5. レースアップシアーブーツ（足首上まで覆う編み上げ白ブーツ＆フリル履き口）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          <!-- 左足ブーツ本体 -->
+          <path d="M115 315 L131 315 L131 340 L136 355 Q123 359 108 353 L115 340 Z" fill="${c}" stroke="#2f3542" stroke-width="1.8"/>
+          <path d="M110 353 L108 358 L114 358 L115 353 Z" fill="#2f3542"/>
+          <!-- 履き口フリル -->
+          <path d="M114 315 Q123 311 132 315" stroke="#ff7675" stroke-width="3" stroke-dasharray="3,3" fill="none"/>
+          <!-- 編み上げリボン紐 -->
+          <line x1="118" y1="318" x2="128" y2="326" stroke="#ff4757" stroke-width="1.5"/>
+          <line x1="128" y1="318" x2="118" y2="326" stroke="#ff4757" stroke-width="1.5"/>
+          <line x1="118" y1="326" x2="128" y2="334" stroke="#ff4757" stroke-width="1.5"/>
+          <line x1="128" y1="326" x2="118" y2="334" stroke="#ff4757" stroke-width="1.5"/>
+          <line x1="118" y1="334" x2="128" y2="342" stroke="#ff4757" stroke-width="1.5"/>
+          <line x1="128" y1="334" x2="118" y2="342" stroke="#ff4757" stroke-width="1.5"/>
+
+          <!-- 右足ブーツ本体 -->
+          <path d="M149 315 L165 315 L165 340 L172 353 Q157 359 144 355 L149 340 Z" fill="${c}" stroke="#2f3542" stroke-width="1.8"/>
+          <path d="M166 353 L165 358 L171 358 L170 353 Z" fill="#2f3542"/>
+          <!-- 履き口フリル -->
+          <path d="M148 315 Q157 311 166 315" stroke="#ff7675" stroke-width="3" stroke-dasharray="3,3" fill="none"/>
+          <!-- 編み上げリボン紐 -->
+          <line x1="152" y1="318" x2="162" y2="326" stroke="#ff4757" stroke-width="1.5"/>
+          <line x1="162" y1="318" x2="152" y2="326" stroke="#ff4757" stroke-width="1.5"/>
+          <line x1="152" y1="326" x2="162" y2="334" stroke="#ff4757" stroke-width="1.5"/>
+          <line x1="162" y1="326" x2="152" y2="334" stroke="#ff4757" stroke-width="1.5"/>
+          <line x1="152" y1="334" x2="162" y2="342" stroke="#ff4757" stroke-width="1.5"/>
+          <line x1="162" y1="334" x2="152" y2="342" stroke="#ff4757" stroke-width="1.5"/>
+        </svg>
+      `;
+    } else if (t === 'ice_mules') {
+      // 6. アイスクリスタルミュール（かかと開きミュール＆雪の結晶ブローチ＆氷柱ヒール）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          <!-- 左足ミュール -->
+          <path d="M118 342 L134 340 L136 354 Q123 358 112 352 Z" fill="${c}" stroke="#00cec9" stroke-width="1.8"/>
+          <path d="M112 352 L110 358 L114 358 L115 352 Z" fill="#81ecec" stroke="#00cec9" stroke-width="1"/>
+          <!-- 雪の結晶チャーム -->
+          <line x1="126" y1="341" x2="126" y2="351" stroke="#ffffff" stroke-width="2"/>
+          <line x1="121" y1="346" x2="131" y2="346" stroke="#ffffff" stroke-width="2"/>
+          <line x1="122" y1="342" x2="130" y2="350" stroke="#ffffff" stroke-width="1.5"/>
+          <line x1="130" y1="342" x2="122" y2="350" stroke="#ffffff" stroke-width="1.5"/>
+          <circle cx="126" cy="346" r="1.5" fill="#81ecec"/>
+
+          <!-- 右足ミュール -->
+          <path d="M146 340 L162 342 L168 352 Q157 358 144 354 Z" fill="${c}" stroke="#00cec9" stroke-width="1.8"/>
+          <path d="M164 353 L165 358 L169 358 L168 352 Z" fill="#81ecec" stroke="#00cec9" stroke-width="1"/>
+          <!-- 雪の結晶チャーム -->
+          <line x1="156" y1="341" x2="156" y2="351" stroke="#ffffff" stroke-width="2"/>
+          <line x1="151" y1="346" x2="161" y2="346" stroke="#ffffff" stroke-width="2"/>
+          <line x1="152" y1="342" x2="160" y2="350" stroke="#ffffff" stroke-width="1.5"/>
+          <line x1="160" y1="342" x2="152" y2="350" stroke="#ffffff" stroke-width="1.5"/>
+          <circle cx="156" cy="346" r="1.5" fill="#81ecec"/>
+        </svg>
+      `;
+    } else if (t === 'ruby_heels') {
+      // 7. ベルベットルビーヒール（真紅のベルベット＆ゴールドソール＆特大ルビージュエル）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          <!-- 左足ルビーヒール -->
+          <path d="M112 338 L132 338 L136 355 Q123 360 108 353 Z" fill="${c}" stroke="#78281f" stroke-width="1.8"/>
+          <path d="M108 353 Q123 360 136 355" stroke="#f1c40f" stroke-width="2" fill="none"/>
+          <path d="M110 353 L108 358 L113 358 L114 353 Z" fill="#f1c40f" stroke="#78281f" stroke-width="1"/>
+          <!-- ルビージュエル -->
+          <polygon points="124,342 129,345 129,351 124,354 119,351 119,345" fill="#e74c3c" stroke="#f1c40f" stroke-width="1.5"/>
+          <circle cx="124" cy="348" r="1.5" fill="#ffffff"/>
+
+          <!-- 右足ルビーヒール -->
+          <path d="M148 338 L168 338 L172 353 Q157 360 144 355 Z" fill="${c}" stroke="#78281f" stroke-width="1.8"/>
+          <path d="M144 355 Q157 360 172 353" stroke="#f1c40f" stroke-width="2" fill="none"/>
+          <path d="M166 353 L167 358 L172 358 L170 353 Z" fill="#f1c40f" stroke="#78281f" stroke-width="1"/>
+          <!-- ルビージュエル -->
+          <polygon points="158,342 163,345 163,351 158,354 153,351 153,345" fill="#e74c3c" stroke="#f1c40f" stroke-width="1.5"/>
+          <circle cx="158" cy="348" r="1.5" fill="#ffffff"/>
+        </svg>
+      `;
+    } else if (t === 'ballet_flats') {
+      // 8. パールフラットシューズ（足首巻きサテンリボン＆ラウンドトゥ＆パール縁取り）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          <!-- 左足バレエシューズ -->
+          <line x1="116" y1="322" x2="130" y2="334" stroke="#ffb8b8" stroke-width="2.5"/>
+          <line x1="130" y1="322" x2="116" y2="334" stroke="#ffb8b8" stroke-width="2.5"/>
+          <line x1="116" y1="334" x2="130" y2="344" stroke="#ffb8b8" stroke-width="2.5"/>
+          <line x1="130" y1="334" x2="116" y2="344" stroke="#ffb8b8" stroke-width="2.5"/>
+          <path d="M112 344 Q123 340 134 344 Q138 356 123 356 Q108 356 112 344 Z" fill="${c}" stroke="#d35400" stroke-width="1.5"/>
+          <!-- パール縁取り -->
+          <circle cx="116" cy="344" r="1.8" fill="#ffffff"/><circle cx="120" cy="343" r="1.8" fill="#ffffff"/><circle cx="124" cy="343" r="1.8" fill="#ffffff"/><circle cx="128" cy="344" r="1.8" fill="#ffffff"/>
+
+          <!-- 右足バレエシューズ -->
+          <line x1="150" y1="322" x2="164" y2="334" stroke="#ffb8b8" stroke-width="2.5"/>
+          <line x1="164" y1="322" x2="150" y2="334" stroke="#ffb8b8" stroke-width="2.5"/>
+          <line x1="150" y1="334" x2="164" y2="344" stroke="#ffb8b8" stroke-width="2.5"/>
+          <line x1="164" y1="334" x2="150" y2="344" stroke="#ffb8b8" stroke-width="2.5"/>
+          <path d="M146 344 Q157 340 168 344 Q172 356 157 356 Q142 356 146 344 Z" fill="${c}" stroke="#d35400" stroke-width="1.5"/>
+          <!-- パール縁取り -->
+          <circle cx="150" cy="344" r="1.8" fill="#ffffff"/><circle cx="154" cy="343" r="1.8" fill="#ffffff"/><circle cx="158" cy="343" r="1.8" fill="#ffffff"/><circle cx="162" cy="344" r="1.8" fill="#ffffff"/>
+        </svg>
+      `;
+    } else if (t === 'butterfly_anklet') {
+      // 9. バタフライアンクル靴（足首に大きく広がる立体バタフライウィング＆ラベンダーヒール）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          <!-- 左足バタフライウィングアンクレット -->
+          <path d="M116 332 Q96 318 102 308 Q118 316 117 332 Z" fill="rgba(162, 155, 254, 0.85)" stroke="#6c5ce7" stroke-width="1.5"/>
+          <path d="M116 332 Q100 338 105 344 Q116 340 117 332 Z" fill="rgba(162, 155, 254, 0.85)" stroke="#6c5ce7" stroke-width="1.5"/>
+          <rect x="114" y="331" width="16" height="3" rx="1.5" fill="#6c5ce7"/>
+          <path d="M112 338 L132 338 L136 355 Q123 360 108 353 Z" fill="${c}" stroke="#6c5ce7" stroke-width="1.8"/>
+          <path d="M110 353 L108 358 L113 358 L114 353 Z" fill="#6c5ce7"/>
+          <circle cx="116" cy="332" r="3" fill="#ffffff" stroke="#6c5ce7" stroke-width="1"/>
+
+          <!-- 右足バタフライウィングアンクレット -->
+          <path d="M164 332 Q184 318 178 308 Q162 316 163 332 Z" fill="rgba(162, 155, 254, 0.85)" stroke="#6c5ce7" stroke-width="1.5"/>
+          <path d="M164 332 Q180 338 175 344 Q164 340 163 332 Z" fill="rgba(162, 155, 254, 0.85)" stroke="#6c5ce7" stroke-width="1.5"/>
+          <rect x="150" y="331" width="16" height="3" rx="1.5" fill="#6c5ce7"/>
+          <path d="M148 338 L168 338 L172 353 Q157 360 144 355 Z" fill="${c}" stroke="#6c5ce7" stroke-width="1.8"/>
+          <path d="M166 353 L167 358 L172 358 L170 353 Z" fill="#6c5ce7"/>
+          <circle cx="164" cy="332" r="3" fill="#ffffff" stroke="#6c5ce7" stroke-width="1"/>
+        </svg>
+      `;
+    } else {
+      // 10. スターダストプラットフォーム（厚底ウェッジソール＆ゴールドスタースタッズ＆夜空グラデーション）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          <!-- 左足プラットフォーム厚底 -->
+          <rect x="114" y="330" width="16" height="3" rx="1.5" fill="#2f3542" stroke="#feca57" stroke-width="1"/>
+          <rect x="114" y="335" width="16" height="3" rx="1.5" fill="#2f3542" stroke="#feca57" stroke-width="1"/>
+          <path d="M112 340 L132 340 L136 348 L108 348 Z" fill="${c}" stroke="#feca57" stroke-width="1.5"/>
+          <path d="M106 348 L138 348 L138 357 L106 357 Z" fill="#1e272e" stroke="#feca57" stroke-width="1.5"/>
+          <polygon points="114,352 116,349 118,352 115,354 117,357 114,355 111,357 113,354 110,352 113,352" fill="#feca57"/>
+          <polygon points="128,352 130,349 132,352 129,354 131,357 128,355 125,357 127,354 124,352 127,352" fill="#feca57"/>
+
+          <!-- 右足プラットフォーム厚底 -->
+          <rect x="150" y="330" width="16" height="3" rx="1.5" fill="#2f3542" stroke="#feca57" stroke-width="1"/>
+          <rect x="150" y="335" width="16" height="3" rx="1.5" fill="#2f3542" stroke="#feca57" stroke-width="1"/>
+          <path d="M148 340 L168 340 L172 348 L144 348 Z" fill="${c}" stroke="#feca57" stroke-width="1.5"/>
+          <path d="M142 348 L174 348 L174 357 L142 357 Z" fill="#1e272e" stroke="#feca57" stroke-width="1.5"/>
+          <polygon points="150,352 152,349 154,352 151,354 153,357 150,355 147,357 149,354 146,352 149,352" fill="#feca57"/>
+          <polygon points="164,352 166,349 168,352 165,354 167,357 164,355 161,357 163,354 160,352 163,352" fill="#feca57"/>
+        </svg>
+      `;
+    }
   }
 
   getHairSvgThumbnail(hair) {
