@@ -75,6 +75,7 @@
         <button class="cat-tab-btn" data-category="clock">⏰ とけい</button>
         <button class="cat-tab-btn" data-category="days">📅 ようび</button>
         <button class="cat-tab-btn" data-category="seasons">🌸 きせつ</button>
+        <button class="cat-tab-btn" data-category="princess">👑 プリンセス</button>
       </div>
 
       <!-- パネル1: すうじ (6ゲーム) -->
@@ -193,6 +194,18 @@
             <div class="card-icon">🌳 🔄 🪄</div>
             <h2 class="card-title">めぐる まほうの木</h2>
             <p class="card-desc">ダイヤルを回して木を変身させよう！</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- パネル5: プリンセス着せ替え (新カテゴリ) -->
+      <div class="home-cat-panel" id="cat-panel-princess">
+        <div class="menu-cards-grid">
+          <div class="menu-card card-princess-dress" id="menu-card-princess">
+            <div class="card-badge">3D きせかえ</div>
+            <div class="card-icon">👑 👗 👠 🪄</div>
+            <h2 class="card-title">プリンセス・ドレスアップ 3D</h2>
+            <p class="card-desc">80種類の豪華アイテムで変身！360度3D回転！</p>
           </div>
         </div>
       </div>
@@ -544,6 +557,49 @@
       </section>
     </main>
 
+    <!-- ==========================================
+         17. プリンセス・ドレスアップ 3D
+         ========================================== -->
+    <main class="view-panel" id="view-game-princess">
+      <div class="princess-workspace">
+        
+        <!-- 左側：3D回転ステージ -->
+        <section class="princess-stage-panel" id="princess-stage-wrapper">
+          <div class="princess-stage-header">
+            <span class="stage-title-badge">👑 3D ステージ</span>
+            <div class="stage-actions">
+              <button class="stage-action-btn" id="btn-princess-spin">✨ 3D かいてん</button>
+              <button class="stage-action-btn" id="btn-princess-random">🎲 おまかせ</button>
+              <button class="stage-action-btn photo-btn" id="btn-princess-photo">📸 さつえい</button>
+            </div>
+          </div>
+
+          <div class="princess-stage-3d-scene">
+            <div class="princess-turntable-base" id="princess-3d-turntable">
+              <div class="turntable-floor" id="princess-turntable-floor"></div>
+              <div class="doll-3d-wrapper" id="princess-doll-container"></div>
+            </div>
+          </div>
+
+          <div class="stage-drag-hint">👆 ステージをゆびでなぞると 360度 くるくるまわせるよ！</div>
+        </section>
+
+        <!-- 右側：着せ替えアイテムドロワー -->
+        <section class="princess-drawer-panel">
+          <!-- カテゴリタブバー（8種） -->
+          <div class="princess-cat-nav" id="princess-category-tabs"></div>
+
+          <!-- アイテムグリッドタイトル -->
+          <div class="drawer-header">
+            <span class="drawer-title" id="princess-current-category-title">ドレス（全10種類）</span>
+          </div>
+
+          <!-- アイテムグリッド（10種スクロール） -->
+          <div class="princess-items-tray" id="princess-items-grid"></div>
+        </section>
+      </div>
+    </main>
+
   </div>
 
   <!-- 全クリアモーダル -->
@@ -553,6 +609,14 @@
       <p class="modal-subtitle">スタンプが ぜんぶ あつまったよ！</p>
       <div class="modal-stars">⭐⭐⭐⭐⭐</div>
       <button class="primary-btn" id="restart-btn">もう１かい あそぶ！</button>
+    </div>
+  </div>
+
+  <!-- プリンセス写真撮影モーダル -->
+  <div class="modal-backdrop" id="princess-photo-modal">
+    <div class="modal-card princess-photo-modal-card">
+      <div id="princess-photo-card"></div>
+      <button class="primary-btn" id="princess-photo-close-btn">💖 とじる</button>
     </div>
   </div>
 
@@ -575,6 +639,7 @@
   <script src="js/game_hiragana_trace.js"></script>
   <script src="js/game_hiragana_karuta.js"></script>
   <script src="js/game_hiragana_word.js"></script>
+  <script src="js/game_princess.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

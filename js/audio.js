@@ -324,8 +324,13 @@ class SoundSystem {
   }
 
   startBgm() {
+    this.startNormalBgm();
+  }
+
+  startNormalBgm() {
     if (this.isBgmPlaying || this.isMuted) return;
     this.isBgmPlaying = true;
+    this.currentBgmType = 'normal';
 
     const melody = [
       { note: 523.25, dur: 0.25 },
@@ -344,7 +349,7 @@ class SoundSystem {
 
     let noteIndex = 0;
     const playNextNote = () => {
-      if (!this.isBgmPlaying || this.isMuted || !this.ctx) return;
+      if (!this.isBgmPlaying || this.isMuted || !this.ctx || this.currentBgmType !== 'normal') return;
       const current = melody[noteIndex];
       const now = this.ctx.currentTime;
 
@@ -367,8 +372,125 @@ class SoundSystem {
     playNextNote();
   }
 
+  // プリンセス専用：優雅なロイヤルワルツBGM
+  startPrincessBgm() {
+    this.stopBgm();
+    if (this.isMuted) return;
+    this.initAudio();
+    this.isBgmPlaying = true;
+    this.currentBgmType = 'princess';
+
+    const waltzNotes = [
+      // 1小節: ド・ミ・ソ
+      { bass: 261.63, treble: 523.25, dur: 0.4 },
+      { bass: null,   treble: 659.25, dur: 0.35 },
+      { bass: null,   treble: 783.99, dur: 0.35 },
+      // 2小節: シ・レ・ソ
+      { bass: 246.94, treble: 880.00, dur: 0.4 },
+      { bass: null,   treble: 783.99, dur: 0.35 },
+      { bass: null,   treble: 659.25, dur: 0.35 },
+      // 3小節: ラ・ド・ファ
+      { bass: 220.00, treble: 698.46, dur: 0.4 },
+      { bass: null,   treble: 880.00, dur: 0.35 },
+      { bass: null,   treble: 1046.5, dur: 0.35 },
+      // 4小節: ソ・シ・レ
+      { bass: 196.00, treble: 987.77, dur: 0.4 },
+      { bass: null,   treble: 783.99, dur: 0.35 },
+      { bass: null,   treble: 523.25, dur: 0.45 },
+    ];
+
+    let waltzIdx = 0;
+    const playNextWaltz = () => {
+      if (!this.isBgmPlaying || this.isMuted || !this.ctx || this.currentBgmType !== 'princess') return;
+      const cur = waltzNotes[waltzIdx];
+      const now = this.ctx.currentTime;
+
+      // メロディ音（オルゴール＆ハープ風）
+      if (cur.treble) {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(cur.treble, now);
+        gain.gain.setValueAtTime(0.045, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + cur.dur * 1.2);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + cur.dur * 1.2);
+      }
+
+      // 低音ベース（チェロ・コントラバス風）
+      if (cur.bass) {
+        const bassOsc = this.ctx.createOscillator();
+        const bassGain = this.ctx.createGain();
+        bassOsc.type = 'sine';
+        bassOsc.frequency.setValueAtTime(cur.bass, now);
+        bassGain.gain.setValueAtTime(0.05, now);
+        bassGain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+        bassOsc.connect(bassGain);
+        bassGain.connect(this.ctx.destination);
+        bassOsc.start(now);
+        bassOsc.stop(now + 0.8);
+      }
+
+      waltzIdx = (waltzIdx + 1) % waltzNotes.length;
+      this.bgmTimer = setTimeout(playNextWaltz, cur.dur * 1000);
+    };
+
+    playNextWaltz();
+  }
+
+  // カメラのシャッター音（カシャッ！）
+  playCameraShutter() {
+    if (this.isMuted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    // クリック音
+    const osc1 = this.ctx.createOscillator();
+    const gain1 = this.ctx.createGain();
+    osc1.type = 'square';
+    osc1.frequency.setValueAtTime(2000, now);
+    osc1.frequency.exponentialRampToValueAtTime(300, now + 0.04);
+    gain1.gain.setValueAtTime(0.3, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
+    osc1.connect(gain1);
+    gain1.connect(this.ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.045);
+
+    // 後半のメカニカル音
+    const osc2 = this.ctx.createOscillator();
+    const gain2 = this.ctx.createGain();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(800, now + 0.06);
+    osc2.frequency.exponentialRampToValueAtTime(150, now + 0.14);
+    gain2.gain.setValueAtTime(0.25, now + 0.06);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+    osc2.connect(gain2);
+    gain2.connect(this.ctx.destination);
+    osc2.start(now + 0.06);
+    osc2.stop(now + 0.15);
+  }
+
+  // ドレス着せ替えシュッ音
+  playDressSwoosh() {
+    if (this.isMuted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, now);
+    osc.frequency.exponentialRampToValueAtTime(1320, now + 0.18);
+    gain.gain.setValueAtTime(0.15, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.2);
+  }
+
   stopBgm() {
     this.isBgmPlaying = false;
+    this.currentBgmType = null;
     if (this.bgmTimer) {
       clearTimeout(this.bgmTimer);
       this.bgmTimer = null;

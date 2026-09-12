@@ -180,6 +180,7 @@ class GameApp {
     this.gameHiraganaTrace = new GameHiraganaTrace(this);
     this.gameHiraganaKaruta = new GameHiraganaKaruta(this);
     this.gameHiraganaWord = new GameHiraganaWord(this);
+    this.gamePrincess = new GamePrincess(this);
 
     this.homeCharManager = new CharacterManager('home-character-stage');
 
@@ -200,7 +201,8 @@ class GameApp {
       season_wheel: document.getElementById('view-game-season-wheel'),
       hiragana_trace: document.getElementById('view-game-hiragana-trace'),
       hiragana_karuta: document.getElementById('view-game-hiragana-karuta'),
-      hiragana_word: document.getElementById('view-game-hiragana-word')
+      hiragana_word: document.getElementById('view-game-hiragana-word'),
+      princess: document.getElementById('view-game-princess')
     };
 
     this.homeBtn = document.getElementById('home-btn');
@@ -310,6 +312,7 @@ class GameApp {
     bindCard('menu-card-hiragana-trace', 'game_title_13', 'hiragana_trace');
     bindCard('menu-card-hiragana-karuta', 'game_title_14', 'hiragana_karuta');
     bindCard('menu-card-hiragana-word', 'game_title_15', 'hiragana_word');
+    bindCard('menu-card-princess', 'praise_kitty_1', 'princess');
 
     // もう1回遊ぶボタン
     if (this.restartBtn) {
@@ -332,6 +335,7 @@ class GameApp {
         else if (v === 'hiragana_trace') this.gameHiraganaTrace.start();
         else if (v === 'hiragana_karuta') this.gameHiraganaKaruta.start();
         else if (v === 'hiragana_word') this.gameHiraganaWord.start();
+        else if (v === 'princess') this.gamePrincess.start();
         else this.switchView('home');
       });
     }
@@ -357,13 +361,16 @@ class GameApp {
       hiragana: 'cat_hiragana',
       clock: 'cat_clock',
       days: 'cat_days',
-      seasons: 'cat_seasons'
+      seasons: 'cat_seasons',
+      princess: 'praise_kitty_2'
     };
     if (catVoices[categoryName]) {
       window.soundSystem.playVoice(catVoices[categoryName]);
     }
 
-    if (categoryName === 'hiragana') {
+    if (categoryName === 'princess') {
+      this.homeCharManager.setCharacter('kitty');
+    } else if (categoryName === 'hiragana') {
       this.homeCharManager.setCharacter('cinna');
     } else if (categoryName === 'clock') {
       this.homeCharManager.setCharacter('shokupan');
@@ -391,6 +398,7 @@ class GameApp {
       this.homeBtn.style.display = 'none';
       this.updateStamps(0, 5);
       this.switchHomeCategory(this.currentHomeCategory);
+      window.soundSystem.startNormalBgm();
     } else {
       this.homeBtn.style.display = 'flex';
       const targetViewEl = this.views[viewName];
@@ -417,6 +425,7 @@ class GameApp {
       }
       else if (viewName === 'hiragana_karuta') this.gameHiraganaKaruta.start();
       else if (viewName === 'hiragana_word') this.gameHiraganaWord.start();
+      else if (viewName === 'princess') this.gamePrincess.start();
     }
   }
 

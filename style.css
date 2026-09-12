@@ -817,3 +817,195 @@ html, body {
 @keyframes shakeDot { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
 @keyframes floatBubble { 0% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-12px) rotate(4deg); } 100% { transform: translateY(6px) rotate(-4deg); } }
 @keyframes bubblePopAnim { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.8; } 100% { transform: scale(1.8); opacity: 0; } }
+
+/* ==========================================================================
+   ゲーム17（プリンセス・ドレスアップ 3D）固有スタイル
+   ========================================================================== */
+.card-princess-dress {
+  background: linear-gradient(135deg, #ffffff 0%, #fff0f5 50%, #f3e5f5 100%);
+  border: 4px solid #fbc531 !important;
+  box-shadow: 0 8px 24px rgba(251, 197, 49, 0.25);
+}
+.card-princess-dress .card-badge {
+  background: linear-gradient(135deg, #ff4757, #e84393);
+}
+
+#view-game-princess {
+  flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 4px 6px;
+}
+.princess-workspace {
+  display: flex; gap: 10px; width: 100%; height: 100%; min-height: 0;
+}
+
+/* 1. 左側：3D回転ステージ */
+.princess-stage-panel {
+  flex: 1.15; min-width: 0; border-radius: 22px;
+  border: 4px solid #f1c40f; box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  display: flex; flex-direction: column; justify-content: space-between;
+  padding: 8px 10px; position: relative; overflow: hidden;
+  transition: background 0.6s ease;
+}
+.princess-stage-header {
+  display: flex; justify-content: space-between; align-items: center; z-index: 10;
+}
+.stage-title-badge {
+  background: rgba(255, 255, 255, 0.95); padding: 3px 12px; border-radius: 16px;
+  border: 2px solid #f1c40f; font-size: 13px; font-weight: 900; color: #2f3542;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+.stage-actions { display: flex; gap: 6px; }
+.stage-action-btn {
+  background: rgba(255, 255, 255, 0.95); border: 2px solid #ff9f1a;
+  border-radius: 16px; padding: 4px 10px; font-size: 12px; font-weight: 900;
+  color: #d35400; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  transition: transform 0.15s, background 0.15s;
+}
+.stage-action-btn:active { transform: scale(0.92); }
+.stage-action-btn.active {
+  background: linear-gradient(135deg, #ff9f1a, #fbc531); color: #ffffff; border-color: #ffffff;
+}
+.stage-action-btn.photo-btn {
+  background: linear-gradient(135deg, #ff4757, #ff6b81); color: #ffffff; border-color: #ffffff;
+}
+
+/* 3D 空間 ＆ ターンテーブル */
+.princess-stage-3d-scene {
+  flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center;
+  perspective: 1000px; position: relative; cursor: grab;
+}
+.princess-stage-3d-scene:active { cursor: grabbing; }
+
+.princess-turntable-base {
+  position: relative; width: 220px; height: 320px;
+  transform-style: preserve-3d; transition: transform 0.05s ease-out;
+  display: flex; align-items: center; justify-content: center;
+}
+.turntable-floor {
+  position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%) rotateX(75deg);
+  width: 200px; height: 200px; border-radius: 50%;
+  border: 4px solid #ffffff; box-shadow: 0 0 20px rgba(241, 196, 15, 0.6), inset 0 0 10px rgba(0,0,0,0.2);
+  pointer-events: none; transition: background-color 0.5s;
+}
+.doll-3d-wrapper {
+  position: relative; width: 220px; height: 320px; transform-style: preserve-3d;
+}
+.doll-layer {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.doll-svg { width: 100%; height: 100%; }
+
+/* 裏面を向いたときの自然な深度切り替え */
+.doll-3d-wrapper.viewing-back .layer-face { opacity: 0; }
+.doll-3d-wrapper.viewing-back .layer-front-hair { opacity: 0.15; }
+.doll-3d-wrapper.viewing-back .layer-back-hair { transform: scale(1.05) translateZ(10px); }
+.doll-3d-wrapper.viewing-back .layer-back-wings { transform: translateZ(12px); }
+
+.stage-drag-hint {
+  text-align: center; font-size: 11px; font-weight: bold; color: #ffffff;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.7); z-index: 10; margin-top: 2px;
+}
+
+/* 2. 右側：アイテムドロワー */
+.princess-drawer-panel {
+  flex: 1; min-width: 0; background: rgba(255, 255, 255, 0.95);
+  border-radius: 22px; border: 4px solid #fbc531; box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  display: flex; flex-direction: column; overflow: hidden; padding: 6px 8px;
+}
+.princess-cat-nav {
+  display: flex; gap: 4px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none;
+}
+.princess-cat-nav::-webkit-scrollbar { display: none; }
+.princess-cat-btn {
+  flex: 0 0 auto; padding: 4px 10px; border-radius: 14px;
+  border: 2px solid #dfe4ea; background: #ffffff; font-weight: 900;
+  font-size: 12px; color: #2f3542; cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; gap: 3px;
+}
+.princess-cat-btn:active { transform: scale(0.95); }
+.princess-cat-btn.active {
+  background: linear-gradient(135deg, #ff7597, #ff4757); color: #ffffff;
+  border-color: #ffffff; box-shadow: 0 3px 8px rgba(255, 71, 87, 0.3);
+}
+
+.drawer-header {
+  padding: 4px 2px; border-bottom: 2px dashed #f1f2f6; margin-bottom: 4px;
+}
+.drawer-title { font-size: 12px; font-weight: 900; color: #e84118; }
+
+.princess-items-tray {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;
+  flex: 1; min-height: 0; overflow-y: auto; padding: 2px;
+}
+.princess-item-card {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: #ffffff; border-radius: 14px; border: 2.5px solid #dfe4ea;
+  padding: 4px 2px; cursor: pointer; transition: transform 0.15s, border-color 0.15s;
+  position: relative; height: 72px; text-align: center;
+}
+.princess-item-card:active { transform: scale(0.95); }
+.princess-item-card.selected {
+  border-color: #ff4757; background: #fff0f5; transform: scale(1.04);
+  box-shadow: 0 0 10px rgba(255, 71, 87, 0.35);
+}
+.item-thumb-wrapper {
+  width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  margin-bottom: 2px;
+}
+.item-thumb-color {
+  width: 100%; height: 100%; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; border: 1.5px solid rgba(0,0,0,0.08);
+}
+.item-name-text {
+  font-size: 9px; font-weight: 900; color: #2f3542; line-height: 1.1;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.selected-badge {
+  position: absolute; top: 2px; right: 2px; background: #ff4757; color: #ffffff;
+  border-radius: 50%; width: 14px; height: 14px; font-size: 9px; font-weight: 900;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* カメラフラッシュ＆ポラロイド写真モーダル */
+.camera-flash-overlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: #ffffff; z-index: 99999; pointer-events: none;
+  animation: flashAnim 0.4s ease-out forwards;
+}
+@keyframes flashAnim {
+  0% { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+
+.princess-photo-modal-card {
+  max-width: 360px; padding: 18px;
+}
+.polaroid-frame {
+  background: #ffffff; padding: 10px 10px 14px 10px; border-radius: 12px;
+  border: 2px solid #dfe4ea; box-shadow: 0 8px 24px rgba(0,0,0,0.15); margin-bottom: 12px;
+}
+.polaroid-photo-view {
+  width: 100%; height: 260px; border-radius: 8px; position: relative;
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+}
+.doll-clone-preview {
+  position: relative; width: 180px; height: 250px;
+}
+.doll-clone-preview .doll-layer { position: absolute; width: 100%; height: 100%; }
+.photo-sparkle-decor {
+  position: absolute; top: 8px; right: 8px; font-size: 16px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+}
+.polaroid-caption {
+  text-align: center; margin-top: 10px;
+}
+.polaroid-title { font-size: 18px; font-weight: 900; color: #e84118; }
+.polaroid-desc { font-size: 12px; font-weight: bold; color: #636e72; margin-top: 2px; }
+
+@keyframes auraSpin {
+  0% { transform: scale(0.9) rotate(0deg); opacity: 0.6; }
+  50% { transform: scale(1.1) rotate(180deg); opacity: 0.9; }
+  100% { transform: scale(0.9) rotate(360deg); opacity: 0.6; }
+}
+.aura-sparkle { animation: auraSpin 3s infinite linear; }
+
