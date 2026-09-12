@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>わくわく まなびらんど | iPad向け知育ゲーム（すうじ・とけい・ようび・きせつ）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 背景の雲アニメーション -->
+  <div class="sky-cloud cloud1"></div>
+  <div class="sky-cloud cloud2"></div>
+
+  <!-- エフェクト描画用Canvas（星・紙吹雪） -->
+  <canvas id="effects-canvas"></canvas>
+
+  <!-- スタート画面オーバーレイ（ブラウザ音声アンロック用） -->
+  <div class="start-overlay" id="start-screen">
+    <div class="start-card">
+      <div class="start-char-icon">⭐ 🍞 ⏰ 🌸</div>
+      <h1 class="start-title">わくわく まなびらんど</h1>
+      <p class="start-desc">すうじ・とけい・ようび・きせつ であそぼう！</p>
+      <button class="start-play-btn" id="start-game-btn">▶ タップして あそぶ！</button>
+    </div>
+  </div>
+
+  <!-- アプリケーション全体コンテナ -->
+  <div id="game-container">
+    
+    <!-- 共通ヘッダー：ホームボタン、星スタンプ、サウンドボタン -->
+    <header class="top-bar">
+      <div class="top-left-group">
+        <button id="home-btn" class="icon-btn home-btn" aria-label="おうちへ" style="display: none;">🏠 おうちへ</button>
+        <div class="stamp-card" id="global-stamp-card">
+          <span class="stamp-title">⭐ スタンプ</span>
+          <div class="stamp-slots" id="stamp-container"></div>
+          <span class="star-text" id="star-count-text">0 / 5</span>
+        </div>
+      </div>
+
+      <div class="control-buttons">
+        <button id="sound-toggle-btn" class="icon-btn" aria-label="おと">🔊</button>
+      </div>
+    </header>
+
+    <!-- ==========================================
+         1. ホーム画面（4カテゴリ・全12ゲーム）
+         ========================================== -->
+    <main class="view-panel active" id="view-home">
+      <div class="home-banner">
+        <div class="home-speech">
+          <div class="home-speech-bubble">
+            <span class="home-title-text">どの ゲームで あそぶ？</span>
+          </div>
+        </div>
+        <div class="home-char-box" id="home-character-stage"></div>
+      </div>
+
+      <!-- カテゴリタブ -->
+      <div class="category-tabs-bar">
+        <button class="cat-tab-btn active" data-category="numbers">🔢 すうじ</button>
+        <button class="cat-tab-btn" data-category="clock">⏰ とけい</button>
+        <button class="cat-tab-btn" data-category="days">📅 ようび</button>
+        <button class="cat-tab-btn" data-category="seasons">🌸 きせつ</button>
+      </div>
+
+      <!-- パネル1: すうじ (6ゲーム) -->
+      <div class="home-cat-panel active" id="cat-panel-numbers">
+        <div class="menu-cards-grid-scroll">
+          <div class="menu-card card-counting" id="menu-card-counting">
+            <div class="card-badge">かず・かぞえ</div>
+            <div class="card-icon">🍎 🥐 🧺</div>
+            <h2 class="card-title">もぐもぐ お買い物</h2>
+            <p class="card-desc">すうじの数だけ おさらに運ぼう！</p>
+          </div>
+          <div class="menu-card card-dots" id="menu-card-dots">
+            <div class="card-badge">じゅんばん</div>
+            <div class="card-icon">✨ 🚀 🌟</div>
+            <h2 class="card-title">すうじ てんつなぎ</h2>
+            <p class="card-desc">1から順につないで イラスト完成！</p>
+          </div>
+          <div class="menu-card card-bubble" id="menu-card-bubble">
+            <div class="card-badge">おおきさ</div>
+            <div class="card-icon">🎈 🫧 🎯</div>
+            <h2 class="card-title">バブルポップ</h2>
+            <p class="card-desc">お題の数字の泡を パチンと割ろう！</p>
+          </div>
+          <div class="menu-card card-shopping" id="menu-card-shopping">
+            <div class="card-badge">10のまとまり</div>
+            <div class="card-icon">🪙 🛍️ 🥖</div>
+            <h2 class="card-title">10円 おかいもの</h2>
+            <p class="card-desc">10円と1円で ぴったりお支払い！</p>
+          </div>
+          <div class="menu-card card-rocket" id="menu-card-rocket">
+            <div class="card-badge">10とび・100</div>
+            <div class="card-icon">🪐 🚀 🌕</div>
+            <h2 class="card-title">10とび ロケット</h2>
+            <p class="card-desc">10, 20, 30... 100で月へ発射！</p>
+          </div>
+          <div class="menu-card card-target" id="menu-card-target">
+            <div class="card-badge">2ケタの大小</div>
+            <div class="card-icon">🎯 🎪 ⚾</div>
+            <h2 class="card-title">すうじの 的あて</h2>
+            <p class="card-desc">大きい数字の的を ボールで倒そう！</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- パネル2: とけい (2ゲーム) -->
+      <div class="home-cat-panel" id="cat-panel-clock">
+        <div class="menu-cards-grid">
+          <div class="menu-card card-clock-dial" id="menu-card-clock-dial">
+            <div class="card-badge">はりまわし</div>
+            <div class="card-icon">🕰️ 🐦 ☀️</div>
+            <h2 class="card-title">ぐるぐる とけい</h2>
+            <p class="card-desc">針を回して時間を合わせよう！</p>
+          </div>
+          <div class="menu-card card-clock-match" id="menu-card-clock-match">
+            <div class="card-badge">ペアあわせ</div>
+            <div class="card-icon">⏱️ ⏰ 🔔</div>
+            <h2 class="card-title">とけい ぴったりマッチ</h2>
+            <p class="card-desc">同じ時間を指す時計を見つけよう！</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- パネル3: ようび (2ゲーム) -->
+      <div class="home-cat-panel" id="cat-panel-days">
+        <div class="menu-cards-grid">
+          <div class="menu-card card-week-train" id="menu-card-week-train">
+            <div class="card-badge">1しゅうかん</div>
+            <div class="card-icon">🚂 🌈 🛤️</div>
+            <h2 class="card-title">1しゅうかん トレイン</h2>
+            <p class="card-desc">月〜日の曜日列車を連結しよう！</p>
+          </div>
+          <div class="menu-card card-week-quiz" id="menu-card-week-quiz">
+            <div class="card-badge">ことばあそび</div>
+            <div class="card-icon">🗓️ 🐬 🥇</div>
+            <h2 class="card-title">ようび カレンダー</h2>
+            <p class="card-desc">ヒントから正しい曜日を当てよう！</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- パネル4: きせつ (2ゲーム) -->
+      <div class="home-cat-panel" id="cat-panel-seasons">
+        <div class="menu-cards-grid">
+          <div class="menu-card card-season-items" id="menu-card-season-items">
+            <div class="card-badge">春夏秋冬</div>
+            <div class="card-icon">🌸 🌻 🍁 ⛄</div>
+            <h2 class="card-title">きせつの アイテム集め</h2>
+            <p class="card-desc">季節の食べ物や行事をカゴに入れよう！</p>
+          </div>
+          <div class="menu-card card-season-wheel" id="menu-card-season-wheel">
+            <div class="card-badge">めぐるきせつ</div>
+            <div class="card-icon">🌳 🔄 🪄</div>
+            <h2 class="card-title">めぐる まほうの木</h2>
+            <p class="card-desc">ダイヤルを回して木を変身させよう！</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ==========================================
+         2. ゲーム1：もぐもぐ・お買い物
+         ========================================== -->
+    <main class="view-panel" id="view-game-counting">
+      <section class="stage-upper">
+        <div class="speech-container" id="counting-speech-bubble">
+          <div class="speech-text" id="counting-speech-text">読み込み中...</div>
+          <div class="target-indicator" id="counting-target-indicator"></div>
+          <div class="repeat-hint">🔊 タップすると もういちど おしゃべりするよ</div>
+        </div>
+        <div class="character-box" id="counting-character-stage"></div>
+      </section>
+      <section class="stage-lower">
+        <div class="food-source-panel">
+          <div class="source-title">👇 ゆびで つまんで おさらに はこんでね！</div>
+          <div class="food-items-grid" id="counting-tree-items"></div>
+        </div>
+        <div class="plate-zone" id="counting-plate-dropzone">
+          <div class="plate-dish">
+            <div class="plate-badge" id="counting-plate-counter">0</div>
+            <div class="plate-dish-items" id="counting-plate-items"></div>
+          </div>
+          <div class="plate-hint">お皿（タップすると へらせるよ）</div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ==========================================
+         3. ゲーム2：すうじ てんつなぎ
+         ========================================== -->
+    <main class="view-panel" id="view-game-dots">
+      <section class="dots-header-stage">
+        <div class="speech-container dots-speech" id="dots-speech-bubble">
+          <div class="speech-text" id="dots-speech-text">1から じゅんばんになぞってね</div>
+        </div>
+        <div class="character-box-small" id="dots-character-stage"></div>
+      </section>
+      <section class="dots-stage-container" id="dots-container-area">
+        <canvas id="dots-canvas"></canvas>
+        <div class="dots-illustration-layer" id="dots-illustration-layer"></div>
+        <div class="dots-markers-layer" id="dots-markers-layer"></div>
+      </section>
+    </main>
+
+    <!-- ==========================================
+         4. ゲーム3：バブルポップ
+         ========================================== -->
+    <main class="view-panel" id="view-game-bubble">
+      <section class="bubble-header-stage">
+        <div class="speech-container bubble-speech" id="bubble-speech-bubble">
+          <div class="speech-text" id="bubble-speech-text">いちばん おおきい すうじを タッチ！</div>
+        </div>
+        <div class="character-box-small" id="bubble-character-stage"></div>
+      </section>
+      <section class="bubble-play-area" id="bubble-stage-area"></section>
+    </main>
+
+    <!-- ==========================================
+         5. ゲーム4：10円お買い物
+         ========================================== -->
+    <main class="view-panel" id="view-game-shopping">
+      <section class="stage-upper">
+        <div class="speech-container" id="shopping-speech-bubble">
+          <div class="speech-text" id="shopping-speech-text">このパンは 25えんだよ！</div>
+          <div class="repeat-hint">🔊 タップすると もういちど おしゃべりするよ</div>
+        </div>
+        <div class="character-box" id="shopping-character-stage"></div>
+      </section>
+      <section class="shopping-stage-lower">
+        <div class="shopping-product-card">
+          <div class="shopping-product-badge">パンやさん</div>
+          <div id="shopping-product-img" class="shopping-product-view">🥐</div>
+          <div id="shopping-product-name" class="shopping-product-title">クロワッサン</div>
+          <div id="shopping-product-price" class="shopping-product-tag">25 円</div>
+        </div>
+        <div class="shopping-register-panel">
+          <div class="coin-dispensers">
+            <div class="coin-btn coin-10" id="coin-source-10">
+              <span class="coin-core">10</span>
+              <span class="coin-label-sub">10円を 入れる</span>
+            </div>
+            <div class="coin-btn coin-1" id="coin-source-1">
+              <span class="coin-core">1</span>
+              <span class="coin-label-sub">1円を 入れる</span>
+            </div>
+          </div>
+          <div class="shopping-tray-box">
+            <div class="tray-header">🪙 お金トレイ（タップすると戻せるよ）</div>
+            <div class="shopping-tray-coins" id="shopping-tray-coins"></div>
+            <div class="shopping-tally" id="shopping-tally-text">10円×0枚 ＋ 1円×0枚 ＝ 0 円</div>
+          </div>
+          <button class="shopping-pay-action-btn" id="shopping-pay-btn">🔔 おかいけい！</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- ==========================================
+         6. ゲーム5：10飛びロケット
+         ========================================== -->
+    <main class="view-panel" id="view-game-rocket">
+      <section class="rocket-header-stage">
+        <div class="speech-container rocket-speech" id="rocket-speech-bubble">
+          <div class="speech-text" id="rocket-speech-text">10から 100まで じゅんばんに タッチ！</div>
+        </div>
+        <div class="character-box-small" id="rocket-character-stage"></div>
+      </section>
+      <section class="rocket-space-arena" id="rocket-space-stage">
+        <div class="space-stars-bg"></div>
+        <div class="space-moon-goal" id="rocket-space-goal">
+          <span class="moon-emoji">🌕</span>
+          <span class="moon-flag">🚩 つきに とうちゃく！</span>
+        </div>
+        <div class="rocket-ship" id="rocket-ship-entity">
+          <div class="rocket-body-svg">
+            <svg viewBox="0 0 100 140" width="100%" height="100%">
+              <path d="M50 10 Q75 50 75 105 L25 105 Q25 50 50 10 Z" fill="#ffffff" stroke="#bdc3c7" stroke-width="3"/>
+              <path d="M50 10 Q60 30 65 40 L35 40 Q40 30 50 10 Z" fill="#e74c3c"/>
+              <circle cx="50" cy="65" r="16" fill="#3498db" stroke="#2980b9" stroke-width="3"/>
+              <circle cx="50" cy="65" r="11" fill="#74b9ff"/>
+              <path d="M25 80 L5 115 L25 105 Z" fill="#e74c3c"/>
+              <path d="M75 80 L95 115 L75 105 Z" fill="#e74c3c"/>
+              <path d="M35 105 Q50 135 65 105" fill="#f39c12"/>
+            </svg>
+          </div>
+        </div>
+        <div class="rocket-rings-container" id="rocket-rings-grid"></div>
+      </section>
+    </main>
+
+    <!-- ==========================================
+         7. ゲーム6：すうじの的あて
+         ========================================== -->
+    <main class="view-panel" id="view-game-target">
+      <section class="target-header-stage">
+        <div class="speech-container target-speech" id="target-speech-bubble">
+          <div class="speech-text" id="target-speech-text">おおきい すうじの まとを たおしてね！</div>
+        </div>
+        <div class="character-box-small" id="target-character-stage"></div>
+      </section>
+      <section class="target-carnival-stage">
+        <div class="target-boards-shelf" id="target-boards-grid"></div>
+        <div class="target-ball-area">
+          <div class="ball-launcher" id="target-ball-launcher">
+            <span class="launcher-ball">⚾</span>
+            <span class="launcher-hint">まとを タッチして ボールを投げよう！</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ==========================================
+         8. ゲーム7：ぐるぐる時計
+         ========================================== -->
+    <main class="view-panel" id="view-game-clock-dial">
+      <section class="stage-upper">
+        <div class="speech-container" id="clock-dial-speech-bubble">
+          <div class="speech-text" id="clock-dial-speech-text">あさ 7じ に はりを まわそう！</div>
+          <div class="repeat-hint">🔊 タップすると もういちど おしゃべりするよ</div>
+        </div>
+        <div class="character-box" id="clock-dial-character-stage"></div>
+      </section>
+      <section class="clock-dial-stage-lower">
+        <div class="clock-dial-wrapper">
+          <!-- 鳩時計ポップアップ -->
+          <div class="cuckoo-box" id="clock-cuckoo-box">🐦 ポッポー！</div>
+          
+          <!-- 時計盤 -->
+          <div class="clock-dial-face" id="clock-dial-face">
+            <div class="clock-center-pin"></div>
+            <div class="clock-hand clock-hour-hand" id="clock-hour-hand"></div>
+            <div class="clock-hand clock-minute-hand" id="clock-minute-hand"></div>
+            
+            <!-- 1〜12の文字盤 -->
+            <div class="clock-num-pos num-12">12</div>
+            <div class="clock-num-pos num-1">1</div>
+            <div class="clock-num-pos num-2">2</div>
+            <div class="clock-num-pos num-3">3</div>
+            <div class="clock-num-pos num-4">4</div>
+            <div class="clock-num-pos num-5">5</div>
+            <div class="clock-num-pos num-6">6</div>
+            <div class="clock-num-pos num-7">7</div>
+            <div class="clock-num-pos num-8">8</div>
+            <div class="clock-num-pos num-9">9</div>
+            <div class="clock-num-pos num-10">10</div>
+            <div class="clock-num-pos num-11">11</div>
+          </div>
+        </div>
+
+        <div class="clock-controls-panel">
+          <div class="clock-time-display" id="clock-time-readout">いまの じかん：7:00</div>
+          <div class="clock-quick-btns">
+            <button class="clock-adj-btn" id="btn-clock-add-hour">＋1 じかん</button>
+            <button class="clock-adj-btn" id="btn-clock-add-min">＋30 ぷん</button>
+          </div>
+          <div class="clock-hint-text">👆 時計盤を指でぐるぐる回しても 針が動くよ！</div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ==========================================
+         9. ゲーム8：時計マッチ
+         ========================================== -->
+    <main class="view-panel" id="view-game-clock-match">
+      <section class="stage-upper">
+        <div class="speech-container" id="clock-match-speech-bubble">
+          <div class="speech-text" id="clock-match-speech-text">おなじ じかんの とけいを えらんでね！</div>
+        </div>
+        <div class="character-box-small" id="clock-match-character-stage"></div>
+      </section>
+      <section class="clock-match-stage-lower">
+        <div class="clock-match-grid" id="clock-match-cards-grid"></div>
+      </section>
+    </main>
+
+    <!-- ==========================================
+         10. ゲーム9：1週間トレイン
+         ========================================== -->
+    <main class="view-panel" id="view-game-week-train">
+      <section class="stage-upper">
+        <div class="speech-container" id="week-train-speech-bubble">
+          <div class="speech-text" id="week-train-speech-text">ただしい ようびを つなげてね！</div>
+        </div>
+        <div class="character-box-small" id="week-train-character-stage"></div>
+      </section>
+      <section class="week-train-stage-lower">
+        <div class="train-railway-area">
+          <div class="train-track-line"></div>
+          <div class="train-cars-scroll" id="week-train-cars-track"></div>
+        </div>
+        <div class="week-candidates-area" id="week-train-candidates"></div>
+      </section>
+    </main>
+
+    <!-- ==========================================
+         11. ゲーム10：曜日カレンダー
+         ========================================== -->
+    <main class="view-panel" id="view-game-week-quiz">
+      <section class="stage-upper">
+        <div class="speech-container" id="week-quiz-speech-bubble">
+          <div class="speech-text" id="week-quiz-speech-text">ヒントをみて ようびをえらんでね！</div>
+        </div>
+        <div class="character-box-small" id="week-quiz-character-stage"></div>
+      </section>
+      <section class="week-quiz-stage-lower">
+        <div class="week-quiz-card-box" id="week-quiz-card"></div>
+        <div class="week-quiz-buttons-panel" id="week-quiz-buttons-grid"></div>
+      </section>
+    </main>
+
+    <!-- ==========================================
+         12. ゲーム11：季節アイテム集め
+         ========================================== -->
+    <main class="view-panel" id="view-game-season-items">
+      <section class="stage-upper">
+        <div class="speech-container" id="season-items-speech-bubble">
+          <div class="speech-text" id="season-items-speech-text">きせつの アイテムを カゴにいれてね！</div>
+        </div>
+        <div class="character-box-small" id="season-items-character-stage"></div>
+      </section>
+      <section class="season-items-stage-lower">
+        <div class="season-stage-ambient" id="season-items-stage-bg">
+          <div class="season-items-grid" id="season-items-grid"></div>
+          <div class="season-basket-area" id="season-items-basket">
+            <div class="basket-icon">🧺</div>
+            <div class="basket-items-row" id="season-basket-items"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ==========================================
+         13. ゲーム12：まほうの木パズル
+         ========================================== -->
+    <main class="view-panel" id="view-game-season-wheel">
+      <section class="stage-upper">
+        <div class="speech-container" id="season-wheel-speech-bubble">
+          <div class="speech-text" id="season-wheel-speech-text">つぎの きせつに まわしてね！</div>
+        </div>
+        <div class="character-box-small" id="season-wheel-character-stage"></div>
+      </section>
+      <section class="season-wheel-stage-lower">
+        <div class="magic-tree-wrapper">
+          <div class="magic-tree-box" id="season-magic-tree"></div>
+        </div>
+        <div class="season-wheel-choices" id="season-wheel-buttons"></div>
+      </section>
+    </main>
+
+  </div>
+
+  <!-- 全クリアモーダル -->
+  <div class="modal-backdrop" id="complete-modal">
+    <div class="modal-card">
+      <h2 class="modal-title">🎉 たいへんよくできました！ 🎉</h2>
+      <p class="modal-subtitle">スタンプが ぜんぶ あつまったよ！</p>
+      <div class="modal-stars">⭐⭐⭐⭐⭐</div>
+      <button class="primary-btn" id="restart-btn">もう１かい あそぶ！</button>
+    </div>
+  </div>
+
+  <!-- スクリプト読み込み -->
+  <script src="js/audio.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/characters.js"></script>
+  <script src="js/game_counting.js"></script>
+  <script src="js/game_dots.js"></script>
+  <script src="js/game_bubble.js"></script>
+  <script src="js/game_shopping.js"></script>
+  <script src="js/game_rocket.js"></script>
+  <script src="js/game_target.js"></script>
+  <script src="js/game_clock_dial.js"></script>
+  <script src="js/game_clock_match.js"></script>
+  <script src="js/game_week_train.js"></script>
+  <script src="js/game_week_quiz.js"></script>
+  <script src="js/game_season_items.js"></script>
+  <script src="js/game_season_wheel.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
