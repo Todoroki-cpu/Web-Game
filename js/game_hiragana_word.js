@@ -93,15 +93,14 @@ class GameHiraganaWord {
     this.earnedStamps = 0;
     this.app.updateStamps(0, this.maxStamps);
 
-    window.soundSystem.playVoice('word_prompt');
-    this.setSpeech('もじを ならべて ことばを つくってね！');
-
     this.shuffledWords = [...this.words].sort(() => Math.random() - 0.5);
     this.wordIndex = 0;
 
-    setTimeout(() => {
-      this.nextRound();
-    }, 1800);
+    window.soundSystem.playVoice('word_prompt');
+    this.setSpeech('もじを ならべて ことばを つくってね！');
+
+    // 即座に第1問を準備
+    this.nextRound();
   }
 
   setSpeech(text) {
@@ -132,6 +131,12 @@ class GameHiraganaWord {
   }
 
   render() {
+    if (!this.targetClueEl) {
+      this.targetClueEl = document.getElementById('hiragana-word-target-clue');
+      this.slotsContainerEl = document.getElementById('hiragana-word-slots-container');
+      this.tilesContainerEl = document.getElementById('hiragana-word-tiles-container');
+    }
+
     // 1. お題ヒント（絵文字と読み）
     if (this.targetClueEl) {
       this.targetClueEl.innerHTML = `

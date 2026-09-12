@@ -18,6 +18,8 @@ class GameHiraganaTrace {
     this.earnedStamps = 0;
     this.maxStamps = 5;
     this.isCompleted = false;
+    this.canvasWidth = 340;
+    this.canvasHeight = 340;
 
     this.letters = [
       {
@@ -27,9 +29,9 @@ class GameHiraganaTrace {
         voiceKey: 'trace_a',
         strokes: [
           // 画1: 横棒
-          [{ x: 0.28, y: 0.35 }, { x: 0.50, y: 0.35 }, { x: 0.72, y: 0.35 }],
+          [{ x: 0.26, y: 0.35 }, { x: 0.50, y: 0.35 }, { x: 0.74, y: 0.35 }],
           // 画2: 縦棒
-          [{ x: 0.50, y: 0.20 }, { x: 0.50, y: 0.50 }, { x: 0.48, y: 0.82 }],
+          [{ x: 0.50, y: 0.18 }, { x: 0.50, y: 0.50 }, { x: 0.46, y: 0.82 }],
           // 画3: くるりん
           [{ x: 0.65, y: 0.45 }, { x: 0.38, y: 0.65 }, { x: 0.45, y: 0.85 }, { x: 0.72, y: 0.78 }, { x: 0.75, y: 0.58 }, { x: 0.58, y: 0.52 }]
         ]
@@ -41,7 +43,7 @@ class GameHiraganaTrace {
         voiceKey: 'trace_i',
         strokes: [
           // 画1: 左の曲線とはね
-          [{ x: 0.35, y: 0.28 }, { x: 0.32, y: 0.55 }, { x: 0.35, y: 0.75 }, { x: 0.42, y: 0.70 }],
+          [{ x: 0.35, y: 0.28 }, { x: 0.32, y: 0.55 }, { x: 0.35, y: 0.75 }, { x: 0.44, y: 0.70 }],
           // 画2: 右の短い線
           [{ x: 0.65, y: 0.38 }, { x: 0.68, y: 0.58 }, { x: 0.70, y: 0.72 }]
         ]
@@ -53,9 +55,9 @@ class GameHiraganaTrace {
         voiceKey: 'trace_u',
         strokes: [
           // 画1: 上の点
-          [{ x: 0.45, y: 0.25 }, { x: 0.55, y: 0.30 }],
+          [{ x: 0.42, y: 0.25 }, { x: 0.58, y: 0.30 }],
           // 画2: 下の丸み
-          [{ x: 0.38, y: 0.45 }, { x: 0.65, y: 0.48 }, { x: 0.68, y: 0.70 }, { x: 0.45, y: 0.85 }]
+          [{ x: 0.36, y: 0.45 }, { x: 0.65, y: 0.48 }, { x: 0.68, y: 0.70 }, { x: 0.42, y: 0.85 }]
         ]
       },
       {
@@ -65,7 +67,7 @@ class GameHiraganaTrace {
         voiceKey: 'trace_e',
         strokes: [
           // 画1: 上の点
-          [{ x: 0.45, y: 0.22 }, { x: 0.55, y: 0.28 }],
+          [{ x: 0.44, y: 0.22 }, { x: 0.56, y: 0.28 }],
           // 画2: ジグザグと波
           [{ x: 0.35, y: 0.42 }, { x: 0.65, y: 0.42 }, { x: 0.38, y: 0.72 }, { x: 0.58, y: 0.68 }, { x: 0.75, y: 0.82 }]
         ]
@@ -77,11 +79,11 @@ class GameHiraganaTrace {
         voiceKey: 'trace_o',
         strokes: [
           // 画1: 横棒
-          [{ x: 0.30, y: 0.35 }, { x: 0.65, y: 0.35 }],
+          [{ x: 0.28, y: 0.35 }, { x: 0.66, y: 0.35 }],
           // 画2: 縦からループ
-          [{ x: 0.48, y: 0.22 }, { x: 0.48, y: 0.55 }, { x: 0.32, y: 0.72 }, { x: 0.60, y: 0.82 }, { x: 0.72, y: 0.65 }],
+          [{ x: 0.48, y: 0.20 }, { x: 0.48, y: 0.55 }, { x: 0.30, y: 0.72 }, { x: 0.60, y: 0.82 }, { x: 0.72, y: 0.65 }],
           // 画3: 右上の点
-          [{ x: 0.70, y: 0.28 }, { x: 0.78, y: 0.38 }]
+          [{ x: 0.70, y: 0.28 }, { x: 0.80, y: 0.38 }]
         ]
       },
       {
@@ -91,11 +93,11 @@ class GameHiraganaTrace {
         voiceKey: 'trace_ka',
         strokes: [
           // 画1: 左の曲がり
-          [{ x: 0.35, y: 0.35 }, { x: 0.60, y: 0.35 }, { x: 0.55, y: 0.72 }, { x: 0.45, y: 0.78 }],
+          [{ x: 0.35, y: 0.35 }, { x: 0.62, y: 0.35 }, { x: 0.56, y: 0.72 }, { x: 0.44, y: 0.78 }],
           // 画2: 縦の払い
-          [{ x: 0.42, y: 0.20 }, { x: 0.35, y: 0.82 }],
+          [{ x: 0.44, y: 0.20 }, { x: 0.35, y: 0.82 }],
           // 画3: 右の点
-          [{ x: 0.70, y: 0.30 }, { x: 0.78, y: 0.42 }]
+          [{ x: 0.70, y: 0.30 }, { x: 0.80, y: 0.42 }]
         ]
       },
       {
@@ -105,9 +107,9 @@ class GameHiraganaTrace {
         voiceKey: 'trace_sa',
         strokes: [
           // 画1: 横棒
-          [{ x: 0.30, y: 0.38 }, { x: 0.70, y: 0.35 }],
+          [{ x: 0.28, y: 0.38 }, { x: 0.72, y: 0.35 }],
           // 画2: 縦の斜め
-          [{ x: 0.55, y: 0.25 }, { x: 0.45, y: 0.62 }],
+          [{ x: 0.56, y: 0.25 }, { x: 0.44, y: 0.62 }],
           // 画3: 下のカーブ
           [{ x: 0.35, y: 0.68 }, { x: 0.55, y: 0.85 }, { x: 0.70, y: 0.75 }]
         ]
@@ -119,13 +121,13 @@ class GameHiraganaTrace {
         voiceKey: 'trace_ta',
         strokes: [
           // 画1: 横棒
-          [{ x: 0.28, y: 0.40 }, { x: 0.58, y: 0.40 }],
+          [{ x: 0.26, y: 0.40 }, { x: 0.58, y: 0.40 }],
           // 画2: 縦の払い
           [{ x: 0.42, y: 0.25 }, { x: 0.32, y: 0.80 }],
           // 画3: 右上の「こ」の上
-          [{ x: 0.58, y: 0.45 }, { x: 0.75, y: 0.45 }],
+          [{ x: 0.58, y: 0.45 }, { x: 0.76, y: 0.45 }],
           // 画4: 右下の「こ」の下
-          [{ x: 0.58, y: 0.70 }, { x: 0.75, y: 0.75 }]
+          [{ x: 0.58, y: 0.70 }, { x: 0.76, y: 0.75 }]
         ]
       }
     ];
@@ -161,22 +163,26 @@ class GameHiraganaTrace {
     window.soundSystem.playVoice('trace_prompt');
     this.setSpeech('すうじの じゅんばんに ゆびで なぞってみよう！');
 
-    setTimeout(() => {
-      this.initCanvasSize();
-      this.loadLetter(this.currentLetterIdx);
-    }, 150);
+    // 即座に初期化＆描画
+    this.initCanvasSize();
+    this.loadLetter(this.currentLetterIdx);
   }
 
   initCanvasSize() {
     if (!this.canvas) return;
     const rect = this.canvas.getBoundingClientRect();
-    if (rect.width > 0 && rect.height > 0) {
-      this.canvas.width = rect.width;
-      this.canvas.height = rect.height;
-    } else {
-      this.canvas.width = 400;
-      this.canvas.height = 400;
-    }
+    const w = rect.width > 0 ? rect.width : 340;
+    const h = rect.height > 0 ? rect.height : 340;
+    const dpr = window.devicePixelRatio || 1;
+
+    this.canvas.width = w * dpr;
+    this.canvas.height = h * dpr;
+    this.ctx = this.canvas.getContext('2d');
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    this.canvasWidth = w;
+    this.canvasHeight = h;
+    this.render();
   }
 
   setSpeech(text) {
@@ -205,11 +211,13 @@ class GameHiraganaTrace {
       const rect = this.canvas.getBoundingClientRect();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
       return {
-        x: clientX - rect.left,
-        y: clientY - rect.top,
-        normX: (clientX - rect.left) / rect.width,
-        normY: (clientY - rect.top) / rect.height
+        x: x,
+        y: y,
+        normX: x / (rect.width || 340),
+        normY: y / (rect.height || 340)
       };
     };
 
@@ -225,7 +233,7 @@ class GameHiraganaTrace {
       const dist = Math.hypot(pos.normX - targetCheck.x, pos.normY - targetCheck.y);
 
       // 開始ポイントの近くをタップした場合に描画スタート
-      if (dist < 0.22 || this.currentCheckIdx > 0) {
+      if (dist < 0.28 || this.currentCheckIdx > 0) {
         this.isDrawing = true;
         this.currentStrokePoints = [pos];
         this.checkPointAdvance(pos.normX, pos.normY);
@@ -240,7 +248,7 @@ class GameHiraganaTrace {
       this.currentStrokePoints.push(pos);
       this.checkPointAdvance(pos.normX, pos.normY);
 
-      if (Math.random() < 0.3) {
+      if (Math.random() < 0.25) {
         window.soundSystem.playTick();
       }
       this.render();
@@ -292,7 +300,7 @@ class GameHiraganaTrace {
     const targetCheck = stroke[this.currentCheckIdx];
     const dist = Math.hypot(nx - targetCheck.x, ny - targetCheck.y);
 
-    if (dist < 0.18) {
+    if (dist < 0.24) {
       this.currentCheckIdx++;
       if (this.currentCheckIdx < stroke.length) {
         window.soundSystem.playPop();
@@ -334,8 +342,8 @@ class GameHiraganaTrace {
 
   render() {
     if (!this.ctx || !this.canvas) return;
-    const w = this.canvas.width;
-    const h = this.canvas.height;
+    const w = this.canvasWidth;
+    const h = this.canvasHeight;
 
     this.ctx.clearRect(0, 0, w, h);
 
@@ -347,17 +355,17 @@ class GameHiraganaTrace {
     this.ctx.font = `900 ${h * 0.72}px 'Hiragino Maru Gothic ProN', 'Rounded Mplus 1c', sans-serif`;
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
-    this.ctx.fillStyle = 'rgba(255, 182, 193, 0.28)';
-    this.ctx.strokeStyle = 'rgba(255, 105, 180, 0.35)';
+    this.ctx.fillStyle = 'rgba(255, 182, 193, 0.45)';
+    this.ctx.strokeStyle = 'rgba(255, 105, 180, 0.4)';
     this.ctx.lineWidth = 6;
     this.ctx.setLineDash([8, 8]);
     this.ctx.strokeText(letter.char, w / 2, h / 2 + 10);
     this.ctx.fillText(letter.char, w / 2, h / 2 + 10);
     this.ctx.restore();
 
-    // 2. 完了した画を描画（パステル虹色グラデーション）
-    this.drawnStrokes.forEach((strokePoints, sIdx) => {
-      this.drawStrokeCurve(strokePoints, '#ff6b81', 28);
+    // 2. 完了した画を描画（パステルピンク・赤）
+    this.drawnStrokes.forEach((strokePoints) => {
+      this.drawStrokeCurve(strokePoints, '#ff4757', 28);
     });
 
     // 3. 現在なぞり中のパスを描画

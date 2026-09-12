@@ -90,16 +90,15 @@ class GameHiraganaKaruta {
     this.app.updateStamps(0, this.maxStamps);
     this.isAnswering = false;
 
-    window.soundSystem.playVoice('karuta_prompt');
-    this.setSpeech('よまれた ひらがなカードを パチンと タッチしてね！');
-
     // 出題順をシャッフル
     this.shuffledQuestions = [...this.questions].sort(() => Math.random() - 0.5);
     this.questionIndex = 0;
 
-    setTimeout(() => {
-      this.nextRound();
-    }, 2000);
+    window.soundSystem.playVoice('karuta_prompt');
+    this.setSpeech('よまれた ひらがなカードを パチンと タッチしてね！');
+
+    // 即座に第1問を準備
+    this.nextRound();
   }
 
   setSpeech(text) {
@@ -118,12 +117,12 @@ class GameHiraganaKaruta {
     window.soundSystem.playVoice(this.currentQuestion.voiceKey);
 
     setTimeout(() => {
-      if (this.characterManager.state === 'talking') {
+      if (this.characterManager && this.characterManager.state === 'talking') {
         this.characterManager.setState('idle');
       }
     }, 2000);
 
-    // 選択肢カードの作成（正解1枚 + ダミー3〜5枚）
+    // 選択肢カードの作成（正解1枚 + ダミー5枚 = 6枚）
     const choices = [{
       char: this.currentQuestion.char,
       word: this.currentQuestion.word,
@@ -148,6 +147,9 @@ class GameHiraganaKaruta {
   }
 
   renderCards(choices) {
+    if (!this.cardsGridEl) {
+      this.cardsGridEl = document.getElementById('hiragana-karuta-cards-grid');
+    }
     if (!this.cardsGridEl) return;
     this.cardsGridEl.innerHTML = '';
 
