@@ -720,7 +720,27 @@ class GamePrincess {
       </defs>
     `;
 
-    if (t === 'rose_frill') {
+    if (t === 'cinderella_gown') {
+      // 1. シンデレラクリスタル（ペプラム付き大舞踏会ガウン）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- ドーム型大パニエスカート -->
+          <path d="M118 190 Q140 195 162 190 Q220 260 225 348 Q140 360 55 348 Q60 260 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <path d="M118 190 Q140 195 162 190 Q220 260 225 348 Q140 360 55 348 Q60 260 118 190 Z" fill="url(#dressShine_${dress.id})"/>
+          <!-- 左右のシルバードレープペプラム（腰の羽根飾り） -->
+          <path d="M118 190 Q85 190 70 215 Q95 235 120 210 Z" fill="#ffffff" stroke="#74b9ff" stroke-width="1.5"/>
+          <path d="M162 190 Q195 190 210 215 Q185 235 160 210 Z" fill="#ffffff" stroke="#74b9ff" stroke-width="1.5"/>
+          <!-- 裾のクリスタルレース -->
+          <path d="M65 344 Q140 365 215 344" stroke="#ffffff" stroke-width="5" stroke-dasharray="6,6" fill="none"/>
+          <!-- トップ＆オフショルダー -->
+          <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <circle cx="140" cy="155" r="5" fill="#ffffff" stroke="#74b9ff" stroke-width="1.5"/>
+          <path d="M96 144 Q115 132 125 144 Q112 154 96 144 Z" fill="#ffffff" stroke="#74b9ff" stroke-width="1.5"/>
+          <path d="M184 144 Q165 132 155 144 Q168 154 184 144 Z" fill="#ffffff" stroke="#74b9ff" stroke-width="1.5"/>
+        </svg>
+      `;
+    } else if (t === 'rose_frill') {
       // 2. ロイヤルローズピンク（3段ティアードフリル）
       return `
         <svg viewBox="0 0 280 400" class="doll-svg">
@@ -738,6 +758,42 @@ class GamePrincess {
           <circle cx="140" cy="155" r="5" fill="#ffffff" stroke="#ff4757" stroke-width="1.5"/>
           <path d="M98 145 Q115 135 125 145 Q112 155 98 145 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
           <path d="M182 145 Q165 135 155 145 Q168 155 182 145 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
+        </svg>
+      `;
+    } else if (t === 'midnight_star') {
+      // 3. スターダストネイビー（星形ギザギザ裾＆シアーサイドトレーン）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- 星空のサイドシアートレイン -->
+          <path d="M110 190 Q40 270 45 350 Q75 350 100 290 Z" fill="rgba(87, 96, 111, 0.45)" stroke="#feca57" stroke-width="1"/>
+          <path d="M170 190 Q240 270 235 350 Q205 350 180 290 Z" fill="rgba(87, 96, 111, 0.45)" stroke="#feca57" stroke-width="1"/>
+          <!-- 星形カットのスカート -->
+          <polygon points="118,190 162,190 220,290 195,355 160,315 140,355 120,315 85,355 60,290" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <polygon points="195,355 160,315 140,355 120,315 85,355" fill="none" stroke="#feca57" stroke-width="2.5"/>
+          <!-- トップ＆星屑ブローチ -->
+          <path d="M112 140 Q140 148 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <polygon points="140,150 142,155 148,155 143,159 145,164 140,161 135,164 137,159 132,155 138,155" fill="#feca57"/>
+          <path d="M96 142 Q115 130 125 142 Z" fill="#2f3542" stroke="#feca57" stroke-width="1.5"/>
+          <path d="M184 142 Q165 130 155 142 Z" fill="#2f3542" stroke="#feca57" stroke-width="1.5"/>
+        </svg>
+      `;
+    } else if (t === 'fairy_chiffon') {
+      // 4. フラワーフェアリー（花びらカット＆リーフドレス）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- 重なる花びらスカート -->
+          <path d="M118 190 Q140 195 162 190 L205 250 L160 340 L120 250 Z" fill="url(#${gId})" stroke="#00b894" stroke-width="1.8"/>
+          <path d="M118 190 Q140 195 162 190 L160 250 L120 340 L75 250 Z" fill="url(#${gId})" stroke="#00b894" stroke-width="1.8"/>
+          <path d="M118 190 Q140 195 162 190 L185 270 L140 350 L95 270 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.8"/>
+          <!-- つる草ベルト＆花飾り -->
+          <path d="M116 195 Q140 202 164 195" stroke="#2ed573" stroke-width="4" fill="none"/>
+          <circle cx="140" cy="198" r="5" fill="#ff7675"/><circle cx="132" cy="197" r="3.5" fill="#ffeaa7"/><circle cx="148" cy="197" r="3.5" fill="#ffeaa7"/>
+          <!-- 花びらトップ -->
+          <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#00b894" stroke-width="1.8"/>
+          <path d="M96 142 Q115 130 125 142 Z" fill="#55efc4" stroke="#ffffff" stroke-width="1.5"/>
+          <path d="M184 142 Q165 130 155 142 Z" fill="#55efc4" stroke="#ffffff" stroke-width="1.5"/>
         </svg>
       `;
     } else if (t === 'aurora_mermaid') {
@@ -758,22 +814,23 @@ class GamePrincess {
           <path d="M184 142 Q165 130 155 142 Z" fill="${dress.subColor}" stroke="#ffffff" stroke-width="1.5"/>
         </svg>
       `;
-    } else if (t === 'sweet_lolita') {
-      // 8. スイートロリータ（ひざ丈カップケーキパニエ）
+    } else if (t === 'sunlight_ball') {
+      // 6. サンライトゴールド（ロココ調超ワイドパニエ＆ゴールドドレープ）
       return `
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
-          <!-- ふんわり丸いひざ丈スカート -->
-          <path d="M118 190 Q140 195 162 190 Q225 240 215 295 Q140 310 65 295 Q55 240 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
-          <path d="M65 295 Q140 310 215 295" stroke="#ffffff" stroke-width="6" stroke-dasharray="6,4" fill="none"/>
-          <!-- エプロン風ホワイトリボン -->
-          <path d="M125 192 Q140 230 110 270 Q140 280 170 270 Q140 230 155 192 Z" fill="rgba(255,255,255,0.7)"/>
-          <circle cx="140" cy="205" r="5" fill="#ff4757"/>
+          <!-- 超ワイド横広がりパニエスカート -->
+          <path d="M118 190 Q140 195 162 190 Q240 220 235 348 Q140 360 45 348 Q40 220 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <path d="M118 190 Q140 195 162 190 Q240 220 235 348 Q140 360 45 348 Q40 220 118 190 Z" fill="url(#dressShine_${dress.id})"/>
+          <!-- ロココ調ゴールドフェストゥーン（花綱ドレープ） -->
+          <path d="M120 210 Q80 260 50 320" stroke="#f1c40f" stroke-width="3" fill="none"/>
+          <path d="M160 210 Q200 260 230 320" stroke="#f1c40f" stroke-width="3" fill="none"/>
+          <circle cx="80" cy="260" r="4" fill="#ffffff"/><circle cx="200" cy="260" r="4" fill="#ffffff"/>
           <!-- トップ -->
           <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <!-- パフスリーブ -->
-          <circle cx="106" cy="146" r="12" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
-          <circle cx="174" cy="146" r="12" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
+          <circle cx="140" cy="155" r="5" fill="#f1c40f" stroke="#ffffff" stroke-width="1.5"/>
+          <path d="M96 142 Q115 130 125 142 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
+          <path d="M184 142 Q165 130 155 142 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
         </svg>
       `;
     } else if (t === 'snow_frost') {
@@ -794,28 +851,58 @@ class GamePrincess {
           <polygon points="182,142 170,132 156,142 168,150" fill="#ffffff" stroke="#81ecec" stroke-width="1.5"/>
         </svg>
       `;
-    } else {
-      // 1, 3, 4, 6, 9, 10. クラシカルロイヤルプリンセスガウン (大舞踏会ボリューム)
+    } else if (t === 'sweet_lolita') {
+      // 8. スイートロリータ（ひざ丈カップケーキパニエ）
       return `
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
-          <!-- ドレスのパニエ・スカート（ゴージャスなフリルとボリューム） -->
-          <path d="M118 190 Q140 195 162 190 Q215 260 225 345 Q140 360 55 345 Q65 260 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
-          <path d="M118 190 Q140 195 162 190 Q215 260 225 345 Q140 360 55 345 Q65 260 118 190 Z" fill="url(#dressShine_${dress.id})"/>
-
-          <!-- スカートのオーバースカート・ドレープ -->
-          <path d="M125 192 Q140 240 90 320 Q140 340 190 320 Q140 240 155 192" fill="none" stroke="${dress.glow}" stroke-width="3" opacity="0.85"/>
-          <path d="M65 340 Q140 365 215 340" stroke="#ffffff" stroke-width="4" stroke-dasharray="6,6" fill="none"/>
-
-          <!-- トップ・コルセット部 -->
+          <!-- ふんわり丸いひざ丈ショートスカート -->
+          <path d="M118 190 Q140 195 162 190 Q225 240 215 295 Q140 310 65 295 Q55 240 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <path d="M65 295 Q140 310 215 295" stroke="#ffffff" stroke-width="6" stroke-dasharray="6,4" fill="none"/>
+          <!-- エプロン風ホワイトリボン -->
+          <path d="M125 192 Q140 230 110 270 Q140 280 170 270 Q140 230 155 192 Z" fill="rgba(255,255,255,0.7)"/>
+          <circle cx="140" cy="205" r="5" fill="#ff4757"/>
+          <!-- トップ＆パフスリーブ -->
           <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <!-- 胸元のジュエル＆リボン -->
-          <circle cx="140" cy="155" r="5" fill="${dress.glow}" stroke="#ffffff" stroke-width="1.5"/>
-          <path d="M135 155 L130 162 M145 155 L150 162" stroke="#ffffff" stroke-width="2"/>
-
-          <!-- ショルダーフリル・オフショルダー -->
-          <path d="M98 145 Q115 135 125 145 Q112 155 98 145 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
-          <path d="M182 145 Q165 135 155 145 Q168 155 182 145 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
+          <circle cx="106" cy="146" r="12" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
+          <circle cx="174" cy="146" r="12" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
+        </svg>
+      `;
+    } else if (t === 'twilight_gown') {
+      // 9. トワイライトマジック（前後アシンメトリー・フィッシュテール＆月夜のローブ）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- 後ろのロングトレイン -->
+          <path d="M105 190 Q45 280 50 355 Q140 365 230 355 Q235 280 175 190 Z" fill="#4834d4" stroke="#e0c3fc" stroke-width="1.8"/>
+          <!-- 前側の短いハイロースカート（脚が見える） -->
+          <path d="M118 190 Q140 195 162 190 Q195 230 175 265 Q140 275 105 265 Q85 230 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <path d="M105 265 Q140 275 175 265" stroke="#f1c40f" stroke-width="3" fill="none"/>
+          <!-- トップ＆三日月ベルト -->
+          <path d="M112 140 Q140 148 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <path d="M140 195 Q145 192 143 186 Q138 188 138 192 Z" fill="#f1c40f"/>
+          <!-- シアーショルダードレープ -->
+          <path d="M96 142 Q115 130 125 142 Z" fill="#8e44ad" stroke="#e0c3fc" stroke-width="1.5"/>
+          <path d="M184 142 Q165 130 155 142 Z" fill="#8e44ad" stroke="#e0c3fc" stroke-width="1.5"/>
+        </svg>
+      `;
+    } else {
+      // 10. クラシカルルビー（ベルベットオープンローブ＆ゴールドアンダースカート）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- 下地のゴールド刺繍アンダースカート -->
+          <path d="M118 190 Q140 195 162 190 Q215 260 220 348 Q140 360 60 348 Q65 260 118 190 Z" fill="#f5cd79" stroke="#f1c40f" stroke-width="2"/>
+          <!-- 前開きベルベットローブ（左右に分かれた真紅のガウン） -->
+          <path d="M118 190 Q95 240 60 348 Q100 350 120 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <path d="M162 190 Q185 240 220 348 Q180 350 160 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <!-- 襟元のファー＆ジュエル -->
+          <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <ellipse cx="140" cy="144" rx="26" ry="7" fill="#ffffff" stroke="#ced6e0" stroke-width="1.5"/>
+          <circle cx="140" cy="155" r="5" fill="#f1c40f" stroke="#ffffff" stroke-width="1.5"/>
+          <!-- ロイヤルベルベットスリーブ -->
+          <rect x="94" y="140" width="16" height="22" rx="4" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
+          <rect x="170" y="140" width="16" height="22" rx="4" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
         </svg>
       `;
     }
