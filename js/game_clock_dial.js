@@ -142,6 +142,7 @@ class GameClockDial {
 
     this.speechTextEl.innerHTML = quest.text;
     this.updateClockHands();
+    this.app.startTimer(10);
 
     setTimeout(() => {
       if (!this.app.isCurrentView('clock_dial')) return;
@@ -173,6 +174,7 @@ class GameClockDial {
       // ぴったり正解！
       this.isCleared = true;
       this.isLocked = true;
+      this.app.stopTimer();
 
       // 鳩時計が飛び出す！
       if (this.cuckooBoxEl) {

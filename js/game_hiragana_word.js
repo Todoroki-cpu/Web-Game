@@ -126,6 +126,7 @@ class GameHiraganaWord {
     })).sort(() => Math.random() - 0.5);
 
     this.availableTiles = tileList;
+    this.app.startTimer(10);
 
     this.render();
   }
@@ -217,6 +218,8 @@ class GameHiraganaWord {
     // 全文字揃ったかチェック
     if (this.placedLetters.length === this.currentWordData.letters.length) {
       this.checkWord();
+    } else {
+      this.app.startTimer(10);
     }
   }
 
@@ -235,7 +238,8 @@ class GameHiraganaWord {
     const targetWord = this.currentWordData.letters.join('');
 
     if (formedWord === targetWord) {
-      // 大正解！もぐもぐアニメーション ＆ 音声
+      // 大正解！
+      this.app.stopTimer();
       this.characterManager.setState('eating');
       window.soundSystem.playMunch();
       window.soundSystem.playSparkle();

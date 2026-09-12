@@ -40,7 +40,17 @@
         </div>
       </div>
 
+      <!-- 10秒カウントダウンタイマー表示 -->
+      <div class="timer-badge" id="global-timer-badge" style="display: none;">
+        <span class="timer-icon">⏱️</span>
+        <div class="timer-gauge-bg">
+          <div class="timer-gauge-fill" id="global-timer-gauge"></div>
+        </div>
+        <span class="timer-num" id="global-timer-num">10</span>
+      </div>
+
       <div class="control-buttons">
+        <button id="timer-toggle-btn" class="icon-btn timer-toggle-btn" aria-label="タイマー設定" title="10秒タイマー">⏱️ ON</button>
         <button id="sound-toggle-btn" class="icon-btn" aria-label="おと">🔊</button>
       </div>
     </header>

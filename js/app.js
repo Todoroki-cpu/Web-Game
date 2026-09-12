@@ -1,12 +1,168 @@
-﻿/**
- * app.js - メインアプリケーション管理 ＆ 全15ゲームルーティング (すうじ・とけい・ようび・きせつ・ひらがな)
+/**
+ * CountdownTimer - 10秒カウントダウンタイマー管理クラス
  */
+class CountdownTimer {
+  constructor(app) {
+    this.app = app;
+    this.badgeEl = document.getElementById('global-timer-badge');
+    this.gaugeEl = document.getElementById('global-timer-gauge');
+    this.numEl = document.getElementById('global-timer-num');
+    this.toggleBtn = document.getElementById('timer-toggle-btn');
+
+    this.enabled = true;
+    this.duration = 10;
+    this.remaining = 10;
+    this.intervalId = null;
+    this.onTimeoutCb = null;
+    this.isPaused = false;
+    this.lastSecond = 10;
+
+    this.initToggle();
+  }
+
+  initToggle() {
+    if (this.toggleBtn) {
+      this.toggleBtn.addEventListener('click', () => {
+        this.enabled = !this.enabled;
+        window.soundSystem.playPop();
+        this.updateToggleBtn();
+        if (!this.enabled) {
+          this.stop();
+          this.hide();
+        } else {
+          if (this.app.currentView !== 'home') {
+            this.start(10, this.onTimeoutCb);
+          }
+        }
+      });
+      this.updateToggleBtn();
+    }
+  }
+
+  updateToggleBtn() {
+    if (!this.toggleBtn) return;
+    if (this.enabled) {
+      this.toggleBtn.textContent = '⏱️ ON';
+      this.toggleBtn.classList.remove('off');
+    } else {
+      this.toggleBtn.textContent = '⏱️ OFF';
+      this.toggleBtn.classList.add('off');
+    }
+  }
+
+  start(seconds = 10, onTimeout = null) {
+    this.stop();
+    if (!this.enabled || this.app.currentView === 'home') {
+      this.hide();
+      return;
+    }
+
+    this.duration = seconds;
+    this.remaining = seconds;
+    this.lastSecond = Math.ceil(seconds);
+    this.onTimeoutCb = onTimeout;
+    this.isPaused = false;
+
+    this.show();
+    this.updateUI();
+
+    const startTime = Date.now();
+    const totalMs = seconds * 1000;
+
+    this.intervalId = setInterval(() => {
+      if (this.isPaused) return;
+
+      const elapsed = Date.now() - startTime;
+      this.remaining = Math.max(0, (totalMs - elapsed) / 1000);
+      const currentSec = Math.ceil(this.remaining);
+
+      if (currentSec !== this.lastSecond && currentSec > 0) {
+        this.lastSecond = currentSec;
+        if (currentSec <= 3) {
+          window.soundSystem.playTimerWarning();
+        } else {
+          window.soundSystem.playTimerTick();
+        }
+      }
+
+      this.updateUI();
+
+      if (this.remaining <= 0) {
+        this.stop();
+        this.handleTimeout();
+      }
+    }, 100);
+  }
+
+  handleTimeout() {
+    if (this.badgeEl) {
+      this.badgeEl.classList.add('timeout');
+      setTimeout(() => this.badgeEl.classList.remove('timeout'), 800);
+    }
+    window.soundSystem.playTimeout();
+
+    if (this.onTimeoutCb) {
+      this.onTimeoutCb();
+    } else {
+      this.app.handleDefaultTimeout();
+    }
+  }
+
+  pause() {
+    this.isPaused = true;
+  }
+
+  resume() {
+    this.isPaused = false;
+  }
+
+  stop() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+    if (this.badgeEl) {
+      this.badgeEl.classList.remove('warning');
+    }
+  }
+
+  show() {
+    if (this.badgeEl && this.enabled) {
+      this.badgeEl.style.display = 'flex';
+    }
+  }
+
+  hide() {
+    if (this.badgeEl) {
+      this.badgeEl.style.display = 'none';
+    }
+  }
+
+  updateUI() {
+    if (!this.badgeEl) return;
+    const pct = Math.max(0, Math.min(100, (this.remaining / this.duration) * 100));
+    if (this.gaugeEl) {
+      this.gaugeEl.style.width = `${pct}%`;
+    }
+    const secDisplay = Math.ceil(this.remaining);
+    if (this.numEl) {
+      this.numEl.textContent = secDisplay;
+    }
+
+    if (this.remaining <= 3.05) {
+      this.badgeEl.classList.add('warning');
+    } else {
+      this.badgeEl.classList.remove('warning');
+    }
+  }
+}
 
 class GameApp {
   constructor() {
     this.currentView = 'home';
     this.currentHomeCategory = 'numbers';
     this.particles = new ParticleSystem('effects-canvas');
+    this.timer = new CountdownTimer(this);
 
     // 全15ゲームのインスタンス化
     this.gameCounting = new GameCounting(this);
@@ -57,6 +213,30 @@ class GameApp {
     this.startGameBtn = document.getElementById('start-game-btn');
 
     this.initEvents();
+  }
+
+  startTimer(seconds = 10, onTimeout = null) {
+    this.timer.start(seconds, onTimeout);
+  }
+
+  stopTimer() {
+    this.timer.stop();
+  }
+
+  handleDefaultTimeout() {
+    const activeView = this.views[this.currentView];
+    if (activeView) {
+      const speech = activeView.querySelector('.speech-container');
+      if (speech) {
+        speech.classList.add('shake-card');
+        setTimeout(() => speech.classList.remove('shake-card'), 500);
+      }
+    }
+    setTimeout(() => {
+      if (this.currentView !== 'home') {
+        this.timer.start(10);
+      }
+    }, 1000);
   }
 
   isCurrentView(viewName) {
@@ -205,6 +385,8 @@ class GameApp {
     Object.values(this.views).forEach(v => { if (v) v.classList.remove('active'); });
 
     if (viewName === 'home') {
+      this.timer.stop();
+      this.timer.hide();
       this.viewHome.classList.add('active');
       this.homeBtn.style.display = 'none';
       this.updateStamps(0, 5);
@@ -253,6 +435,8 @@ class GameApp {
   }
 
   showCompleteModal() {
+    this.timer.stop();
+    this.timer.hide();
     if (this.completeModalEl) {
       this.completeModalEl.classList.add('show');
       window.soundSystem.playFanfare();

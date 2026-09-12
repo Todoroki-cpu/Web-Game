@@ -71,6 +71,7 @@ class GameWeekTrain {
 
     this.renderTrain();
     this.renderCandidates();
+    this.app.startTimer(10);
 
     setTimeout(() => {
       if (!this.app.isCurrentView('week_train')) return;
@@ -159,6 +160,8 @@ class GameWeekTrain {
       if (this.filledIndices.length >= this.missingIndices.length) {
         // 全連結完了！
         this.handleTrainClear();
+      } else {
+        this.app.startTimer(10);
       }
     }
   }
@@ -166,6 +169,7 @@ class GameWeekTrain {
   handleTrainClear() {
     this.isCleared = true;
     this.isLocked = true;
+    this.app.stopTimer();
 
     window.soundSystem.playTrainWhistle();
 

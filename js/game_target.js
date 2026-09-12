@@ -79,6 +79,7 @@ class GameTarget {
     }
 
     this.renderTargets(pair);
+    this.app.startTimer(10);
 
     setTimeout(() => {
       if (!this.app.isCurrentView('target')) return;
@@ -149,6 +150,7 @@ class GameTarget {
     if (num === this.correctNum) {
       // 命中・正解！
       this.isCleared = true;
+      this.app.stopTimer();
       boardEl.classList.add('knocked-down');
       window.soundSystem.playTargetHit();
 

@@ -64,6 +64,7 @@ class GameSeasonWheel {
 
     this.renderTree('spring'); // 初期ツリー
     this.renderButtons(q.target);
+    this.app.startTimer(10);
 
     setTimeout(() => {
       if (!this.app.isCurrentView('season_wheel')) return;
@@ -154,6 +155,7 @@ class GameSeasonWheel {
       // 正解！
       this.isCleared = true;
       this.isLocked = true;
+      this.app.stopTimer();
 
       window.soundSystem.playSparkle();
       element.classList.add('selected-correct');

@@ -104,6 +104,7 @@ class GameShopping {
     `;
 
     this.renderTray();
+    this.app.startTimer(10);
 
     setTimeout(() => {
       if (!this.app.isCurrentView('shopping')) return;
@@ -176,9 +177,10 @@ class GameShopping {
   checkPayment() {
     const total = this.calcTotal();
     if (total === this.targetPrice) {
-      // ぴったり大正解！
+      // ぴったり！
       this.isCleared = true;
       this.isLocked = true;
+      this.app.stopTimer();
 
       window.soundSystem.playRegister();
 

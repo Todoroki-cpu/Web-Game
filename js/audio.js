@@ -375,6 +375,65 @@ class SoundSystem {
     }
   }
 
+  // タイマー：通常秒針音
+  playTimerTick() {
+    if (this.isMuted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1200, now);
+    osc.frequency.exponentialRampToValueAtTime(400, now + 0.015);
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.02);
+  }
+
+  // タイマー：残り3秒以下の警告音
+  playTimerWarning() {
+    if (this.isMuted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    [880, 1174.66].forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.04);
+      gain.gain.setValueAtTime(0.12, now + idx * 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.04 + 0.06);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now + idx * 0.04);
+      osc.stop(now + idx * 0.04 + 0.06);
+    });
+  }
+
+  // タイマー：時間切れ音（コミカルな下降チャイム）
+  playTimeout() {
+    if (this.isMuted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const notes = [
+      { f: 587.33, t: 0, d: 0.12 },   // D5
+      { f: 493.88, t: 0.1, d: 0.12 }, // B4
+      { f: 392.00, t: 0.2, d: 0.15 }, // G4
+      { f: 329.63, t: 0.32, d: 0.3 }  // E4
+    ];
+    notes.forEach(n => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(n.f, now + n.t);
+      gain.gain.setValueAtTime(0.25, now + n.t);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + n.t + n.d);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now + n.t);
+      osc.stop(now + n.t + n.d);
+    });
+  }
+
   toggleMute() {
     this.isMuted = !this.isMuted;
     if (this.isMuted) {

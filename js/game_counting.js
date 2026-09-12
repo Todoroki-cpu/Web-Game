@@ -79,6 +79,8 @@ class GameCounting {
     this.renderTreeItems();
     this.renderPlate();
 
+    this.app.startTimer(10);
+
     // 登場したキャラクター固有のVOICEVOX音声で注文！
     setTimeout(() => {
       if (!this.app.isCurrentView('counting')) return;
@@ -258,6 +260,7 @@ class GameCounting {
   handleSuccess() {
     this.isCleared = true;
     this.isInputLocked = true;
+    this.app.stopTimer();
 
     setTimeout(() => {
       this.charManager.setState('eating');

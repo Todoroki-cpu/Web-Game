@@ -203,6 +203,7 @@ class GameHiraganaTrace {
       this.rewardPopup.classList.remove('show');
     }
 
+    this.app.startTimer(10);
     this.render();
   }
 
@@ -273,6 +274,7 @@ class GameHiraganaTrace {
           // 文字全体の完了！
           this.handleLetterComplete();
         } else {
+          this.app.startTimer(10);
           this.render();
         }
       } else {
@@ -310,6 +312,7 @@ class GameHiraganaTrace {
 
   handleLetterComplete() {
     this.isCompleted = true;
+    this.app.stopTimer();
     const letter = this.letters[this.currentLetterIdx];
     this.render();
 

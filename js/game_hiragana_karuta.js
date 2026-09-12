@@ -144,6 +144,7 @@ class GameHiraganaKaruta {
 
     const randomizedChoices = choices.sort(() => Math.random() - 0.5);
     this.renderCards(randomizedChoices);
+    this.app.startTimer(10);
   }
 
   renderCards(choices) {
@@ -179,6 +180,7 @@ class GameHiraganaKaruta {
 
     if (choice.isCorrect) {
       this.isAnswering = false;
+      this.app.stopTimer();
       cardEl.classList.add('flipped', 'correct-karuta');
       window.soundSystem.playStamp();
       window.soundSystem.playSparkle();

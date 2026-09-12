@@ -72,6 +72,7 @@ class GameClockMatch {
     // シャッフル
     cards.sort(() => Math.random() - 0.5);
     this.renderCards(cards);
+    this.app.startTimer(10);
 
     setTimeout(() => {
       if (!this.app.isCurrentView('clock_match')) return;
@@ -153,6 +154,8 @@ class GameClockMatch {
         if (this.matchedPairsCount >= 3) {
           // 全ペア達成！
           this.handleRoundComplete();
+        } else {
+          this.app.startTimer(10);
         }
       } else {
         // 不正解
@@ -173,6 +176,7 @@ class GameClockMatch {
   handleRoundComplete() {
     this.isCleared = true;
     this.isLocked = true;
+    this.app.stopTimer();
 
     setTimeout(() => {
       this.charManager.setState('celebrate');

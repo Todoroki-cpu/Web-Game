@@ -130,7 +130,7 @@ html, body {
   transform: scale(1.15) rotate(12deg);
 }
 .star-text { font-size: 12px; font-weight: bold; color: #ff9f1a; }
-.control-buttons { display: flex; gap: 6px; }
+.control-buttons { display: flex; align-items: center; gap: 6px; }
 .icon-btn {
   width: 34px; height: 34px; border-radius: 50%; border: none;
   background: #ffffff; box-shadow: 0 3px 8px rgba(0,0,0,0.12);
@@ -139,6 +139,62 @@ html, body {
 }
 .icon-btn:active { transform: scale(0.92); }
 .icon-btn.muted { background: #dcdde1; }
+
+/* 10秒タイマーバッジ */
+.timer-badge {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2.5px solid #ff9f1a;
+  padding: 2px 10px; border-radius: 20px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  height: 34px; user-select: none;
+  transition: all 0.25s ease;
+}
+.timer-icon { font-size: 16px; }
+.timer-gauge-bg {
+  width: 60px; height: 10px; background: #dfe4ea;
+  border-radius: 5px; overflow: hidden; position: relative;
+}
+.timer-gauge-fill {
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, #2ed573, #10ac84);
+  border-radius: 5px; transition: width 0.1s linear, background 0.3s;
+}
+.timer-num {
+  font-size: 15px; font-weight: 900; color: #2f3542;
+  min-width: 20px; text-align: right; font-family: monospace;
+}
+.timer-badge.warning {
+  border-color: #ff4757; background: #fff0f3;
+  animation: timerAlertPulse 0.5s infinite alternate;
+}
+.timer-badge.warning .timer-gauge-fill {
+  background: linear-gradient(90deg, #ff4757, #ff6b81);
+}
+.timer-badge.warning .timer-num {
+  color: #ff4757;
+}
+.timer-badge.timeout {
+  border-color: #e84118; background: #ffeaa7;
+  animation: shakeCard 0.4s ease;
+}
+
+@keyframes timerAlertPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4); }
+  100% { transform: scale(1.08); box-shadow: 0 0 8px 3px rgba(255, 71, 87, 0.5); }
+}
+
+.timer-toggle-btn {
+  font-size: 13px; font-weight: 900; padding: 0 10px;
+  border-radius: 20px !important; width: auto !important; height: 34px;
+  background: linear-gradient(135deg, #ff9f1a, #feca57);
+  color: #ffffff; border: 2px solid #ffffff;
+  box-shadow: 0 3px 8px rgba(255, 159, 26, 0.3);
+  cursor: pointer; display: flex; align-items: center; gap: 3px;
+}
+.timer-toggle-btn.off {
+  background: #ced6e0; color: #747d8c; box-shadow: none; border-color: #dfe4ea;
+}
 
 /* ==========================================================================
    1. ホーム画面＆カテゴリタブ

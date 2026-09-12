@@ -74,6 +74,7 @@ class GameWeekQuiz {
     `;
 
     this.renderButtons(q.day);
+    this.app.startTimer(10);
 
     setTimeout(() => {
       if (!this.app.isCurrentView('week_quiz')) return;
@@ -106,6 +107,7 @@ class GameWeekQuiz {
       // 正解！
       this.isCleared = true;
       this.isLocked = true;
+      this.app.stopTimer();
 
       element.classList.add('correct-answer');
       window.soundSystem.playStamp();

@@ -50,6 +50,7 @@ class GameRocket {
     }
 
     this.renderRings();
+    this.app.startTimer(10);
 
     setTimeout(() => {
       if (!this.app.isCurrentView('rocket')) return;
@@ -111,6 +112,8 @@ class GameRocket {
         // 100到達！発射＆月面到着
         this.handleLaunchSuccess();
       } else {
+        // 次のステップのためにタイマーをリセット
+        this.app.startTimer(10);
         // 次のリングをアクティブに
         const nextEl = this.ringsGridEl.querySelector(`.energy-ring[data-index="${this.currentStepIndex}"]`);
         if (nextEl) {
@@ -129,6 +132,7 @@ class GameRocket {
   handleLaunchSuccess() {
     this.isCleared = true;
     this.isLocked = true;
+    this.app.stopTimer();
 
     if (this.rocketShipEl) {
       this.rocketShipEl.classList.add('warp-launch');

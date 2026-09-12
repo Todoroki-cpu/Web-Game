@@ -158,6 +158,8 @@ class GameDots {
     this.charManager.setCharacter('anpan');
     this.charManager.setState('idle');
 
+    this.app.startTimer(10);
+
     if (this.ctx) {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
@@ -233,10 +235,9 @@ class GameDots {
 
       const shape = this.shapes[this.currentShapeIdx];
       if (this.currentDotIndex >= shape.points.length) {
-        // すべて繋ぎ終わった（最後のドットから1番目へ自動接続して完成）
         this.handleShapeComplete();
       } else {
-        // 次のターゲットを強調
+        this.app.startTimer(10);
         const nextEl = this.dotsOverlayEl.querySelector(`.dot-marker[data-index="${this.currentDotIndex}"]`);
         if (nextEl) {
           nextEl.classList.add('next-target');
@@ -292,6 +293,7 @@ class GameDots {
 
   handleShapeComplete() {
     this.isCleared = true;
+    this.app.stopTimer();
     this.redrawLines();
 
     // イラストを表示

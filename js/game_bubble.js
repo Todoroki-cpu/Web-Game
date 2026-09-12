@@ -59,6 +59,7 @@ class GameBubble {
 
     // バブルの生成
     this.createBubbles(numbers);
+    this.app.startTimer(10);
 
     // 音声案内
     setTimeout(() => {
@@ -120,6 +121,7 @@ class GameBubble {
       // 正解！
       this.isCleared = true;
       this.isLocked = true;
+      this.app.stopTimer();
 
       // 破裂エフェクト
       element.classList.add('popped');

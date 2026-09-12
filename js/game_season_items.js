@@ -133,6 +133,7 @@ class GameSeasonItems {
     `;
 
     this.renderItems(season);
+    this.app.startTimer(10);
 
     setTimeout(() => {
       if (!this.app.isCurrentView('season_items')) return;
@@ -192,6 +193,8 @@ class GameSeasonItems {
       if (this.collectedCount >= this.targetCount) {
         // 3つ集まった！
         this.handleSeasonClear();
+      } else {
+        this.app.startTimer(10);
       }
     } else {
       // 違う季節のアイテム
@@ -204,6 +207,7 @@ class GameSeasonItems {
   handleSeasonClear() {
     this.isCleared = true;
     this.isLocked = true;
+    this.app.stopTimer();
 
     setTimeout(() => {
       this.charManager.setState('celebrate');
