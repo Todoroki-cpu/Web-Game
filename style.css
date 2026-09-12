@@ -882,17 +882,36 @@ html, body {
 /* 3D 空間 ＆ ターンテーブル */
 .princess-stage-3d-scene {
   flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center;
-  position: relative; cursor: grab; z-index: 5;
-  width: 100%; height: 100%;
+  perspective: 1000px; position: relative; cursor: grab;
 }
 .princess-stage-3d-scene:active { cursor: grabbing; }
 
-.princess-stage-3d-scene canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-  touch-action: none;
+.princess-turntable-base {
+  position: relative; width: 220px; height: 320px;
+  transform-style: preserve-3d; transition: transform 0.05s ease-out;
+  display: flex; align-items: center; justify-content: center;
 }
+.turntable-floor {
+  position: absolute; bottom: -85px; left: 50%; transform: translateX(-50%) rotateX(82deg) translateZ(-40px);
+  width: 260px; height: 260px; border-radius: 50%;
+  border: 4px solid #ffffff; box-shadow: 0 0 25px rgba(241, 196, 15, 0.7), inset 0 0 15px rgba(0,0,0,0.2);
+  pointer-events: none; transition: background-color 0.5s;
+}
+.doll-3d-wrapper {
+  position: relative; width: 220px; height: 320px; transform-style: preserve-3d;
+  transform: translateZ(35px);
+}
+.doll-layer {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.doll-svg { width: 100%; height: 100%; }
+
+/* 裏面を向いたときの自然な深度切り替え */
+.doll-3d-wrapper.viewing-back .layer-face { opacity: 0; }
+.doll-3d-wrapper.viewing-back .layer-front-hair { opacity: 0.15; }
+.doll-3d-wrapper.viewing-back .layer-back-hair { transform: scale(1.05) translateZ(10px); }
+.doll-3d-wrapper.viewing-back .layer-back-wings { transform: translateZ(12px); }
 
 .stage-drag-hint {
   text-align: center; font-size: 11px; font-weight: bold; color: #ffffff;
