@@ -8,61 +8,99 @@ OUTPUT_DIR = "c:/work/Web-game/audio"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # 話者ID:
-# あんぱん: 3 (ずんだもん)
-# ばいきん: 11 (玄野武宏)
-# しょくぱん: 2 (四国めたん)
-# めろんぱん: 8 (春日部つむぎ)
+# キティ風 (リボンキャット): 0 (四国めたん あまあま)
+# シナモン風 (フラッフィーパピー): 8 (春日部つむぎ)
+# プリン風 (ゴールデンベレー): 1 (ずんだもん あまあま)
+# メロディ風 (ピンクバニー): 10 (雨晴はう)
 
-new_voices = [
+hiragana_voices = [
     # タイトルコール
-    ("game_title_7", "ぐるぐる とけい！", 3),
-    ("game_title_8", "とけい ぴったりマッチ！", 8),
-    ("game_title_9", "1しゅうかん トレイン！", 11),
-    ("game_title_10", "ようび カレンダー！", 2),
-    ("game_title_11", "きせつの アイテムあつめ！", 8),
-    ("game_title_12", "めぐる まほうの木！", 3),
+    ("game_title_13", "ひらがな なぞりがき！", 8),
+    ("game_title_14", "キャラクター かるた！", 0),
+    ("game_title_15", "ことばの もぐもぐパズル！", 1),
+    ("cat_hiragana", "ひらがなの ゲーム！", 8),
 
-    # 時計用
-    ("clock_prompt_7", "あさ 7じ に はりを まわしてね！", 3),
-    ("clock_prompt_12", "おひる 12じ に はりを まわしてね！", 3),
-    ("clock_prompt_3", "3じの おやつに はりを まわしてね！", 3),
-    ("clock_prompt_8", "よる 8じの おやすみに はりを まわしてね！", 3),
-    ("clock_prompt_930", "9じはん に はりを まわしてね！", 3),
-    ("clock_match_prompt", "おなじ じかんの とけいを えらんでね！", 8),
-    ("clock_exact", "ポッポー！じかん ぴったり！", 3),
-    ("clock_match_good", "せいかい！じかん バッチリ！", 8),
+    # なぞり書き用
+    ("trace_prompt", "ガイドの すうじにあわせて ゆびで なぞってね！", 8),
+    ("trace_good", "すごい！とっても じょうずに かけたね！", 8),
+    ("trace_a", "あ！アイスの あ！", 8),
+    ("trace_i", "い！いちごの い！", 8),
+    ("trace_u", "う！うさぎの う！", 8),
+    ("trace_e", "え！えのぐの え！", 8),
+    ("trace_o", "お！おにぎりの お！", 8),
+    ("trace_ka", "か！かめの か！", 8),
+    ("trace_sa", "さ！さかなの さ！", 8),
+    ("trace_ta", "た！たいようの た！", 8),
 
-    # 曜日用
-    ("day_mon", "げつようび！", 11),
-    ("day_tue", "かようび！", 11),
-    ("day_wed", "すいようび！", 11),
-    ("day_thu", "もくようび！", 11),
-    ("day_fri", "きんようび！", 11),
-    ("day_sat", "どようび！", 11),
-    ("day_sun", "にちようび！", 11),
-    ("week_train_prompt", "あいている しゃりょうに ただしい ようびを つなげてね！", 11),
-    ("week_train_clear", "ガッシャーン！1しゅうかん トレイン しゅっぱつ進行！", 11),
-    ("week_quiz_prompt", "ヒントをみて ただしい ようびを タッチしてね！", 2),
-    ("week_quiz_good", "たいへんよくできました！", 2),
+    # 単音（五十音主要文字）
+    ("hira_a", "あ！", 0),
+    ("hira_i", "い！", 0),
+    ("hira_u", "う！", 0),
+    ("hira_e", "え！", 0),
+    ("hira_o", "お！", 0),
+    ("hira_ka", "か！", 0),
+    ("hira_ki", "き！", 0),
+    ("hira_ku", "く！", 0),
+    ("hira_ke", "け！", 0),
+    ("hira_ko", "こ！", 0),
+    ("hira_sa", "さ！", 0),
+    ("hira_shi", "し！", 0),
+    ("hira_su", "す！", 0),
+    ("hira_se", "せ！", 0),
+    ("hira_so", "そ！", 0),
+    ("hira_ta", "た！", 0),
+    ("hira_chi", "ち！", 0),
+    ("hira_tsu", "つ！", 0),
+    ("hira_te", "て！", 0),
+    ("hira_to", "と！", 0),
+    ("hira_na", "な！", 0),
+    ("hira_ni", "に！", 0),
+    ("hira_nu", "ぬ！", 0),
+    ("hira_ne", "ね！", 0),
+    ("hira_no", "の！", 0),
+    ("hira_ha", "は！", 0),
+    ("hira_hi", "ひ！", 0),
+    ("hira_fu", "ふ！", 0),
+    ("hira_he", "へ！", 0),
+    ("hira_ho", "ほ！", 0),
+    ("hira_ma", "ま！", 0),
+    ("hira_mi", "み！", 0),
+    ("hira_mu", "む！", 0),
+    ("hira_me", "め！", 0),
+    ("hira_mo", "も！", 0),
+    ("hira_ya", "や！", 0),
+    ("hira_yu", "ゆ！", 0),
+    ("hira_yo", "よ！", 0),
+    ("hira_ra", "ら！", 0),
+    ("hira_ri", "り！", 0),
+    ("hira_ru", "る！", 0),
+    ("hira_re", "れ！", 0),
+    ("hira_ro", "ろ！", 0),
+    ("hira_wa", "わ！", 0),
+    ("hira_wo", "を！", 0),
+    ("hira_nn", "ん！", 0),
 
-    # 季節用
-    ("season_spring", "はる！", 8),
-    ("season_summer", "なつ！", 8),
-    ("season_autumn", "あき！", 8),
-    ("season_winter", "ふゆ！", 8),
-    ("season_items_prompt", "この きせつの アイテムを カゴにいれてね！", 8),
-    ("season_items_clear", "いっぱい あつまったね！おいしそう！", 8),
-    ("season_wheel_prompt", "つぎの きせつに ダイヤルを まわしてね！", 3),
-    ("season_wheel_clear", "まほうの木が へんしん！きれいだね！", 3),
+    # かるた用問題
+    ("karuta_prompt", "よまれた ひらがなカードを パチンと タッチしてね！", 0),
+    ("karuta_q_ringo", "りんごの り は どれかな？", 0),
+    ("karuta_q_usagi", "うさぎの う を タッチしてね！", 0),
+    ("karuta_q_neko", "ねこの ね は どれかな？", 0),
+    ("karuta_q_kuma", "くまの く を タッチしてね！", 0),
+    ("karuta_q_sakana", "さかなの さ は どれかな？", 0),
+    ("karuta_q_tori", "とりの と を タッチしてね！", 0),
+    ("karuta_hit", "パチン！だいせいかい！", 0),
 
-    # カテゴリ案内
-    ("cat_numbers", "すうじの ゲーム！", 3),
-    ("cat_clock", "とけいの ゲーム！", 8),
-    ("cat_days", "ようびの ゲーム！", 11),
-    ("cat_seasons", "きせつの ゲーム！", 2)
+    # 言葉パズル用
+    ("word_prompt", "もじを ならべて ことばを つくってね！", 1),
+    ("word_ringo", "りんご！おいしそう！", 1),
+    ("word_panda", "ぱんだ！かわいいね！", 1),
+    ("word_kuruma", "くるま！かっこいい！", 1),
+    ("word_neko", "ねこ！ニャー！", 1),
+    ("word_kuma", "くま！だいせいこう！", 1),
+    ("word_cake", "ケーキ！おいしいー！", 1)
 ]
 
-def synthesize(text, filename, speaker=3):
+def synthesize(text, filename, speaker=0):
     out_path = os.path.join(OUTPUT_DIR, f"{filename}.wav")
     if os.path.exists(out_path):
         print(f"Skipping (exists): {filename}.wav")
@@ -95,11 +133,11 @@ def synthesize(text, filename, speaker=3):
         print(f"Error generating {filename}: {e}")
 
 def main():
-    print("=== Generating Clock, Days, Seasons Voices ===")
-    for key, txt, spk in new_voices:
+    print("=== Generating Hiragana & Sanrio Voices ===")
+    for key, txt, spk in hiragana_voices:
         synthesize(txt, key, speaker=spk)
 
-    print("\n=== All audio generation done! ===")
+    print("\n=== All hiragana audio generation done! ===")
 
 if __name__ == "__main__":
     main()

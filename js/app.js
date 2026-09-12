@@ -1,5 +1,5 @@
-/**
- * app.js - メインアプリケーション管理 ＆ 全12ゲームルーティング
+﻿/**
+ * app.js - メインアプリケーション管理 ＆ 全15ゲームルーティング (すうじ・とけい・ようび・きせつ・ひらがな)
  */
 
 class GameApp {
@@ -8,7 +8,7 @@ class GameApp {
     this.currentHomeCategory = 'numbers';
     this.particles = new ParticleSystem('effects-canvas');
 
-    // 全12ゲームのインスタンス化
+    // 全15ゲームのインスタンス化
     this.gameCounting = new GameCounting(this);
     this.gameDots = new GameDots(this);
     this.gameBubble = new GameBubble(this);
@@ -21,6 +21,9 @@ class GameApp {
     this.gameWeekQuiz = new GameWeekQuiz(this);
     this.gameSeasonItems = new GameSeasonItems(this);
     this.gameSeasonWheel = new GameSeasonWheel(this);
+    this.gameHiraganaTrace = new GameHiraganaTrace(this);
+    this.gameHiraganaKaruta = new GameHiraganaKaruta(this);
+    this.gameHiraganaWord = new GameHiraganaWord(this);
 
     this.homeCharManager = new CharacterManager('home-character-stage');
 
@@ -38,7 +41,10 @@ class GameApp {
       week_train: document.getElementById('view-game-week-train'),
       week_quiz: document.getElementById('view-game-week-quiz'),
       season_items: document.getElementById('view-game-season-items'),
-      season_wheel: document.getElementById('view-game-season-wheel')
+      season_wheel: document.getElementById('view-game-season-wheel'),
+      hiragana_trace: document.getElementById('view-game-hiragana-trace'),
+      hiragana_karuta: document.getElementById('view-game-hiragana-karuta'),
+      hiragana_word: document.getElementById('view-game-hiragana-word')
     };
 
     this.homeBtn = document.getElementById('home-btn');
@@ -97,7 +103,7 @@ class GameApp {
       });
     });
 
-    // 12枚のゲーム選択カードのクリックイベント
+    // 15枚のゲーム選択カードのクリックイベント
     const bindCard = (id, voiceKey, viewName) => {
       const el = document.getElementById(id);
       if (el) {
@@ -121,6 +127,9 @@ class GameApp {
     bindCard('menu-card-week-quiz', 'game_title_10', 'week_quiz');
     bindCard('menu-card-season-items', 'game_title_11', 'season_items');
     bindCard('menu-card-season-wheel', 'game_title_12', 'season_wheel');
+    bindCard('menu-card-hiragana-trace', 'game_title_13', 'hiragana_trace');
+    bindCard('menu-card-hiragana-karuta', 'game_title_14', 'hiragana_karuta');
+    bindCard('menu-card-hiragana-word', 'game_title_15', 'hiragana_word');
 
     // もう1回遊ぶボタン
     if (this.restartBtn) {
@@ -140,6 +149,9 @@ class GameApp {
         else if (v === 'week_quiz') this.gameWeekQuiz.start();
         else if (v === 'season_items') this.gameSeasonItems.start();
         else if (v === 'season_wheel') this.gameSeasonWheel.start();
+        else if (v === 'hiragana_trace') this.gameHiraganaTrace.start();
+        else if (v === 'hiragana_karuta') this.gameHiraganaKaruta.start();
+        else if (v === 'hiragana_word') this.gameHiraganaWord.start();
         else this.switchView('home');
       });
     }
@@ -159,15 +171,28 @@ class GameApp {
       panel.classList.toggle('active', panel.id === `cat-panel-${categoryName}`);
     });
 
-    // カテゴリ案内ボイス
+    // カテゴリ案内ボイス ＆ キャラクター切り替え
     const catVoices = {
       numbers: 'cat_numbers',
+      hiragana: 'cat_hiragana',
       clock: 'cat_clock',
       days: 'cat_days',
       seasons: 'cat_seasons'
     };
     if (catVoices[categoryName]) {
       window.soundSystem.playVoice(catVoices[categoryName]);
+    }
+
+    if (categoryName === 'hiragana') {
+      this.homeCharManager.setCharacter('cinna');
+    } else if (categoryName === 'clock') {
+      this.homeCharManager.setCharacter('shokupan');
+    } else if (categoryName === 'days') {
+      this.homeCharManager.setCharacter('baikin');
+    } else if (categoryName === 'seasons') {
+      this.homeCharManager.setCharacter('melonpan');
+    } else {
+      this.homeCharManager.setCharacter('anpan');
     }
   }
 
@@ -183,12 +208,7 @@ class GameApp {
       this.viewHome.classList.add('active');
       this.homeBtn.style.display = 'none';
       this.updateStamps(0, 5);
-      this.homeCharManager.setCharacter('anpan');
-      this.homeCharManager.setState('talking');
-      setTimeout(() => {
-        window.soundSystem.playVoice('home_select');
-        setTimeout(() => this.homeCharManager.setState('idle'), 2000);
-      }, 300);
+      this.switchHomeCategory(this.currentHomeCategory);
     } else {
       this.homeBtn.style.display = 'flex';
       const targetViewEl = this.views[viewName];
@@ -209,6 +229,12 @@ class GameApp {
       else if (viewName === 'week_quiz') this.gameWeekQuiz.start();
       else if (viewName === 'season_items') this.gameSeasonItems.start();
       else if (viewName === 'season_wheel') this.gameSeasonWheel.start();
+      else if (viewName === 'hiragana_trace') {
+        setTimeout(() => this.gameHiraganaTrace.initCanvasSize(), 100);
+        this.gameHiraganaTrace.start();
+      }
+      else if (viewName === 'hiragana_karuta') this.gameHiraganaKaruta.start();
+      else if (viewName === 'hiragana_word') this.gameHiraganaWord.start();
     }
   }
 

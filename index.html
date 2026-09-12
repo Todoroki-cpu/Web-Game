@@ -61,6 +61,7 @@
       <!-- カテゴリタブ -->
       <div class="category-tabs-bar">
         <button class="cat-tab-btn active" data-category="numbers">🔢 すうじ</button>
+        <button class="cat-tab-btn" data-category="hiragana">🔤 ひらがな</button>
         <button class="cat-tab-btn" data-category="clock">⏰ とけい</button>
         <button class="cat-tab-btn" data-category="days">📅 ようび</button>
         <button class="cat-tab-btn" data-category="seasons">🌸 きせつ</button>
@@ -104,6 +105,30 @@
             <div class="card-icon">🎯 🎪 ⚾</div>
             <h2 class="card-title">すうじの 的あて</h2>
             <p class="card-desc">大きい数字の的を ボールで倒そう！</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- パネル: ひらがな (サンリオ風 3ゲーム) -->
+      <div class="home-cat-panel" id="cat-panel-hiragana">
+        <div class="menu-cards-grid">
+          <div class="menu-card card-hiragana-trace" id="menu-card-hiragana-trace">
+            <div class="card-badge">なぞりがき</div>
+            <div class="card-icon">✨ 🍦 🍓</div>
+            <h2 class="card-title">ひらがな なぞり書き</h2>
+            <p class="card-desc">ガイドにあわせて 楽しくなぞろう！</p>
+          </div>
+          <div class="menu-card card-hiragana-karuta" id="menu-card-hiragana-karuta">
+            <div class="card-badge">かるたあそび</div>
+            <div class="card-icon">🎪 🍎 🐰</div>
+            <h2 class="card-title">キャラクター かるた</h2>
+            <p class="card-desc">よまれた文字を パチンとタッチ！</p>
+          </div>
+          <div class="menu-card card-hiragana-word" id="menu-card-hiragana-word">
+            <div class="card-badge">ことばパズル</div>
+            <div class="card-icon">🍱 🍰 🐼</div>
+            <h2 class="card-title">ことばの もぐもぐパズル</h2>
+            <p class="card-desc">文字をならべて ごちそうを作ろう！</p>
           </div>
         </div>
       </div>
@@ -449,6 +474,62 @@
         </div>
         <div class="season-wheel-choices" id="season-wheel-buttons"></div>
       </section>
+    <!-- ==========================================
+         14. ゲーム13：ひらがな なぞり書き
+         ========================================== -->
+    <main class="view-panel" id="view-game-hiragana-trace">
+      <section class="stage-upper">
+        <div class="speech-container" id="hiragana-trace-speech-bubble">
+          <div class="speech-text" id="hiragana-trace-speech-text">ガイドにあわせて なぞってね！</div>
+          <div class="repeat-hint">🔊 タップすると もういちど おしゃべりするよ</div>
+        </div>
+        <div class="character-box" id="hiragana-trace-character-stage"></div>
+      </section>
+      <section class="trace-stage-lower">
+        <div class="trace-canvas-wrapper">
+          <canvas id="hiragana-trace-canvas"></canvas>
+          <div class="trace-reward-popup" id="hiragana-trace-reward">
+            <span class="trace-reward-emoji" id="hiragana-trace-reward-emoji">🍦</span>
+            <span class="trace-reward-word" id="hiragana-trace-reward-word">あ：アイス</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ==========================================
+         15. ゲーム14：キャラクター かるた
+         ========================================== -->
+    <main class="view-panel" id="view-game-hiragana-karuta">
+      <section class="stage-upper">
+        <div class="speech-container" id="hiragana-karuta-speech-bubble">
+          <div class="speech-text" id="hiragana-karuta-speech-text">よまれた ひらがなカードを タッチしてね！</div>
+          <div class="repeat-hint">🔊 タップすると もういちど おしゃべりするよ</div>
+        </div>
+        <div class="character-box-small" id="hiragana-karuta-character-stage"></div>
+      </section>
+      <section class="karuta-stage-lower">
+        <div class="karuta-tatami-mat">
+          <div class="karuta-cards-grid" id="hiragana-karuta-cards-grid"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ==========================================
+         16. ゲーム15：ことばの もぐもぐパズル
+         ========================================== -->
+    <main class="view-panel" id="view-game-hiragana-word">
+      <section class="stage-upper">
+        <div class="speech-container" id="hiragana-word-speech-bubble">
+          <div class="speech-text" id="hiragana-word-speech-text">もじを ならべて ことばを つくってね！</div>
+          <div class="repeat-hint">🔊 タップすると もういちど おしゃべりするよ</div>
+        </div>
+        <div class="character-box" id="hiragana-word-character-stage"></div>
+      </section>
+      <section class="word-stage-lower">
+        <div class="word-target-card" id="hiragana-word-target-clue"></div>
+        <div class="word-slots-tray" id="hiragana-word-slots-container"></div>
+        <div class="word-tiles-palette" id="hiragana-word-tiles-container"></div>
+      </section>
     </main>
 
   </div>
@@ -479,6 +560,9 @@
   <script src="js/game_week_quiz.js"></script>
   <script src="js/game_season_items.js"></script>
   <script src="js/game_season_wheel.js"></script>
+  <script src="js/game_hiragana_trace.js"></script>
+  <script src="js/game_hiragana_karuta.js"></script>
+  <script src="js/game_hiragana_word.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
