@@ -160,6 +160,7 @@ class GamePrincess {
   initDOM() {
     this.containerEl = document.getElementById('view-game-princess');
     this.stageWrapperEl = document.getElementById('princess-stage-wrapper');
+    this.stageSceneEl = document.getElementById('princess-stage-scene') || document.querySelector('.princess-stage-3d-scene');
     this.turntableEl = document.getElementById('princess-3d-turntable');
     this.dollContainerEl = document.getElementById('princess-doll-container');
     this.categoriesTabsEl = document.getElementById('princess-category-tabs');
@@ -184,6 +185,7 @@ class GamePrincess {
     window.soundSystem.startPrincessBgm();
     window.soundSystem.playSparkle();
 
+    this.toggleAutoSpin(false);
     this.rotationAngle = 0;
     this.updateTurntableRotation();
 
@@ -193,10 +195,19 @@ class GamePrincess {
     this.updateStageBackground();
   }
 
+  stop() {
+    this.toggleAutoSpin(false);
+  }
+
   bindEvents() {
-    // 3D ターンテーブルのドラッグ回転制御
-    if (this.stageWrapperEl) {
+    // 3D ターンテーブルのドラッグ回転制御 (ステージ中央の3D描画エリアに限定)
+    const dragTarget = this.stageSceneEl || this.stageWrapperEl;
+    if (dragTarget) {
       const onStart = (e) => {
+        // ボタン類がクリックされた場合はドラッグ開始しない
+        if (e.target.closest('button') || e.target.closest('.stage-action-btn')) {
+          return;
+        }
         this.isDragging = true;
         this.startX = e.touches ? e.touches[0].clientX : e.clientX;
         this.startAngle = this.rotationAngle;
@@ -217,32 +228,35 @@ class GamePrincess {
         this.isDragging = false;
       };
 
-      this.stageWrapperEl.addEventListener('mousedown', onStart);
+      dragTarget.addEventListener('mousedown', onStart);
       window.addEventListener('mousemove', onMove);
       window.addEventListener('mouseup', onEnd);
 
-      this.stageWrapperEl.addEventListener('touchstart', onStart, { passive: true });
+      dragTarget.addEventListener('touchstart', onStart, { passive: true });
       window.addEventListener('touchmove', onMove, { passive: true });
       window.addEventListener('touchend', onEnd);
     }
 
-    // 自動回転ボタン
+    // 自動回転ボタン (クリック時のイベント伝播を抑止して確実にトグル)
     if (this.spinBtn) {
-      this.spinBtn.addEventListener('click', () => {
+      this.spinBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         this.toggleAutoSpin(!this.isAutoSpinning);
       });
     }
 
     // おまかせランダムコーデボタン
     if (this.randomBtn) {
-      this.randomBtn.addEventListener('click', () => {
+      this.randomBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         this.randomizeCoordinate();
       });
     }
 
     // 📸 写真撮影ボタン
     if (this.photoBtn) {
-      this.photoBtn.addEventListener('click', () => {
+      this.photoBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         this.takePrincessPhoto();
       });
     }
@@ -256,7 +270,13 @@ class GamePrincess {
   }
 
   toggleAutoSpin(enable) {
-    this.isAutoSpinning = enable;
+    if (this.spinAnimId) {
+      cancelAnimationFrame(this.spinAnimId);
+      this.spinAnimId = null;
+    }
+
+    this.isAutoSpinning = !!enable;
+
     if (this.spinBtn) {
       this.spinBtn.classList.toggle('active', this.isAutoSpinning);
       this.spinBtn.innerHTML = this.isAutoSpinning ? '⏸️ ていし' : '✨ 3D かいてん';
@@ -271,11 +291,6 @@ class GamePrincess {
         this.spinAnimId = requestAnimationFrame(spinLoop);
       };
       this.spinAnimId = requestAnimationFrame(spinLoop);
-    } else {
-      if (this.spinAnimId) {
-        cancelAnimationFrame(this.spinAnimId);
-        this.spinAnimId = null;
-      }
     }
   }
 

@@ -386,6 +386,7 @@ class GameApp {
   switchView(viewName) {
     this.currentView = viewName;
     this.hideCompleteModal();
+    if (this.gamePrincess) this.gamePrincess.stop();
 
     // 全ビューを非表示
     if (this.viewHome) this.viewHome.classList.remove('active');
