@@ -1,6 +1,7 @@
 /**
  * game_princess.js - 3Dプリンセス着せ替えゲーム (Royal Princess 3D Dress-up)
- * 8カテゴリ × 各10種類（計80アイテム）、360度3D回転ステージ、写真撮影、優雅なロイヤルワルツBGM
+ * Three.js WebGL による完全立体・360度3D回転キャラクターモデル
+ * 8カテゴリ × 各10種類（計80アイテム）、3Dターンテーブル、写真撮影、優雅なロイヤルワルツBGM
  */
 
 class GamePrincess {
@@ -13,6 +14,17 @@ class GamePrincess {
     this.startX = 0;
     this.startAngle = 0;
     this.spinAnimId = null;
+
+    // Three.js 関連オブジェクト
+    this.scene = null;
+    this.camera = null;
+    this.renderer = null;
+    this.turntableGroup = null;
+    this.characterGroup = null;
+    this.pedestalMesh = null;
+    this.pedestalGlow = null;
+    this.animTime = 0;
+    this.isThreeInitialized = false;
 
     // 現在着用中のアイテムID
     this.selected = {
@@ -160,9 +172,8 @@ class GamePrincess {
   initDOM() {
     this.containerEl = document.getElementById('view-game-princess');
     this.stageWrapperEl = document.getElementById('princess-stage-wrapper');
-    this.stageSceneEl = document.getElementById('princess-stage-scene') || document.querySelector('.princess-stage-3d-scene');
-    this.turntableEl = document.getElementById('princess-3d-turntable');
-    this.dollContainerEl = document.getElementById('princess-doll-container');
+    this.stageSceneEl = document.getElementById('princess-stage-scene');
+    this.canvasEl = document.getElementById('princess-three-canvas');
     this.categoriesTabsEl = document.getElementById('princess-category-tabs');
     this.itemsGridEl = document.getElementById('princess-items-grid');
     this.currentCategoryTitleEl = document.getElementById('princess-current-category-title');
@@ -182,16 +193,26 @@ class GamePrincess {
     this.app.timer.hide();
 
     // ロイヤルワルツBGM開始
-    window.soundSystem.startPrincessBgm();
-    window.soundSystem.playSparkle();
+    if (window.soundSystem) {
+      window.soundSystem.startPrincessBgm();
+      window.soundSystem.playSparkle();
+    }
+
+    if (!this.isThreeInitialized) {
+      this.initThree();
+    } else {
+      this.onResize();
+    }
 
     this.toggleAutoSpin(false);
     this.rotationAngle = 0;
-    this.updateTurntableRotation();
+    if (this.turntableGroup) {
+      this.turntableGroup.rotation.y = 0;
+    }
 
     this.renderCategoryTabs();
     this.renderItemsGrid(this.currentCategory);
-    this.renderDoll();
+    this.buildCharacter3D();
     this.updateStageBackground();
   }
 
@@ -199,15 +220,135 @@ class GamePrincess {
     this.toggleAutoSpin(false);
   }
 
+  // =========================================================================
+  // Three.js WebGL 3D シーン初期化
+  // =========================================================================
+  initThree() {
+    if (!window.THREE || !this.canvasEl) return;
+
+    const width = this.canvasEl.clientWidth || 320;
+    const height = this.canvasEl.clientHeight || 460;
+
+    // 1. シーン作成
+    this.scene = new THREE.Scene();
+
+    // 2. カメラ作成 (全身が綺麗に収まるアングル)
+    this.camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 100);
+    this.camera.position.set(0, 1.05, 4.3);
+    this.camera.lookAt(0, 0.95, 0);
+
+    // 3. レンダラー作成 (背景透過・アンチエイリアス・高画質バッファ)
+    this.renderer = new THREE.WebGLRenderer({
+      canvas: this.canvasEl,
+      alpha: true,
+      antialias: true,
+      preserveDrawingBuffer: true
+    });
+    this.renderer.setSize(width, height);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    this.renderer.outputEncoding = THREE.sRGBEncoding;
+
+    // 4. ライティング設定 (アニメ調リッチスタジオライティング)
+    const ambientLight = new THREE.AmbientLight(0xfff5f8, 0.85);
+    this.scene.add(ambientLight);
+
+    const keyLight = new THREE.DirectionalLight(0xffffff, 0.9);
+    keyLight.position.set(2.5, 4, 3.5);
+    this.scene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0xffe4e8, 0.5);
+    fillLight.position.set(-2.5, 2.5, 2.5);
+    this.scene.add(fillLight);
+
+    // 後方からのリムライト（髪やドレスの輪郭を美しく光らせる）
+    const rimLight = new THREE.DirectionalLight(0xffeaa7, 0.7);
+    rimLight.position.set(0, 3, -3.5);
+    this.scene.add(rimLight);
+
+    // 5. 3D 回転ターンテーブル＆キャラクターグループ
+    this.turntableGroup = new THREE.Group();
+    this.scene.add(this.turntableGroup);
+
+    // 3D ターンテーブル台座（円形ゴールドステップ＆発光ディスク）
+    const pedestalGeo = new THREE.CylinderGeometry(1.05, 1.15, 0.1, 36);
+    const pedestalMat = new THREE.MeshStandardMaterial({
+      color: 0xf1c40f,
+      metalness: 0.7,
+      roughness: 0.25
+    });
+    this.pedestalMesh = new THREE.Mesh(pedestalGeo, pedestalMat);
+    this.pedestalMesh.position.y = -0.05;
+    this.turntableGroup.add(this.pedestalMesh);
+
+    const glowGeo = new THREE.CylinderGeometry(0.98, 0.98, 0.02, 36);
+    this.pedestalGlowMat = new THREE.MeshStandardMaterial({
+      color: 0xf5cd79,
+      emissive: 0xf5cd79,
+      emissiveIntensity: 0.2,
+      roughness: 0.3
+    });
+    this.pedestalGlow = new THREE.Mesh(glowGeo, this.pedestalGlowMat);
+    this.pedestalGlow.position.y = 0.01;
+    this.turntableGroup.add(this.pedestalGlow);
+
+    // キャラクター親グループ
+    this.characterGroup = new THREE.Group();
+    this.turntableGroup.add(this.characterGroup);
+
+    this.isThreeInitialized = true;
+
+    // リサイズ監視
+    window.addEventListener('resize', () => this.onResize());
+    if (window.ResizeObserver && this.stageSceneEl) {
+      const ro = new ResizeObserver(() => this.onResize());
+      ro.observe(this.stageSceneEl);
+    }
+
+    // レンダリングループ開始
+    this.animate();
+  }
+
+  onResize() {
+    if (!this.renderer || !this.camera || !this.canvasEl) return;
+    const width = this.canvasEl.clientWidth;
+    const height = this.canvasEl.clientHeight;
+    if (width === 0 || height === 0) return;
+
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(width, height);
+  }
+
+  animate() {
+    requestAnimationFrame(() => this.animate());
+    if (!this.renderer || !this.scene || !this.camera) return;
+
+    this.animTime += 0.025;
+
+    // 微細な息づかい・浮遊アニメーション
+    if (this.characterGroup) {
+      this.characterGroup.position.y = Math.sin(this.animTime * 1.5) * 0.012;
+    }
+
+    // 羽やオーラのゆらめき
+    if (this.wingsMesh) {
+      this.wingsMesh.rotation.y = Math.sin(this.animTime * 3) * 0.12;
+    }
+    if (this.auraGroup) {
+      this.auraGroup.rotation.y += 0.02;
+    }
+
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  // =========================================================================
+  // イベントバインド
+  // =========================================================================
   bindEvents() {
-    // 3D ターンテーブルのドラッグ回転制御 (ステージ中央の3D描画エリアに限定)
-    const dragTarget = this.stageSceneEl || this.stageWrapperEl;
+    const dragTarget = this.stageSceneEl || this.canvasEl;
     if (dragTarget) {
       const onStart = (e) => {
-        // ボタン類がクリックされた場合はドラッグ開始しない
-        if (e.target.closest('button') || e.target.closest('.stage-action-btn')) {
-          return;
-        }
+        if (e.target.closest('button') || e.target.closest('.stage-action-btn')) return;
         this.isDragging = true;
         this.startX = e.touches ? e.touches[0].clientX : e.clientX;
         this.startAngle = this.rotationAngle;
@@ -220,8 +361,10 @@ class GamePrincess {
         if (!this.isDragging) return;
         const currentX = e.touches ? e.touches[0].clientX : e.clientX;
         const deltaX = currentX - this.startX;
-        this.rotationAngle = (this.startAngle + deltaX * 0.75) % 360;
-        this.updateTurntableRotation();
+        this.rotationAngle = (this.startAngle + deltaX * 0.015);
+        if (this.turntableGroup) {
+          this.turntableGroup.rotation.y = this.rotationAngle;
+        }
       };
 
       const onEnd = () => {
@@ -237,7 +380,7 @@ class GamePrincess {
       window.addEventListener('touchend', onEnd);
     }
 
-    // 自動回転ボタン (クリック時のイベント伝播を抑止して確実にトグル)
+    // 自動回転ボタン
     if (this.spinBtn) {
       this.spinBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -283,29 +426,22 @@ class GamePrincess {
     }
 
     if (this.isAutoSpinning) {
-      window.soundSystem.playSparkle();
+      if (window.soundSystem) window.soundSystem.playSparkle();
       const spinLoop = () => {
         if (!this.isAutoSpinning) return;
-        this.rotationAngle = (this.rotationAngle + 1.2) % 360;
-        this.updateTurntableRotation();
+        this.rotationAngle += 0.018;
+        if (this.turntableGroup) {
+          this.turntableGroup.rotation.y = this.rotationAngle;
+        }
         this.spinAnimId = requestAnimationFrame(spinLoop);
       };
       this.spinAnimId = requestAnimationFrame(spinLoop);
     }
   }
 
-  updateTurntableRotation() {
-    if (!this.turntableEl) return;
-    this.turntableEl.style.transform = `rotateY(${this.rotationAngle}deg)`;
-
-    // 角度に応じたライティングと裏面表示の調整
-    const normAngle = ((this.rotationAngle % 360) + 360) % 360;
-    const isBack = normAngle > 90 && normAngle < 270;
-    if (this.dollContainerEl) {
-      this.dollContainerEl.classList.toggle('viewing-back', isBack);
-    }
-  }
-
+  // =========================================================================
+  // カテゴリ＆アイテムUI描画
+  // =========================================================================
   renderCategoryTabs() {
     if (!this.categoriesTabsEl) return;
     this.categoriesTabsEl.innerHTML = '';
@@ -317,7 +453,7 @@ class GamePrincess {
       btn.innerHTML = `<span class="cat-icon">${cat.icon}</span><span class="cat-label">${cat.name}</span>`;
 
       btn.addEventListener('click', () => {
-        window.soundSystem.playPop();
+        if (window.soundSystem) window.soundSystem.playPop();
         this.currentCategory = cat.id;
         this.renderCategoryTabs();
         this.renderItemsGrid(cat.id);
@@ -337,7 +473,7 @@ class GamePrincess {
       this.currentCategoryTitleEl.textContent = `${catMeta.name}（全10種類）`;
     }
 
-    items.forEach((item, idx) => {
+    items.forEach((item) => {
       const card = document.createElement('div');
       const isSelected = this.selected[categoryId] === item.id;
       card.className = 'princess-item-card pop-in' + (isSelected ? ' selected' : '');
@@ -372,17 +508,18 @@ class GamePrincess {
 
   equipItem(category, itemId) {
     this.selected[category] = itemId;
-    window.soundSystem.playDressSwoosh();
-    window.soundSystem.playSparkle();
+    if (window.soundSystem) {
+      window.soundSystem.playDressSwoosh();
+      window.soundSystem.playSparkle();
+    }
 
-    // パーティクル演出
     if (this.stageWrapperEl) {
       const rect = this.stageWrapperEl.getBoundingClientRect();
       this.app.particles.sparkle(rect.left + rect.width / 2, rect.top + rect.height / 2, 25);
     }
 
     this.renderItemsGrid(this.currentCategory);
-    this.renderDoll();
+    this.buildCharacter3D();
 
     if (category === 'stage') {
       this.updateStageBackground();
@@ -390,8 +527,10 @@ class GamePrincess {
   }
 
   randomizeCoordinate() {
-    window.soundSystem.playMagicChime ? window.soundSystem.playMagicChime() : window.soundSystem.playFanfare();
-    window.soundSystem.playSparkle();
+    if (window.soundSystem) {
+      window.soundSystem.playMagicChime ? window.soundSystem.playMagicChime() : window.soundSystem.playFanfare();
+      window.soundSystem.playSparkle();
+    }
 
     Object.keys(this.database).forEach(cat => {
       const items = this.database[cat];
@@ -405,7 +544,7 @@ class GamePrincess {
     }
 
     this.renderItemsGrid(this.currentCategory);
-    this.renderDoll();
+    this.buildCharacter3D();
     this.updateStageBackground();
   }
 
@@ -415,14 +554,33 @@ class GamePrincess {
     if (sceneryBgEl) {
       sceneryBgEl.innerHTML = this.getStageSvg(stageItem);
     }
-    const floorEl = document.getElementById('princess-turntable-floor');
-    if (floorEl) {
-      floorEl.style.backgroundColor = stageItem.floor || '#f5cd79';
+    if (this.pedestalGlowMat) {
+      this.pedestalGlowMat.color.set(stageItem.floor || '#f5cd79');
+      this.pedestalGlowMat.emissive.set(stageItem.floor || '#f5cd79');
     }
   }
 
-  renderDoll() {
-    if (!this.dollContainerEl) return;
+  // =========================================================================
+  // Three.js 立体3Dプリンセスモデル構築 (全カテゴリ 3D Mesh 生成)
+  // =========================================================================
+  buildCharacter3D() {
+    if (!this.characterGroup || !window.THREE) return;
+
+    // 既存の3Dメッシュをメモリ解放してクリア
+    while (this.characterGroup.children.length > 0) {
+      const obj = this.characterGroup.children[0];
+      this.characterGroup.remove(obj);
+      if (obj.geometry) obj.geometry.dispose();
+      if (obj.material) {
+        if (Array.isArray(obj.material)) {
+          obj.material.forEach(m => m.dispose());
+        } else {
+          obj.material.dispose();
+        }
+      }
+    }
+    this.wingsMesh = null;
+    this.auraGroup = null;
 
     const hair = this.database.hair.find(h => h.id === this.selected.hair) || this.database.hair[0];
     const dress = this.database.dress.find(d => d.id === this.selected.dress) || this.database.dress[0];
@@ -432,1081 +590,1027 @@ class GamePrincess {
     const prop = this.database.props.find(p => p.id === this.selected.props) || this.database.props[0];
     const shoe = this.database.shoes.find(s => s.id === this.selected.shoes) || this.database.shoes[0];
 
-    // レイヤー構築（SVG 3D レイヤリング）
-    this.dollContainerEl.innerHTML = `
-      <!-- レイヤー1: 後ろ髪 ＆ 背中の羽・オーラ -->
-      <div class="doll-layer layer-back-wings">
-        ${this.getWingsSvg(jewel)}
-      </div>
-      <div class="doll-layer layer-back-hair">
-        ${this.getBackHairSvg(hair)}
-      </div>
+    // 1. 素体（ヘッド・フェイス・首・上半身・腕・脚）
+    this.create3DBody(makeup);
 
-      <!-- レイヤー2: プリンセス素体（ボディ・手足・ベース） -->
-      <div class="doll-layer layer-body">
-        ${this.getBodySvg(makeup)}
-      </div>
+    // 2. 3D 立体ヘアスタイル（10種）
+    this.create3DHair(hair);
 
-      <!-- レイヤー3: くつ・ガラスの靴 -->
-      <div class="doll-layer layer-shoes">
-        ${this.getShoesSvg(shoe)}
-      </div>
+    // 3. 3D 立体ドレス・ガウン（10種）
+    this.create3DDress(dress);
 
-      <!-- レイヤー4: ドレス・ガウン衣装 -->
-      <div class="doll-layer layer-dress">
-        ${this.getDressSvg(dress)}
-      </div>
+    // 4. 3D ティアラ・頭飾り（10種）
+    this.create3DHeadwear(head);
 
-      <!-- レイヤー5: ジュエリー・手袋・チョーカー -->
-      <div class="doll-layer layer-jewelry">
-        ${this.getJewelrySvg(jewel)}
-      </div>
+    // 5. 3D ジュエリー＆背中の羽・オーラ（10種）
+    this.create3DJewelry(jewel);
 
-      <!-- レイヤー6: 手持ちアイテム（ステッキ・ブーケ） -->
-      <div class="doll-layer layer-props">
-        ${this.getPropsSvg(prop)}
-      </div>
+    // 6. 3D 手持ちアイテム（10種）
+    this.create3DProp(prop);
 
-      <!-- レイヤー7: フェイスメイク（瞳・チーク・リップ） -->
-      <div class="doll-layer layer-face">
-        ${this.getFaceMakeupSvg(makeup)}
-      </div>
-
-      <!-- レイヤー8: 前髪・サイドヘア -->
-      <div class="doll-layer layer-front-hair">
-        ${this.getFrontHairSvg(hair)}
-      </div>
-
-      <!-- レイヤー9: ティアラ・ヘッドドレス -->
-      <div class="doll-layer layer-headwear">
-        ${this.getHeadwearSvg(head)}
-      </div>
-    `;
+    // 7. 3D くつ・ガラスの靴（10種）
+    this.create3DShoes(shoe);
   }
 
-  // --- SVG レンダリングヘルパー ---
+  // --- 1. 3D素体とダイナミック高解像度フェイス ---
+  create3DBody(makeup) {
+    const skinMat = new THREE.MeshStandardMaterial({
+      color: 0xffede6,
+      roughness: 0.35,
+      metalness: 0.05
+    });
 
-  getWingsSvg(jewel) {
-    if (jewel.type === 'fairy_wings') {
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          <ellipse cx="65" cy="180" rx="60" ry="38" fill="rgba(85, 239, 196, 0.45)" stroke="#55efc4" stroke-width="2.5" transform="rotate(-30 65 180)"/>
-          <ellipse cx="215" cy="180" rx="60" ry="38" fill="rgba(85, 239, 196, 0.45)" stroke="#55efc4" stroke-width="2.5" transform="rotate(30 215 180)"/>
-          <circle cx="65" cy="180" r="15" fill="rgba(255,255,255,0.7)"/>
-          <circle cx="215" cy="180" r="15" fill="rgba(255,255,255,0.7)"/>
-        </svg>
-      `;
-    } else if (jewel.type === 'angel_wings') {
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          <path d="M140 180 Q80 120 40 150 Q20 200 60 230 Q100 240 140 200 Z" fill="rgba(255,255,255,0.85)" stroke="#dfe4ea" stroke-width="3"/>
-          <path d="M140 180 Q200 120 240 150 Q260 200 220 230 Q180 240 140 200 Z" fill="rgba(255,255,255,0.85)" stroke="#dfe4ea" stroke-width="3"/>
-        </svg>
-      `;
-    } else if (jewel.type === 'butterfly_aura') {
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          <circle cx="50" cy="140" r="12" fill="rgba(162, 155, 254, 0.6)" class="aura-sparkle"/>
-          <circle cx="230" cy="130" r="14" fill="rgba(253, 121, 168, 0.6)" class="aura-sparkle"/>
-          <circle cx="40" cy="240" r="10" fill="rgba(254, 202, 87, 0.6)" class="aura-sparkle"/>
-          <circle cx="240" cy="250" r="12" fill="rgba(85, 239, 196, 0.6)" class="aura-sparkle"/>
-        </svg>
-      `;
-    }
-    return '';
-  }
+    // 頭部 3D 球体
+    const headGeo = new THREE.SphereGeometry(0.28, 32, 24);
+    headGeo.scale(1.0, 1.08, 0.95);
+    const headMesh = new THREE.Mesh(headGeo, skinMat);
+    headMesh.position.set(0, 1.52, 0);
+    this.characterGroup.add(headMesh);
 
-  getBackHairSvg(hair) {
-    const t = hair.type;
-    const gradId = `backHairGrad_${hair.id}`;
-    const defs = `
-      <defs>
-        <linearGradient id="${gradId}" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="${hair.color}"/>
-          <stop offset="100%" stop-color="${hair.shadow}"/>
-        </linearGradient>
-      </defs>
-    `;
+    // フェイスダイナミックテクスチャ（大きなアニメ瞳・キラキラハイライト・チーク・リップ）
+    const faceCanvas = document.createElement('canvas');
+    faceCanvas.width = 512;
+    faceCanvas.height = 512;
+    const ctx = faceCanvas.getContext('2d');
+    ctx.clearRect(0, 0, 512, 512);
 
-    if (t === 'twin_roll') {
-      // 2. ツインロール
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- ツインテール根本お団子 -->
-          <circle cx="70" cy="85" r="18" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <circle cx="210" cy="85" r="18" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <!-- 縦ロールツインドリル -->
-          <path d="M55 85 Q30 150 50 250 Q75 260 85 235 Q65 150 85 85 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <path d="M225 85 Q250 150 230 250 Q205 260 195 235 Q215 150 195 85 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <!-- ロールの螺旋ハイライト -->
-          <path d="M40 140 Q65 160 80 140 M45 190 Q65 210 82 190" stroke="#ffffff" stroke-width="2.5" opacity="0.6" fill="none"/>
-          <path d="M240 140 Q215 160 200 140 M235 190 Q215 210 198 190" stroke="#ffffff" stroke-width="2.5" opacity="0.6" fill="none"/>
-        </svg>
-      `;
-    } else if (t === 'high_pony') {
-      // 3. 高めポニーテール
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- ポニーテール結び目 -->
-          <ellipse cx="140" cy="45" rx="30" ry="20" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <!-- なびくポニーテール -->
-          <path d="M150 40 Q210 20 240 90 Q260 180 225 260 Q195 240 215 170 Q210 90 160 48 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <circle cx="160" cy="42" r="6" fill="#ff4757"/>
-        </svg>
-      `;
-    } else if (t === 'half_up') {
-      // 4. ハーフアップ
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- 上半分まとめ髪 -->
-          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q210 120 140 130 Q70 120 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <!-- 下半分の流れるウェーブ -->
-          <path d="M90 120 Q60 200 70 290 Q140 315 210 290 Q220 200 190 120 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <ellipse cx="140" cy="70" rx="14" ry="8" fill="#a29bfe" stroke="#ffffff" stroke-width="1.5"/>
-        </svg>
-      `;
-    } else if (t === 'rose_up') {
-      // 5. エレガントローズ（アップスタイル）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- 頭頂部の大きなローズシニヨン -->
-          <ellipse cx="140" cy="18" rx="38" ry="26" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <path d="M115 18 Q140 2 165 18 Q140 34 115 18" stroke="${hair.shadow}" stroke-width="2.5" fill="none"/>
-          <circle cx="125" cy="14" r="3.5" fill="#ffffff"/><circle cx="155" cy="14" r="3.5" fill="#ffffff"/>
-          <circle cx="140" cy="18" r="4" fill="#ff7675"/>
-        </svg>
-      `;
-    } else if (t === 'soft_bob') {
-      // 6. ふんわり内巻きボブ
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- 肩上の短め丸みボブ -->
-          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q215 125 195 175 Q140 188 85 175 Q65 125 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <path d="M85 175 Q140 192 195 175" stroke="${hair.shadow}" stroke-width="3" fill="none"/>
-        </svg>
-      `;
-    } else if (t === 'side_braid') {
-      // 7. サイドテール三つ編み
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q210 130 140 140 Q85 130 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <!-- 左肩に垂れる三つ編み -->
-          <path d="M95 120 Q65 170 70 230 Q60 275 75 310 Q90 300 95 240 Q110 170 115 120 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <circle cx="75" cy="305" r="5" fill="#ff4757"/>
-        </svg>
-      `;
-    } else if (t === 'starlight_long') {
-      // 8. 姫カット超ロングストレート
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- 膝下までまっすぐ伸びるスーパーロング -->
-          <polygon points="85,75 78,22 140,20 202,22 195,75 228,200 220,365 60,365 52,200" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <line x1="100" y1="120" x2="100" y2="360" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
-          <line x1="180" y1="120" x2="180" y2="360" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
-        </svg>
-      `;
-    } else if (t === 'crown_braid') {
-      // 9. クラシカル王冠三つ編み
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q205 130 140 135 Q75 130 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <!-- 後頭部を包む三つ編みクラウン -->
-          <path d="M85 70 Q140 100 195 70" stroke="${hair.shadow}" stroke-width="8" stroke-dasharray="6,4" fill="none"/>
-        </svg>
-      `;
-    } else if (t === 'fairy_short') {
-      // 10. フェアリーショート
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- すっきり短いピクシーショート -->
-          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q205 110 170 130 Q140 135 110 130 Q75 110 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-        </svg>
-      `;
+    // チーク
+    const blushColor = makeup.blush || '#ffb8b8';
+    const leftBlushGrad = ctx.createRadialGradient(165, 305, 0, 165, 305, 45);
+    leftBlushGrad.addColorStop(0, blushColor + 'b0');
+    leftBlushGrad.addColorStop(1, blushColor + '00');
+    ctx.fillStyle = leftBlushGrad;
+    ctx.beginPath();
+    ctx.arc(165, 305, 45, 0, Math.PI * 2);
+    ctx.fill();
+
+    const rightBlushGrad = ctx.createRadialGradient(347, 305, 0, 347, 305, 45);
+    rightBlushGrad.addColorStop(0, blushColor + 'b0');
+    rightBlushGrad.addColorStop(1, blushColor + '00');
+    ctx.fillStyle = rightBlushGrad;
+    ctx.beginPath();
+    ctx.arc(347, 305, 45, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 瞳の描画
+    const drawEye = (cx, cy, isLeft) => {
+      const eyeColor = makeup.eyeColor === 'oddeye' ? (isLeft ? '#0984e3' : '#f1c40f') : (makeup.eyeColor || '#0984e3');
+      const isWink = !isLeft && makeup.mood === 'wink';
+
+      if (isWink) {
+        // ウインク目
+        ctx.strokeStyle = '#2d3436';
+        ctx.lineWidth = 10;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.arc(cx, cy + 10, 36, Math.PI * 1.15, Math.PI * 1.85);
+        ctx.stroke();
+
+        // まつげ
+        ctx.beginPath();
+        ctx.moveTo(cx + 25, cy + 2);
+        ctx.lineTo(cx + 42, cy - 8);
+        ctx.stroke();
+        return;
+      }
+
+      // 白目
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 38, 52, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 虹彩グラデーション
+      const irisGrad = ctx.createLinearGradient(cx, cy - 45, cx, cy + 45);
+      irisGrad.addColorStop(0, '#130f40');
+      irisGrad.addColorStop(0.35, eyeColor);
+      irisGrad.addColorStop(1, '#ffffff');
+      ctx.fillStyle = irisGrad;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 3, 30, 44, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 瞳孔
+      ctx.fillStyle = '#0a0a1e';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 3, 14, 22, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // キラキラハイライト
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.ellipse(cx - 10, cy - 14, 10, 15, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx + 10, cy + 16, 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (makeup.mood === 'heart') {
+        ctx.fillStyle = '#ff7597';
+        ctx.font = '24px sans-serif';
+        ctx.fillText('💖', cx - 12, cy + 14);
+      }
+
+      // 上まつげアイライン
+      ctx.strokeStyle = '#2d3436';
+      ctx.lineWidth = 9;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.arc(cx, cy - 8, 40, Math.PI * 1.15, Math.PI * 1.85);
+      ctx.stroke();
+
+      // 目尻まつげ
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      if (isLeft) {
+        ctx.moveTo(cx - 30, cy - 20);
+        ctx.lineTo(cx - 48, cy - 28);
+      } else {
+        ctx.moveTo(cx + 30, cy - 20);
+        ctx.lineTo(cx + 48, cy - 28);
+      }
+      ctx.stroke();
+    };
+
+    drawEye(170, 240, true);
+    drawEye(342, 240, false);
+
+    // 眉毛
+    ctx.strokeStyle = '#636e72';
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.arc(170, 185, 36, Math.PI * 1.25, Math.PI * 1.75);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(342, 185, 36, Math.PI * 1.25, Math.PI * 1.75);
+    ctx.stroke();
+
+    // 鼻
+    ctx.fillStyle = '#fab1a0';
+    ctx.beginPath();
+    ctx.arc(256, 305, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 口・リップグロス
+    const lipColor = makeup.lip || '#ff7675';
+    ctx.fillStyle = lipColor;
+    ctx.strokeStyle = '#d63031';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    if (makeup.mood === 'cat') {
+      ctx.moveTo(230, 355);
+      ctx.quadraticCurveTo(243, 368, 256, 356);
+      ctx.quadraticCurveTo(269, 368, 282, 355);
+      ctx.stroke();
     } else {
-      // 1. ロイヤルウェーブ (デフォルト)
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q240 140 235 260 Q215 320 185 325 Q140 335 95 325 Q65 320 45 260 Q40 140 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <path d="M50 230 Q40 290 65 325 Q85 335 105 315" fill="${hair.color}" opacity="0.6"/>
-          <path d="M230 230 Q240 290 215 325 Q195 335 175 315" fill="${hair.color}" opacity="0.6"/>
-        </svg>
-      `;
+      ctx.arc(256, 345, 18, 0.15, Math.PI - 0.15);
+      ctx.fill();
+      ctx.stroke();
+      // リップハイライト
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.ellipse(256, 354, 8, 3, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    const faceTexture = new THREE.CanvasTexture(faceCanvas);
+    const faceMat = new THREE.MeshBasicMaterial({
+      map: faceTexture,
+      transparent: true,
+      depthWrite: false
+    });
+    const facePlaneGeo = new THREE.PlaneGeometry(0.48, 0.48);
+    const facePlane = new THREE.Mesh(facePlaneGeo, faceMat);
+    facePlane.position.set(0, 1.51, 0.265);
+    this.characterGroup.add(facePlane);
+
+    // 耳
+    const earGeo = new THREE.SphereGeometry(0.06, 12, 12);
+    earGeo.scale(0.5, 1.0, 0.7);
+    const leftEar = new THREE.Mesh(earGeo, skinMat);
+    leftEar.position.set(-0.27, 1.51, -0.02);
+    this.characterGroup.add(leftEar);
+    const rightEar = leftEar.clone();
+    rightEar.position.x = 0.27;
+    this.characterGroup.add(rightEar);
+
+    // 首
+    const neckGeo = new THREE.CylinderGeometry(0.065, 0.08, 0.2, 16);
+    const neckMesh = new THREE.Mesh(neckGeo, skinMat);
+    neckMesh.position.set(0, 1.28, 0);
+    this.characterGroup.add(neckMesh);
+
+    // 上半身（デコルテ・肩・胸）
+    const torsoGeo = new THREE.CylinderGeometry(0.12, 0.095, 0.38, 20);
+    const torsoMesh = new THREE.Mesh(torsoGeo, skinMat);
+    torsoMesh.position.set(0, 1.02, 0);
+    this.characterGroup.add(torsoMesh);
+
+    // 腕（左腕・右腕）
+    const armGeo = new THREE.CylinderGeometry(0.038, 0.032, 0.45, 16);
+    const leftArm = new THREE.Mesh(armGeo, skinMat);
+    leftArm.position.set(-0.21, 0.98, 0.02);
+    leftArm.rotation.z = 0.18;
+    this.characterGroup.add(leftArm);
+
+    const rightArm = new THREE.Mesh(armGeo, skinMat);
+    rightArm.position.set(0.21, 0.98, 0.04);
+    rightArm.rotation.z = -0.22;
+    rightArm.rotation.x = -0.25; // 前方に少し曲げてアイテムを持たせる
+    this.characterGroup.add(rightArm);
+
+    // 手（左手・右手）
+    const handGeo = new THREE.SphereGeometry(0.04, 12, 12);
+    const leftHand = new THREE.Mesh(handGeo, skinMat);
+    leftHand.position.set(-0.25, 0.74, 0.02);
+    this.characterGroup.add(leftHand);
+
+    const rightHand = new THREE.Mesh(handGeo, skinMat);
+    rightHand.position.set(0.26, 0.75, 0.14);
+    this.characterGroup.add(rightHand);
+
+    // 脚（左右）
+    const legGeo = new THREE.CylinderGeometry(0.05, 0.038, 0.68, 16);
+    const leftLeg = new THREE.Mesh(legGeo, skinMat);
+    leftLeg.position.set(-0.06, 0.42, 0);
+    this.characterGroup.add(leftLeg);
+
+    const rightLeg = new THREE.Mesh(legGeo, skinMat);
+    rightLeg.position.set(0.06, 0.42, 0);
+    this.characterGroup.add(rightLeg);
+  }
+
+  // --- 2. 3D ヘアスタイル（10種完全立体造形） ---
+  create3DHair(hair) {
+    const hairColor = parseInt(hair.color.replace('#', '0x'), 16);
+    const hairMat = new THREE.MeshStandardMaterial({
+      color: hairColor,
+      roughness: 0.35,
+      metalness: 0.12
+    });
+
+    const hairGroup = new THREE.Group();
+    this.characterGroup.add(hairGroup);
+
+    // 共通ベース：頭頂部ヘアキャップ
+    const capGeo = new THREE.SphereGeometry(0.3, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.55);
+    capGeo.scale(1.02, 1.05, 1.02);
+    const capMesh = new THREE.Mesh(capGeo, hairMat);
+    capMesh.position.set(0, 1.54, 0);
+    hairGroup.add(capMesh);
+
+    // 前髪・フェイスサイドバングス（立体的に額とお顔を包み込む）
+    const bangsGeo = new THREE.CylinderGeometry(0.31, 0.32, 0.18, 20, 1, true, -Math.PI * 0.4, Math.PI * 0.8);
+    const bangsMesh = new THREE.Mesh(bangsGeo, hairMat);
+    bangsMesh.position.set(0, 1.62, 0.02);
+    hairGroup.add(bangsMesh);
+
+    // サイドの姫毛・横髪
+    const sideLockGeo = new THREE.CylinderGeometry(0.035, 0.015, 0.42, 12);
+    const leftLock = new THREE.Mesh(sideLockGeo, hairMat);
+    leftLock.position.set(-0.25, 1.40, 0.12);
+    leftLock.rotation.z = -0.12;
+    hairGroup.add(leftLock);
+
+    const rightLock = new THREE.Mesh(sideLockGeo, hairMat);
+    rightLock.position.set(0.25, 1.40, 0.12);
+    rightLock.rotation.z = 0.12;
+    hairGroup.add(rightLock);
+
+    const t = hair.type;
+
+    if (t === 'royal_wave') {
+      // 1. ロイヤルゴールデン：背中と肩周りに豊かに広がるウェーブヘア
+      const backGeo = new THREE.CylinderGeometry(0.28, 0.42, 0.85, 20, 1, true, Math.PI * 0.4, Math.PI * 1.2);
+      const backMesh = new THREE.Mesh(backGeo, hairMat);
+      backMesh.position.set(0, 1.15, -0.06);
+      hairGroup.add(backMesh);
+
+      // 肩にかかる左右のロール束
+      for (let i = -1; i <= 1; i += 2) {
+        const curlGeo = new THREE.TorusGeometry(0.12, 0.045, 12, 24, Math.PI * 1.4);
+        const curlMesh = new THREE.Mesh(curlGeo, hairMat);
+        curlMesh.position.set(i * 0.24, 1.12, 0.05);
+        curlMesh.rotation.y = i * 0.6;
+        hairGroup.add(curlMesh);
+      }
+    } else if (t === 'twin_roll') {
+      // 2. パステルピンクツイン：両サイドの巨大縦ロール・ツインドリル
+      for (let i = -1; i <= 1; i += 2) {
+        // お団子根本
+        const bunGeo = new THREE.SphereGeometry(0.12, 16, 16);
+        const bunMesh = new THREE.Mesh(bunGeo, hairMat);
+        bunMesh.position.set(i * 0.35, 1.65, -0.02);
+        hairGroup.add(bunMesh);
+
+        // スパイラルドリルロール（積層トーラス＆円錐）
+        for (let j = 0; j < 5; j++) {
+          const rollGeo = new THREE.TorusGeometry(0.09 - j * 0.012, 0.038, 12, 20);
+          const rollMesh = new THREE.Mesh(rollGeo, hairMat);
+          rollMesh.position.set(i * (0.35 + Math.sin(j * 0.8) * 0.03), 1.55 - j * 0.14, -0.02 + Math.cos(j * 0.8) * 0.03);
+          rollMesh.rotation.x = Math.PI / 2;
+          hairGroup.add(rollMesh);
+        }
+      }
+    } else if (t === 'high_pony') {
+      // 3. クリスタルシルバー：高めポニーテール
+      const knotGeo = new THREE.SphereGeometry(0.1, 16, 16);
+      const knotMesh = new THREE.Mesh(knotGeo, hairMat);
+      knotMesh.position.set(0, 1.76, -0.2);
+      hairGroup.add(knotMesh);
+
+      const ponyGeo = new THREE.CylinderGeometry(0.08, 0.03, 0.85, 16);
+      const ponyMesh = new THREE.Mesh(ponyGeo, hairMat);
+      ponyMesh.position.set(0.08, 1.35, -0.38);
+      ponyMesh.rotation.x = -0.45;
+      ponyMesh.rotation.z = -0.15;
+      hairGroup.add(ponyMesh);
+    } else if (t === 'half_up') {
+      // 4. オーロララベンダー：ハーフアップ＆優美なロングバック
+      const bunGeo = new THREE.CylinderGeometry(0.14, 0.16, 0.12, 16);
+      const bunMesh = new THREE.Mesh(bunGeo, hairMat);
+      bunMesh.position.set(0, 1.62, -0.22);
+      bunMesh.rotation.x = 0.5;
+      hairGroup.add(bunMesh);
+
+      const backGeo = new THREE.CylinderGeometry(0.24, 0.36, 0.95, 18, 1, true, Math.PI * 0.35, Math.PI * 1.3);
+      const backMesh = new THREE.Mesh(backGeo, hairMat);
+      backMesh.position.set(0, 1.05, -0.05);
+      hairGroup.add(backMesh);
+    } else if (t === 'rose_up') {
+      // 5. エレガントローズ：頭頂部のローズシニヨンアップ
+      const roseGroup = new THREE.Group();
+      roseGroup.position.set(0, 1.84, -0.05);
+      for (let r = 0; r < 4; r++) {
+        const ringGeo = new THREE.TorusGeometry(0.06 + r * 0.035, 0.03, 12, 18);
+        const ringMesh = new THREE.Mesh(ringGeo, hairMat);
+        ringMesh.rotation.x = Math.PI / 2 + (r * 0.2);
+        roseGroup.add(ringMesh);
+      }
+      hairGroup.add(roseGroup);
+    } else if (t === 'soft_bob') {
+      // 6. ミルキーミントボブ：首元を包み込むふんわり内巻きボブ
+      const bobGeo = new THREE.SphereGeometry(0.36, 24, 18, 0, Math.PI * 2, 0, Math.PI * 0.7);
+      bobGeo.scale(1.0, 0.9, 1.05);
+      const bobMesh = new THREE.Mesh(bobGeo, hairMat);
+      bobMesh.position.set(0, 1.48, -0.02);
+      hairGroup.add(bobMesh);
+    } else if (t === 'side_braid') {
+      // 7. ルビーレッドサイド：左肩に垂れる三つ編み
+      for (let b = 0; b < 6; b++) {
+        const braidNodeGeo = new THREE.SphereGeometry(0.065 - b * 0.006, 12, 12);
+        const braidNode = new THREE.Mesh(braidNodeGeo, hairMat);
+        braidNode.position.set(-0.22 - b * 0.015, 1.42 - b * 0.12, 0.12 + Math.sin(b) * 0.03);
+        hairGroup.add(braidNode);
+      }
+    } else if (t === 'starlight_long') {
+      // 8. スターライトシフォン：超ロングストレート
+      const longGeo = new THREE.CylinderGeometry(0.26, 0.38, 1.35, 20, 1, true, Math.PI * 0.3, Math.PI * 1.4);
+      const longMesh = new THREE.Mesh(longGeo, hairMat);
+      longMesh.position.set(0, 0.85, -0.05);
+      hairGroup.add(longMesh);
+    } else if (t === 'crown_braid') {
+      // 9. ショコラクラシカル：王冠ブレード編み込み
+      const crownBraidGeo = new THREE.TorusGeometry(0.29, 0.04, 14, 28);
+      const crownBraidMesh = new THREE.Mesh(crownBraidGeo, hairMat);
+      crownBraidMesh.position.set(0, 1.62, 0);
+      crownBraidMesh.rotation.x = Math.PI / 2 - 0.15;
+      hairGroup.add(crownBraidMesh);
+
+      const backGeo = new THREE.CylinderGeometry(0.24, 0.32, 0.7, 16, 1, true, Math.PI * 0.4, Math.PI * 1.2);
+      const backMesh = new THREE.Mesh(backGeo, hairMat);
+      backMesh.position.set(0, 1.2, -0.05);
+      hairGroup.add(backMesh);
+    } else if (t === 'fairy_short') {
+      // 10. フェアリーショート：軽快なショートカット
+      for (let s = 0; s < 8; s++) {
+        const spikeGeo = new THREE.ConeGeometry(0.06, 0.22, 8);
+        const spikeMesh = new THREE.Mesh(spikeGeo, hairMat);
+        const angle = (s / 8) * Math.PI * 2;
+        spikeMesh.position.set(Math.cos(angle) * 0.25, 1.55 + Math.sin(s) * 0.05, Math.sin(angle) * 0.25);
+        spikeMesh.rotation.z = Math.cos(angle) * 0.5;
+        spikeMesh.rotation.x = Math.sin(angle) * 0.5;
+        hairGroup.add(spikeMesh);
+      }
     }
   }
 
-  getBodySvg(makeup) {
-    return `
-      <svg viewBox="0 0 280 400" class="doll-svg">
-        <!-- 首と肩 -->
-        <path d="M128 115 L128 135 L105 145 L90 220 L105 220 L115 155 L140 155 L165 155 L175 220 L190 220 L175 145 L152 135 L152 115 Z" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1.5"/>
-        
-        <!-- 頭部・顔の輪郭 -->
-        <path d="M102 75 Q100 115 140 125 Q180 115 178 75 Q175 40 140 40 Q105 40 102 75 Z" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1.5"/>
-        
-        <!-- 脚・レッグ（すらりと伸びたきれいな足） -->
-        <path d="M118 245 L116 344 L130 344 L132 245 Z" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1.5"/>
-        <path d="M148 245 L150 344 L164 344 L162 245 Z" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1.5"/>
+  // --- 3. 3D 立体ドレス・衣装（10種完全3Dシルエット） ---
+  create3DDress(dress) {
+    const mainColor = parseInt(dress.mainColor.replace('#', '0x'), 16);
+    const subColor = parseInt(dress.subColor.replace('#', '0x'), 16);
 
-        <!-- キャミソール＆ペチパンツ（ベース下着） -->
-        <path d="M115 145 Q140 155 165 145 L170 210 Q140 215 110 210 Z" fill="#ffccd5" stroke="#ff8da1" stroke-width="1.5"/>
-        <path d="M108 208 Q140 215 172 208 L175 245 Q158 250 140 240 Q122 250 105 245 Z" fill="#ffccd5" stroke="#ff8da1" stroke-width="1.5"/>
-        <!-- レースフリル -->
-        <path d="M115 145 Q140 150 165 145" stroke="#ffffff" stroke-width="3" stroke-dasharray="4,4" fill="none"/>
-      </svg>
-    `;
+    const dressMat = new THREE.MeshStandardMaterial({
+      color: mainColor,
+      roughness: 0.3,
+      metalness: 0.15
+    });
+
+    const subDressMat = new THREE.MeshStandardMaterial({
+      color: subColor,
+      roughness: 0.35,
+      metalness: 0.1
+    });
+
+    const dressGroup = new THREE.Group();
+    this.characterGroup.add(dressGroup);
+
+    // ビスチェ・コルセット胴体（全ドレス共通フィット）
+    const corsetGeo = new THREE.CylinderGeometry(0.13, 0.105, 0.32, 20);
+    const corsetMesh = new THREE.Mesh(corsetGeo, dressMat);
+    corsetMesh.position.set(0, 0.98, 0);
+    dressGroup.add(corsetMesh);
+
+    // デコルテフリル・胸元トリム
+    const trimGeo = new THREE.TorusGeometry(0.135, 0.02, 10, 24);
+    const trimMesh = new THREE.Mesh(trimGeo, subDressMat);
+    trimMesh.position.set(0, 1.13, 0);
+    trimMesh.rotation.x = Math.PI / 2;
+    dressGroup.add(trimMesh);
+
+    const t = dress.type;
+
+    if (t === 'cinderella_gown') {
+      // 1. シンデレラ：大きくふくらむドーム型ボールガウン ＆ パフスリーブ
+      const skirtGeo = new THREE.SphereGeometry(0.72, 32, 24, 0, Math.PI * 2, 0, Math.PI * 0.5);
+      skirtGeo.scale(1.0, 1.15, 0.95);
+      const skirtMesh = new THREE.Mesh(skirtGeo, dressMat);
+      skirtMesh.position.set(0, 0.84, 0);
+      skirtMesh.rotation.x = Math.PI;
+      dressGroup.add(skirtMesh);
+
+      // パフスリーブ（両肩の雲のようなふんわり袖）
+      for (let i = -1; i <= 1; i += 2) {
+        const puffGeo = new THREE.SphereGeometry(0.09, 16, 16);
+        const puffMesh = new THREE.Mesh(puffGeo, subDressMat);
+        puffMesh.position.set(i * 0.19, 1.12, 0.02);
+        dressGroup.add(puffMesh);
+      }
+    } else if (t === 'rose_frill') {
+      // 2. ロイヤルローズピンク：3段ティアードフリルスカート
+      for (let f = 0; f < 3; f++) {
+        const frillGeo = new THREE.ConeGeometry(0.38 + f * 0.18, 0.36, 24, 1, true);
+        const frillMesh = new THREE.Mesh(frillGeo, f % 2 === 0 ? dressMat : subDressMat);
+        frillMesh.position.set(0, 0.72 - f * 0.22, 0);
+        dressGroup.add(frillMesh);
+      }
+    } else if (t === 'midnight_star') {
+      // 3. スターダストネイビー：星空Aラインガウン ＆ 星屑ケープ
+      const skirtGeo = new THREE.ConeGeometry(0.68, 0.88, 28, 1, true);
+      const skirtMesh = new THREE.Mesh(skirtGeo, dressMat);
+      skirtMesh.position.set(0, 0.44, 0);
+      dressGroup.add(skirtMesh);
+
+      // 肩にかかるショールケープ
+      const capeGeo = new THREE.CylinderGeometry(0.18, 0.32, 0.45, 20, 1, true, Math.PI * 0.3, Math.PI * 1.4);
+      const capeMesh = new THREE.Mesh(capeGeo, subDressMat);
+      capeMesh.position.set(0, 0.98, -0.02);
+      dressGroup.add(capeMesh);
+    } else if (t === 'fairy_chiffon') {
+      // 4. フラワーフェアリー：花びら重なるシフォンスカート
+      for (let p = 0; p < 8; p++) {
+        const petalGeo = new THREE.ConeGeometry(0.22, 0.65, 12);
+        petalGeo.scale(1.0, 1.0, 0.35);
+        const petalMesh = new THREE.Mesh(petalGeo, p % 2 === 0 ? dressMat : subDressMat);
+        const angle = (p / 8) * Math.PI * 2;
+        petalMesh.position.set(Math.cos(angle) * 0.22, 0.52, Math.sin(angle) * 0.22);
+        petalMesh.rotation.z = Math.cos(angle) * 0.35;
+        petalMesh.rotation.x = Math.sin(angle) * 0.35;
+        dressGroup.add(petalMesh);
+      }
+    } else if (t === 'aurora_mermaid') {
+      // 5. オーロラマーメイド：マーメイドライン＆裾フリル
+      const hipGeo = new THREE.CylinderGeometry(0.105, 0.24, 0.55, 20);
+      const hipMesh = new THREE.Mesh(hipGeo, dressMat);
+      hipMesh.position.set(0, 0.65, 0);
+      dressGroup.add(hipMesh);
+
+      const tailGeo = new THREE.ConeGeometry(0.65, 0.42, 24, 1, true);
+      const tailMesh = new THREE.Mesh(tailGeo, subDressMat);
+      tailMesh.position.set(0, 0.22, 0);
+      dressGroup.add(tailMesh);
+    } else if (t === 'sunlight_ball') {
+      // 6. サンライトゴールド：パニエ広がる宮廷ガウン
+      const skirtGeo = new THREE.SphereGeometry(0.78, 28, 20, 0, Math.PI * 2, 0, Math.PI * 0.5);
+      skirtGeo.scale(1.2, 1.1, 0.85);
+      const skirtMesh = new THREE.Mesh(skirtGeo, dressMat);
+      skirtMesh.position.set(0, 0.84, 0);
+      skirtMesh.rotation.x = Math.PI;
+      dressGroup.add(skirtMesh);
+    } else if (t === 'snow_frost') {
+      // 7. スノークイーン：氷のファセットガウン ＆ 立ち襟
+      const iceSkirtGeo = new THREE.CylinderGeometry(0.11, 0.72, 0.85, 8, 1, true);
+      const iceSkirt = new THREE.Mesh(iceSkirtGeo, dressMat);
+      iceSkirt.position.set(0, 0.44, 0);
+      dressGroup.add(iceSkirt);
+
+      // 高い立ち襟
+      const collarGeo = new THREE.CylinderGeometry(0.14, 0.09, 0.2, 16, 1, true, Math.PI * 0.4, Math.PI * 1.2);
+      const collar = new THREE.Mesh(collarGeo, subDressMat);
+      collar.position.set(0, 1.24, -0.04);
+      dressGroup.add(collar);
+    } else if (t === 'sweet_lolita') {
+      // 8. スイートロリータ：カップケーキベルスカート ＆ 背中の大きなリボン
+      const bellGeo = new THREE.SphereGeometry(0.55, 24, 18, 0, Math.PI * 2, 0, Math.PI * 0.65);
+      const bellMesh = new THREE.Mesh(bellGeo, dressMat);
+      bellMesh.position.set(0, 0.68, 0);
+      bellMesh.rotation.x = Math.PI;
+      dressGroup.add(bellMesh);
+
+      // 背中のビッグリボン
+      const ribbonGeo = new THREE.TorusGeometry(0.14, 0.045, 12, 20);
+      const ribbonMesh = new THREE.Mesh(ribbonGeo, subDressMat);
+      ribbonMesh.position.set(0, 0.85, -0.22);
+      dressGroup.add(ribbonMesh);
+    } else if (t === 'twilight_gown') {
+      // 9. トワイライト：前が短く後ろが長いフィッシュテールガウン
+      const highLowGeo = new THREE.CylinderGeometry(0.11, 0.65, 0.85, 24, 1, true);
+      highLowGeo.scale(1.0, 1.0, 1.3);
+      const highLow = new THREE.Mesh(highLowGeo, dressMat);
+      highLow.position.set(0, 0.46, -0.15);
+      highLow.rotation.x = 0.25;
+      dressGroup.add(highLow);
+    } else if (t === 'velvet_ruby') {
+      // 10. クラシカルルビー：重厚なベルベットガウン ＆ 白ファー裾
+      const skirtGeo = new THREE.ConeGeometry(0.65, 0.85, 24, 1, true);
+      const skirtMesh = new THREE.Mesh(skirtGeo, dressMat);
+      skirtMesh.position.set(0, 0.44, 0);
+      dressGroup.add(skirtMesh);
+
+      // ファートリム
+      const furGeo = new THREE.TorusGeometry(0.66, 0.05, 12, 32);
+      const furMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.8 });
+      const furMesh = new THREE.Mesh(furGeo, furMat);
+      furMesh.position.set(0, 0.02, 0);
+      furMesh.rotation.x = Math.PI / 2;
+      dressGroup.add(furMesh);
+    }
   }
 
-  getShoesSvg(shoe) {
+  // --- 4. 3D ティアラ・頭飾り（10種） ---
+  create3DHeadwear(head) {
+    const headGroup = new THREE.Group();
+    headGroup.position.set(0, 1.80, 0.02);
+    this.characterGroup.add(headGroup);
+
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xf1c40f, metalness: 0.85, roughness: 0.2 });
+    const crystalMat = new THREE.MeshStandardMaterial({ color: 0x74b9ff, metalness: 0.3, roughness: 0.1 });
+
+    const id = head.id;
+
+    if (id === 'head_1') {
+      // ダイヤモンドティアラ
+      const bandGeo = new THREE.TorusGeometry(0.22, 0.015, 8, 24, Math.PI);
+      const band = new THREE.Mesh(bandGeo, goldMat);
+      band.rotation.x = Math.PI / 2 - 0.2;
+      headGroup.add(band);
+
+      for (let s = -2; s <= 2; s++) {
+        const spikeGeo = new THREE.ConeGeometry(0.025, 0.08 - Math.abs(s) * 0.015, 8);
+        const spike = new THREE.Mesh(spikeGeo, crystalMat);
+        spike.position.set(s * 0.07, 0.06 - Math.abs(s) * 0.01, 0.15 - Math.abs(s) * 0.02);
+        headGroup.add(spike);
+      }
+    } else if (id === 'head_2') {
+      // ローズフラワークラウン
+      for (let r = 0; r < 7; r++) {
+        const flowerGeo = new THREE.SphereGeometry(0.038, 12, 12);
+        const flowerMat = new THREE.MeshStandardMaterial({ color: r % 2 === 0 ? 0xff7675 : 0xffc5d3, roughness: 0.4 });
+        const flower = new THREE.Mesh(flowerGeo, flowerMat);
+        const angle = (r / 6) * Math.PI * 0.8 - Math.PI * 0.4;
+        flower.position.set(Math.sin(angle) * 0.24, 0.02, Math.cos(angle) * 0.24);
+        headGroup.add(flower);
+      }
+    } else if (id === 'head_3') {
+      // バタフライカチューシャ
+      const wingGeo = new THREE.ConeGeometry(0.06, 0.12, 4);
+      wingGeo.scale(1.0, 1.0, 0.1);
+      const wingMat = new THREE.MeshStandardMaterial({ color: 0xa29bfe, transparent: true, opacity: 0.85 });
+      const wingLeft = new THREE.Mesh(wingGeo, wingMat);
+      wingLeft.position.set(-0.06, 0.08, 0.15);
+      wingLeft.rotation.z = 0.5;
+      headGroup.add(wingLeft);
+      const wingRight = wingLeft.clone();
+      wingRight.position.x = 0.06;
+      wingRight.rotation.z = -0.5;
+      headGroup.add(wingRight);
+    } else if (id === 'head_4') {
+      // 星屑のゴールドティアラ
+      const starGeo = new THREE.OctahedronGeometry(0.045);
+      for (let st = -2; st <= 2; st++) {
+        const star = new THREE.Mesh(starGeo, goldMat);
+        star.position.set(st * 0.08, 0.06, 0.18 - Math.abs(st) * 0.02);
+        headGroup.add(star);
+      }
+    } else if (id === 'head_5' || id === 'head_7') {
+      // リボン
+      const bowColor = id === 'head_7' ? 0xff4757 : 0xffffff;
+      const bowMat = new THREE.MeshStandardMaterial({ color: bowColor, roughness: 0.3 });
+      const bowGeo = new THREE.TorusGeometry(0.12, 0.04, 10, 20);
+      const bow = new THREE.Mesh(bowGeo, bowMat);
+      bow.position.set(0, 0.06, 0.12);
+      bow.rotation.x = Math.PI / 2;
+      headGroup.add(bow);
+    } else if (id === 'head_6') {
+      // 氷の結晶クラウン
+      for (let ic = -3; ic <= 3; ic++) {
+        const iceGeo = new THREE.CylinderGeometry(0.015, 0.025, 0.12 - Math.abs(ic) * 0.015, 6);
+        const ice = new THREE.Mesh(iceGeo, crystalMat);
+        ice.position.set(ic * 0.05, 0.08 - Math.abs(ic) * 0.01, 0.18 - Math.abs(ic) * 0.02);
+        headGroup.add(ice);
+      }
+    } else if (id === 'head_8') {
+      // フェザーコーム
+      const featherGeo = new THREE.ConeGeometry(0.04, 0.22, 6);
+      featherGeo.scale(1.0, 1.0, 0.2);
+      const featherMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
+      const feather = new THREE.Mesh(featherGeo, featherMat);
+      feather.position.set(0.18, 0.05, 0.12);
+      feather.rotation.z = -0.6;
+      headGroup.add(feather);
+    } else if (id === 'head_9') {
+      // 月桂樹ゴールド冠
+      const wreathGeo = new THREE.TorusGeometry(0.24, 0.02, 8, 24, Math.PI * 1.2);
+      const wreath = new THREE.Mesh(wreathGeo, goldMat);
+      wreath.rotation.x = Math.PI / 2 - 0.2;
+      headGroup.add(wreath);
+    } else if (id === 'head_10') {
+      // キャットジュエル耳
+      for (let c = -1; c <= 1; c += 2) {
+        const earGeo = new THREE.ConeGeometry(0.06, 0.12, 4);
+        const earMat = new THREE.MeshStandardMaterial({ color: 0xfd79a8, metalness: 0.4 });
+        const ear = new THREE.Mesh(earGeo, earMat);
+        ear.position.set(c * 0.18, 0.08, 0.05);
+        ear.rotation.z = -c * 0.3;
+        headGroup.add(ear);
+      }
+    }
+  }
+
+  // --- 5. 3D ジュエリー＆背中の羽・オーラ（10種） ---
+  create3DJewelry(jewel) {
+    const jewelGroup = new THREE.Group();
+    this.characterGroup.add(jewelGroup);
+
+    const id = jewel.id;
+
+    if (id === 'jewel_1') {
+      // ロイヤルパールチョーカー
+      for (let p = 0; p < 12; p++) {
+        const pearlGeo = new THREE.SphereGeometry(0.015, 8, 8);
+        const pearlMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1, metalness: 0.3 });
+        const pearl = new THREE.Mesh(pearlGeo, pearlMat);
+        const angle = (p / 12) * Math.PI * 2;
+        pearl.position.set(Math.sin(angle) * 0.08, 1.25, Math.cos(angle) * 0.08);
+        jewelGroup.add(pearl);
+      }
+    } else if (id === 'jewel_2' || id === 'jewel_8') {
+      // ドロップダイヤ / ハートペンダント
+      const gemColor = id === 'jewel_8' ? 0xff4757 : 0x74b9ff;
+      const gemGeo = new THREE.OctahedronGeometry(0.035);
+      const gemMat = new THREE.MeshStandardMaterial({ color: gemColor, metalness: 0.6, roughness: 0.1 });
+      const gem = new THREE.Mesh(gemGeo, gemMat);
+      gem.position.set(0, 1.15, 0.12);
+      jewelGroup.add(gem);
+    } else if (id === 'jewel_3') {
+      // 光る妖精の羽 (3D立体半透明メッシュ)
+      this.wingsMesh = new THREE.Group();
+      this.wingsMesh.position.set(0, 1.15, -0.12);
+      const wingGeo = new THREE.ConeGeometry(0.24, 0.65, 12);
+      wingGeo.scale(1.0, 1.0, 0.1);
+      const wingMat = new THREE.MeshStandardMaterial({
+        color: 0x55efc4,
+        transparent: true,
+        opacity: 0.75,
+        roughness: 0.1,
+        metalness: 0.2
+      });
+      const leftWing = new THREE.Mesh(wingGeo, wingMat);
+      leftWing.position.set(-0.25, 0.1, 0);
+      leftWing.rotation.z = 0.8;
+      this.wingsMesh.add(leftWing);
+
+      const rightWing = leftWing.clone();
+      rightWing.position.x = 0.25;
+      rightWing.rotation.z = -0.8;
+      this.wingsMesh.add(rightWing);
+      jewelGroup.add(this.wingsMesh);
+    } else if (id === 'jewel_4') {
+      // 純白の天使の羽
+      this.wingsMesh = new THREE.Group();
+      this.wingsMesh.position.set(0, 1.18, -0.12);
+      const wingGeo = new THREE.ConeGeometry(0.28, 0.8, 14);
+      wingGeo.scale(1.0, 1.0, 0.15);
+      const wingMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6 });
+      const leftWing = new THREE.Mesh(wingGeo, wingMat);
+      leftWing.position.set(-0.35, 0.15, 0);
+      leftWing.rotation.z = 0.9;
+      this.wingsMesh.add(leftWing);
+
+      const rightWing = leftWing.clone();
+      rightWing.position.x = 0.35;
+      rightWing.rotation.z = -0.9;
+      this.wingsMesh.add(rightWing);
+      jewelGroup.add(this.wingsMesh);
+    } else if (id === 'jewel_7') {
+      // バタフライオーラ球
+      this.auraGroup = new THREE.Group();
+      for (let a = 0; a < 6; a++) {
+        const orbGeo = new THREE.SphereGeometry(0.04, 12, 12);
+        const orbMat = new THREE.MeshStandardMaterial({
+          color: a % 2 === 0 ? 0xa29bfe : 0xfeca57,
+          emissive: 0xffffff,
+          emissiveIntensity: 0.5
+        });
+        const orb = new THREE.Mesh(orbGeo, orbMat);
+        const angle = (a / 6) * Math.PI * 2;
+        orb.position.set(Math.sin(angle) * 0.65, 0.8 + Math.sin(a * 2) * 0.3, Math.cos(angle) * 0.65);
+        this.auraGroup.add(orb);
+      }
+      jewelGroup.add(this.auraGroup);
+    }
+  }
+
+  // --- 6. 3D 手持ちアイテム（10種右手保持） ---
+  create3DProp(prop) {
+    const propGroup = new THREE.Group();
+    propGroup.position.set(0.28, 0.76, 0.18); // 右手位置
+    this.characterGroup.add(propGroup);
+
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xf1c40f, metalness: 0.8, roughness: 0.2 });
+    const id = prop.id;
+
+    if (id === 'prop_1') {
+      // 星のまほうステッキ
+      const rodGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.65, 12);
+      const rod = new THREE.Mesh(rodGeo, goldMat);
+      propGroup.add(rod);
+
+      const starGeo = new THREE.OctahedronGeometry(0.07);
+      const starMat = new THREE.MeshStandardMaterial({ color: 0xfffa65, emissive: 0xfffa65, emissiveIntensity: 0.4 });
+      const star = new THREE.Mesh(starGeo, starMat);
+      star.position.y = 0.34;
+      propGroup.add(star);
+    } else if (id === 'prop_2') {
+      // ロイヤルローズブーケ
+      for (let r = 0; r < 5; r++) {
+        const roseGeo = new THREE.SphereGeometry(0.045, 10, 10);
+        const roseMat = new THREE.MeshStandardMaterial({ color: 0xff4757, roughness: 0.4 });
+        const rose = new THREE.Mesh(roseGeo, roseMat);
+        rose.position.set(Math.sin(r) * 0.05, 0.1 + Math.cos(r) * 0.04, 0.02);
+        propGroup.add(rose);
+      }
+    } else if (id === 'prop_3') {
+      // レース扇子
+      const fanGeo = new THREE.CylinderGeometry(0.18, 0.02, 0.22, 12, 1, true, 0, Math.PI * 0.8);
+      const fanMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5, side: THREE.DoubleSide });
+      const fan = new THREE.Mesh(fanGeo, fanMat);
+      fan.position.set(0, 0.1, 0);
+      fan.rotation.x = Math.PI / 2;
+      propGroup.add(fan);
+    } else if (id === 'prop_4') {
+      // ランタン
+      const lanternGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.18, 8);
+      const lanternMat = new THREE.MeshStandardMaterial({ color: 0xfeca57, emissive: 0xfeca57, emissiveIntensity: 0.6 });
+      const lantern = new THREE.Mesh(lanternGeo, lanternMat);
+      lantern.position.set(0, -0.15, 0);
+      propGroup.add(lantern);
+    } else if (id === 'prop_5') {
+      // テディベア
+      const bearMat = new THREE.MeshStandardMaterial({ color: 0xd35400, roughness: 0.7 });
+      const bearBody = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), bearMat);
+      bearBody.position.set(0, 0.05, 0);
+      propGroup.add(bearBody);
+      const bearHead = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), bearMat);
+      bearHead.position.set(0, 0.16, 0);
+      propGroup.add(bearHead);
+    } else if (id === 'prop_6') {
+      // 三日月ロッド
+      const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.6, 12), goldMat);
+      propGroup.add(rod);
+      const moon = new THREE.Mesh(new THREE.TorusGeometry(0.08, 0.02, 8, 16, Math.PI * 1.3), goldMat);
+      moon.position.set(0, 0.32, 0);
+      propGroup.add(moon);
+    } else if (id === 'prop_7') {
+      // ハープ
+      const harp = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.02, 8, 20, Math.PI), goldMat);
+      harp.position.set(0, 0.1, 0);
+      propGroup.add(harp);
+    } else if (id === 'prop_8') {
+      // 魔法の手鏡
+      const mirror = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.02, 16), goldMat);
+      mirror.position.set(0, 0.12, 0);
+      mirror.rotation.x = Math.PI / 2;
+      propGroup.add(mirror);
+      const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.2, 8), goldMat);
+      handle.position.set(0, -0.02, 0);
+      propGroup.add(handle);
+    } else if (id === 'prop_9') {
+      // レース日傘
+      const umbrellaGeo = new THREE.ConeGeometry(0.28, 0.15, 16, 1, true);
+      const umbrellaMat = new THREE.MeshStandardMaterial({ color: 0xff7597, roughness: 0.4, side: THREE.DoubleSide });
+      const umbrella = new THREE.Mesh(umbrellaGeo, umbrellaMat);
+      umbrella.position.set(0.05, 0.35, -0.05);
+      umbrella.rotation.x = 0.4;
+      propGroup.add(umbrella);
+      const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.65, 8), goldMat);
+      rod.position.set(0.05, 0.15, -0.05);
+      rod.rotation.x = 0.4;
+      propGroup.add(rod);
+    } else if (id === 'prop_10') {
+      // ティーセット
+      const cupMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 });
+      const saucer = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.01, 14), cupMat);
+      saucer.position.set(0, 0.02, 0);
+      propGroup.add(saucer);
+      const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.025, 0.04, 12), cupMat);
+      cup.position.set(0, 0.05, 0);
+      propGroup.add(cup);
+    }
+  }
+
+  // --- 7. 3D くつ・ガラスの靴（10種） ---
+  create3DShoes(shoe) {
+    const shoeColor = parseInt(shoe.color.replace('#', '0x'), 16);
+    const shoeMat = new THREE.MeshStandardMaterial({
+      color: shoeColor,
+      roughness: 0.2,
+      metalness: shoe.id === 'shoe_1' ? 0.8 : 0.2
+    });
+
+    for (let s = -1; s <= 1; s += 2) {
+      const shoeGeo = new THREE.BoxGeometry(0.065, 0.04, 0.11);
+      const shoeMesh = new THREE.Mesh(shoeGeo, shoeMat);
+      shoeMesh.position.set(s * 0.06, 0.04, 0.02);
+      this.characterGroup.add(shoeMesh);
+
+      // ヒール
+      const heelGeo = new THREE.CylinderGeometry(0.015, 0.01, 0.06, 8);
+      const heel = new THREE.Mesh(heelGeo, shoeMat);
+      heel.position.set(s * 0.06, 0.03, -0.02);
+      this.characterGroup.add(heel);
+    }
+  }
+
+  // =========================================================================
+  // 2D サムネイル ＆ 2D 背景ステージ SVG 生成ヘルパー
+  // =========================================================================
+  getDressSvgThumbnail(dress) {
     return `
-      <svg viewBox="0 0 280 400" class="doll-svg">
-        <!-- 左足の靴（ガラスの靴・ストラップパンプス） -->
-        <path d="M114 340 L132 340 L134 354 Q123 358 112 352 Z" fill="${shoe.color}" stroke="#2f3542" stroke-width="1.5"/>
-        <ellipse cx="123" cy="348" rx="8" ry="4" fill="${shoe.color}"/>
-        <path d="M115 342 Q123 338 131 342" stroke="#ffffff" stroke-width="2" fill="none"/>
-        <circle cx="123" cy="347" r="3" fill="#ffffff"/>
-        <text x="119" y="350" font-size="8">${shoe.gem || '✨'}</text>
-        
-        <!-- 右足の靴（ガラスの靴・ストラップパンプス） -->
-        <path d="M148 340 L166 340 L168 352 Q157 358 146 354 Z" fill="${shoe.color}" stroke="#2f3542" stroke-width="1.5"/>
-        <ellipse cx="157" cy="348" rx="8" ry="4" fill="${shoe.color}"/>
-        <path d="M149 342 Q157 338 165 342" stroke="#ffffff" stroke-width="2" fill="none"/>
-        <circle cx="157" cy="347" r="3" fill="#ffffff"/>
-        <text x="153" y="350" font-size="8">${shoe.gem || '✨'}</text>
+      <svg viewBox="0 0 40 40" class="stage-thumb-svg">
+        <rect width="40" height="40" fill="${dress.mainColor}"/>
+        <path d="M12 10 L28 10 L24 20 L36 38 L4 38 L16 20 Z" fill="${dress.subColor}"/>
+        <circle cx="20" cy="18" r="4" fill="#ffffff" opacity="0.6"/>
       </svg>
     `;
   }
 
   getHairSvgThumbnail(hair) {
     return `
-      <svg viewBox="50 10 180 220" style="width:100%; height:100%; display:block; background:#fff5f7;">
-        ${this.getBackHairSvg(hair)}
-        <ellipse cx="140" cy="85" rx="34" ry="40" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1.5"/>
-        <circle cx="126" cy="82" r="3" fill="#0984e3"/><circle cx="154" cy="82" r="3" fill="#0984e3"/>
-        <path d="M136 98 Q140 102 144 98" stroke="#ff7675" stroke-width="2" fill="#ff7675"/>
-        ${this.getFrontHairSvg(hair)}
-      </svg>
-    `;
-  }
-
-  getDressSvgThumbnail(dress) {
-    return `
-      <svg viewBox="45 130 190 230" style="width:100%; height:100%; display:block; background:#fbfbfb;">
-        ${this.getDressSvg(dress)}
-      </svg>
-    `;
-  }
-
-  getDressSvg(dress) {
-    const t = dress.type;
-    const gId = `dressGrad_${dress.id}`;
-    const defs = `
-      <defs>
-        <linearGradient id="${gId}" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="${dress.mainColor}"/>
-          <stop offset="60%" stop-color="${dress.subColor}"/>
-          <stop offset="100%" stop-color="${dress.mainColor}"/>
-        </linearGradient>
-        <linearGradient id="dressShine_${dress.id}" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="rgba(255,255,255,0.4)"/>
-          <stop offset="50%" stop-color="rgba(255,255,255,0)"/>
-          <stop offset="100%" stop-color="rgba(255,255,255,0.4)"/>
-        </linearGradient>
-      </defs>
-    `;
-
-    if (t === 'cinderella_gown') {
-      // 1. シンデレラクリスタル（ペプラム付き大舞踏会ガウン）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- ドーム型大パニエスカート -->
-          <path d="M118 190 Q140 195 162 190 Q220 260 225 348 Q140 360 55 348 Q60 260 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
-          <path d="M118 190 Q140 195 162 190 Q220 260 225 348 Q140 360 55 348 Q60 260 118 190 Z" fill="url(#dressShine_${dress.id})"/>
-          <!-- 左右のシルバードレープペプラム（腰の羽根飾り） -->
-          <path d="M118 190 Q85 190 70 215 Q95 235 120 210 Z" fill="#ffffff" stroke="#74b9ff" stroke-width="1.5"/>
-          <path d="M162 190 Q195 190 210 215 Q185 235 160 210 Z" fill="#ffffff" stroke="#74b9ff" stroke-width="1.5"/>
-          <!-- 裾のクリスタルレース -->
-          <path d="M65 344 Q140 365 215 344" stroke="#ffffff" stroke-width="5" stroke-dasharray="6,6" fill="none"/>
-          <!-- トップ＆オフショルダー -->
-          <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <circle cx="140" cy="155" r="5" fill="#ffffff" stroke="#74b9ff" stroke-width="1.5"/>
-          <path d="M96 144 Q115 132 125 144 Q112 154 96 144 Z" fill="#ffffff" stroke="#74b9ff" stroke-width="1.5"/>
-          <path d="M184 144 Q165 132 155 144 Q168 154 184 144 Z" fill="#ffffff" stroke="#74b9ff" stroke-width="1.5"/>
-        </svg>
-      `;
-    } else if (t === 'rose_frill') {
-      // 2. ロイヤルローズピンク（3段ティアードフリル）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- 3段フリルスカート -->
-          <path d="M118 190 Q140 196 162 190 Q190 225 198 245 Q140 255 82 245 Q90 225 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <path d="M90 240 Q140 255 190 240 Q212 285 215 300 Q140 310 65 300 Q68 285 90 240 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <path d="M72 295 Q140 310 208 295 Q228 340 230 350 Q140 365 50 350 Q52 340 72 295 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <!-- フリル白レース縁取り -->
-          <path d="M80 245 Q140 258 200 245" stroke="#ffffff" stroke-width="3" stroke-dasharray="4,4" fill="none"/>
-          <path d="M65 300 Q140 315 215 300" stroke="#ffffff" stroke-width="3" stroke-dasharray="4,4" fill="none"/>
-          <path d="M50 350 Q140 365 230 350" stroke="#ffffff" stroke-width="4" stroke-dasharray="5,5" fill="none"/>
-          <!-- トップ -->
-          <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <circle cx="140" cy="155" r="5" fill="#ffffff" stroke="#ff4757" stroke-width="1.5"/>
-          <path d="M98 145 Q115 135 125 145 Q112 155 98 145 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
-          <path d="M182 145 Q165 135 155 145 Q168 155 182 145 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
-        </svg>
-      `;
-    } else if (t === 'midnight_star') {
-      // 3. スターダストネイビー（星形ギザギザ裾＆シアーサイドトレーン）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- 星空のサイドシアートレイン -->
-          <path d="M110 190 Q40 270 45 350 Q75 350 100 290 Z" fill="rgba(87, 96, 111, 0.45)" stroke="#feca57" stroke-width="1"/>
-          <path d="M170 190 Q240 270 235 350 Q205 350 180 290 Z" fill="rgba(87, 96, 111, 0.45)" stroke="#feca57" stroke-width="1"/>
-          <!-- 星形カットのスカート -->
-          <polygon points="118,190 162,190 220,290 195,355 160,315 140,355 120,315 85,355 60,290" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
-          <polygon points="195,355 160,315 140,355 120,315 85,355" fill="none" stroke="#feca57" stroke-width="2.5"/>
-          <!-- トップ＆星屑ブローチ -->
-          <path d="M112 140 Q140 148 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <polygon points="140,150 142,155 148,155 143,159 145,164 140,161 135,164 137,159 132,155 138,155" fill="#feca57"/>
-          <path d="M96 142 Q115 130 125 142 Z" fill="#2f3542" stroke="#feca57" stroke-width="1.5"/>
-          <path d="M184 142 Q165 130 155 142 Z" fill="#2f3542" stroke="#feca57" stroke-width="1.5"/>
-        </svg>
-      `;
-    } else if (t === 'fairy_chiffon') {
-      // 4. フラワーフェアリー（花びらカット＆リーフドレス）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- 重なる花びらスカート -->
-          <path d="M118 190 Q140 195 162 190 L205 250 L160 340 L120 250 Z" fill="url(#${gId})" stroke="#00b894" stroke-width="1.8"/>
-          <path d="M118 190 Q140 195 162 190 L160 250 L120 340 L75 250 Z" fill="url(#${gId})" stroke="#00b894" stroke-width="1.8"/>
-          <path d="M118 190 Q140 195 162 190 L185 270 L140 350 L95 270 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.8"/>
-          <!-- つる草ベルト＆花飾り -->
-          <path d="M116 195 Q140 202 164 195" stroke="#2ed573" stroke-width="4" fill="none"/>
-          <circle cx="140" cy="198" r="5" fill="#ff7675"/><circle cx="132" cy="197" r="3.5" fill="#ffeaa7"/><circle cx="148" cy="197" r="3.5" fill="#ffeaa7"/>
-          <!-- 花びらトップ -->
-          <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#00b894" stroke-width="1.8"/>
-          <path d="M96 142 Q115 130 125 142 Z" fill="#55efc4" stroke="#ffffff" stroke-width="1.5"/>
-          <path d="M184 142 Q165 130 155 142 Z" fill="#55efc4" stroke="#ffffff" stroke-width="1.5"/>
-        </svg>
-      `;
-    } else if (t === 'aurora_mermaid') {
-      // 5. オーロラマーメイド（タイト＆フィッシュテール）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- マーメイドラインスカート -->
-          <path d="M118 190 Q140 195 162 190 Q175 250 165 295 Q140 298 115 295 Q105 250 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <!-- 裾の広がった魚尾フリル -->
-          <path d="M115 295 Q140 298 165 295 Q210 330 230 355 Q140 348 50 355 Q70 330 115 295 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <path d="M50 355 Q140 345 230 355" stroke="${dress.glow}" stroke-width="3" fill="none"/>
-          <!-- トップ -->
-          <path d="M112 140 Q140 148 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <circle cx="140" cy="155" r="5" fill="${dress.glow}" stroke="#ffffff" stroke-width="1.5"/>
-          <!-- 貝殻風ショルダー -->
-          <path d="M96 142 Q115 130 125 142 Z" fill="${dress.subColor}" stroke="#ffffff" stroke-width="1.5"/>
-          <path d="M184 142 Q165 130 155 142 Z" fill="${dress.subColor}" stroke="#ffffff" stroke-width="1.5"/>
-        </svg>
-      `;
-    } else if (t === 'sunlight_ball') {
-      // 6. サンライトゴールド（ロココ調超ワイドパニエ＆ゴールドドレープ）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- 超ワイド横広がりパニエスカート -->
-          <path d="M118 190 Q140 195 162 190 Q240 220 235 348 Q140 360 45 348 Q40 220 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
-          <path d="M118 190 Q140 195 162 190 Q240 220 235 348 Q140 360 45 348 Q40 220 118 190 Z" fill="url(#dressShine_${dress.id})"/>
-          <!-- ロココ調ゴールドフェストゥーン（花綱ドレープ） -->
-          <path d="M120 210 Q80 260 50 320" stroke="#f1c40f" stroke-width="3" fill="none"/>
-          <path d="M160 210 Q200 260 230 320" stroke="#f1c40f" stroke-width="3" fill="none"/>
-          <circle cx="80" cy="260" r="4" fill="#ffffff"/><circle cx="200" cy="260" r="4" fill="#ffffff"/>
-          <!-- トップ -->
-          <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <circle cx="140" cy="155" r="5" fill="#f1c40f" stroke="#ffffff" stroke-width="1.5"/>
-          <path d="M96 142 Q115 130 125 142 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
-          <path d="M184 142 Q165 130 155 142 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
-        </svg>
-      `;
-    } else if (t === 'snow_frost') {
-      // 7. スノークイーン（純白ハイネック＆氷のケープマント）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- 氷のマントトレイン -->
-          <path d="M100 145 Q40 260 45 350 Q140 360 235 350 Q240 260 180 145 Z" fill="rgba(129, 236, 236, 0.35)" stroke="#81ecec" stroke-width="1.5"/>
-          <!-- ドレス本体 -->
-          <path d="M118 190 Q140 195 162 190 Q205 260 215 345 Q140 355 65 345 Q75 260 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
-          <path d="M65 345 Q140 355 215 345" stroke="#74b9ff" stroke-width="4" stroke-dasharray="5,5" fill="none"/>
-          <!-- ハイネック＆トップ -->
-          <path d="M112 135 L128 128 L152 128 L168 135 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <polygon points="140,145 144,153 140,161 136,153" fill="#81ecec" stroke="#ffffff" stroke-width="1"/>
-          <!-- クリスタルショルダー -->
-          <polygon points="98,142 110,132 124,142 112,150" fill="#ffffff" stroke="#81ecec" stroke-width="1.5"/>
-          <polygon points="182,142 170,132 156,142 168,150" fill="#ffffff" stroke="#81ecec" stroke-width="1.5"/>
-        </svg>
-      `;
-    } else if (t === 'sweet_lolita') {
-      // 8. スイートロリータ（ひざ丈カップケーキパニエ）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- ふんわり丸いひざ丈ショートスカート -->
-          <path d="M118 190 Q140 195 162 190 Q225 240 215 295 Q140 310 65 295 Q55 240 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
-          <path d="M65 295 Q140 310 215 295" stroke="#ffffff" stroke-width="6" stroke-dasharray="6,4" fill="none"/>
-          <!-- エプロン風ホワイトリボン -->
-          <path d="M125 192 Q140 230 110 270 Q140 280 170 270 Q140 230 155 192 Z" fill="rgba(255,255,255,0.7)"/>
-          <circle cx="140" cy="205" r="5" fill="#ff4757"/>
-          <!-- トップ＆パフスリーブ -->
-          <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <circle cx="106" cy="146" r="12" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
-          <circle cx="174" cy="146" r="12" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
-        </svg>
-      `;
-    } else if (t === 'twilight_gown') {
-      // 9. トワイライトマジック（前後アシンメトリー・フィッシュテール＆月夜のローブ）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- 後ろのロングトレイン -->
-          <path d="M105 190 Q45 280 50 355 Q140 365 230 355 Q235 280 175 190 Z" fill="#4834d4" stroke="#e0c3fc" stroke-width="1.8"/>
-          <!-- 前側の短いハイロースカート（脚が見える） -->
-          <path d="M118 190 Q140 195 162 190 Q195 230 175 265 Q140 275 105 265 Q85 230 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
-          <path d="M105 265 Q140 275 175 265" stroke="#f1c40f" stroke-width="3" fill="none"/>
-          <!-- トップ＆三日月ベルト -->
-          <path d="M112 140 Q140 148 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <path d="M140 195 Q145 192 143 186 Q138 188 138 192 Z" fill="#f1c40f"/>
-          <!-- シアーショルダードレープ -->
-          <path d="M96 142 Q115 130 125 142 Z" fill="#8e44ad" stroke="#e0c3fc" stroke-width="1.5"/>
-          <path d="M184 142 Q165 130 155 142 Z" fill="#8e44ad" stroke="#e0c3fc" stroke-width="1.5"/>
-        </svg>
-      `;
-    } else {
-      // 10. クラシカルルビー（ベルベットオープンローブ＆ゴールドアンダースカート）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- 下地のゴールド刺繍アンダースカート -->
-          <path d="M118 190 Q140 195 162 190 Q215 260 220 348 Q140 360 60 348 Q65 260 118 190 Z" fill="#f5cd79" stroke="#f1c40f" stroke-width="2"/>
-          <!-- 前開きベルベットローブ（左右に分かれた真紅のガウン） -->
-          <path d="M118 190 Q95 240 60 348 Q100 350 120 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
-          <path d="M162 190 Q185 240 220 348 Q180 350 160 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
-          <!-- 襟元のファー＆ジュエル -->
-          <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <ellipse cx="140" cy="144" rx="26" ry="7" fill="#ffffff" stroke="#ced6e0" stroke-width="1.5"/>
-          <circle cx="140" cy="155" r="5" fill="#f1c40f" stroke="#ffffff" stroke-width="1.5"/>
-          <!-- ロイヤルベルベットスリーブ -->
-          <rect x="94" y="140" width="16" height="22" rx="4" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
-          <rect x="170" y="140" width="16" height="22" rx="4" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
-        </svg>
-      `;
-    }
-  }
-
-  getJewelrySvg(jewel) {
-    if (jewel.type === 'pearl_choker') {
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          <path d="M127 128 Q140 135 153 128" stroke="#ffffff" stroke-width="4" stroke-dasharray="3,3" fill="none"/>
-          <circle cx="140" cy="134" r="3.5" fill="#74b9ff" stroke="#ffffff" stroke-width="1"/>
-        </svg>
-      `;
-    } else if (jewel.type === 'diamond_pendant') {
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          <path d="M125 126 Q140 142 155 126" stroke="#f1c40f" stroke-width="2" fill="none"/>
-          <polygon points="140,140 144,146 140,152 136,146" fill="#74b9ff" stroke="#ffffff" stroke-width="1.5"/>
-        </svg>
-      `;
-    } else if (jewel.type === 'satin_gloves') {
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          <path d="M90 180 L90 220 L105 220 L105 180 Z" fill="#ffffff" stroke="#ced6e0" stroke-width="1.5"/>
-          <path d="M175 180 L175 220 L190 220 L190 180 Z" fill="#ffffff" stroke="#ced6e0" stroke-width="1.5"/>
-        </svg>
-      `;
-    }
-    return '';
-  }
-
-  getPropsSvg(prop) {
-    if (prop.type === 'star_wand') {
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          <!-- 魔法のステッキ -->
-          <line x1="195" y1="210" x2="230" y2="130" stroke="#f1c40f" stroke-width="4" stroke-linecap="round"/>
-          <polygon points="230,120 234,128 243,128 236,134 239,142 230,137 221,142 224,134 217,128 226,128" fill="#f1c40f" stroke="#ffffff" stroke-width="1.5"/>
-          <circle cx="230" cy="132" r="10" fill="rgba(254, 202, 87, 0.4)" class="aura-sparkle"/>
-        </svg>
-      `;
-    } else if (prop.type === 'rose_bouquet') {
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          <!-- 薔薇の花束 -->
-          <circle cx="185" cy="210" r="16" fill="#ff4757"/>
-          <circle cx="175" cy="202" r="10" fill="#ff6b81"/>
-          <circle cx="195" cy="202" r="10" fill="#ff6b81"/>
-          <circle cx="185" cy="220" r="10" fill="#ee5253"/>
-          <path d="M175 225 L185 245 L195 225 Z" fill="#ffffff" stroke="#ced6e0" stroke-width="1.5"/>
-        </svg>
-      `;
-    } else if (prop.type === 'lace_fan') {
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          <!-- レース扇子 -->
-          <path d="M185 220 Q215 170 235 190 L185 220 Z" fill="rgba(255,255,255,0.9)" stroke="#ff9f43" stroke-width="2"/>
-          <path d="M190 215 Q210 180 225 195" stroke="#ff7675" stroke-width="1.5" fill="none"/>
-        </svg>
-      `;
-    } else if (prop.type === 'crystal_lantern') {
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          <line x1="190" y1="210" x2="220" y2="200" stroke="#795548" stroke-width="3"/>
-          <rect x="210" y="200" width="20" height="28" rx="4" fill="#feca57" stroke="#795548" stroke-width="2"/>
-          <circle cx="220" cy="214" r="6" fill="#ffffff" class="aura-sparkle"/>
-        </svg>
-      `;
-    } else if (prop.type === 'teddy_bear') {
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          <circle cx="190" cy="215" r="14" fill="#d35400"/>
-          <circle cx="190" cy="198" r="10" fill="#d35400"/>
-          <circle cx="183" cy="190" r="4" fill="#e67e22"/>
-          <circle cx="197" cy="190" r="4" fill="#e67e22"/>
-          <circle cx="187" cy="196" r="1.5" fill="#2f3542"/>
-          <circle cx="193" cy="196" r="1.5" fill="#2f3542"/>
-        </svg>
-      `;
-    }
-    return '';
-  }
-
-  getFaceMakeupSvg(makeup) {
-    let leftEye = `<ellipse cx="125" cy="80" rx="7" ry="9" fill="${makeup.eyeColor === 'oddeye' ? '#0984e3' : makeup.eyeColor}"/>`;
-    let rightEye = `<ellipse cx="155" cy="80" rx="7" ry="9" fill="${makeup.eyeColor === 'oddeye' ? '#f1c40f' : makeup.eyeColor}"/>`;
-
-    if (makeup.mood === 'wink') {
-      rightEye = `<path d="M148 80 Q155 74 162 80" stroke="#2f3542" stroke-width="3" stroke-linecap="round" fill="none"/>`;
-    }
-
-    return `
-      <svg viewBox="0 0 280 400" class="doll-svg">
-        <!-- 眉 -->
-        <path d="M118 68 Q125 64 132 68" stroke="#795548" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-        <path d="M148 68 Q155 64 162 68" stroke="#795548" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-
-        <!-- 瞳とハイライト -->
-        ${leftEye}
-        ${rightEye}
-        <circle cx="123" cy="77" r="3" fill="#ffffff"/>
-        <circle cx="127" cy="83" r="1.5" fill="#ffffff"/>
-        ${makeup.mood !== 'wink' ? '<circle cx="153" cy="77" r="3" fill="#ffffff"/><circle cx="157" cy="83" r="1.5" fill="#ffffff"/>' : ''}
-
-        <!-- まつ毛 -->
-        <path d="M117 74 Q125 71 133 74" stroke="#2f3542" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-        ${makeup.mood !== 'wink' ? '<path d="M147 74 Q155 71 163 74" stroke="#2f3542" stroke-width="2.5" stroke-linecap="round" fill="none"/>' : ''}
-
-        <!-- チーク -->
-        <ellipse cx="118" cy="92" rx="7" ry="4" fill="${makeup.blush}" opacity="0.6"/>
-        <ellipse cx="162" cy="92" rx="7" ry="4" fill="${makeup.blush}" opacity="0.6"/>
-
-        <!-- リップ・口元 -->
-        <path d="M136 102 Q140 106 144 102" stroke="${makeup.lip}" stroke-width="2.5" stroke-linecap="round" fill="${makeup.lip}"/>
-      </svg>
-    `;
-  }
-
-  getFrontHairSvg(hair) {
-    const t = hair.type;
-    const gradId = `frontHairGrad_${hair.id}`;
-    const defs = `
-      <defs>
-        <linearGradient id="${gradId}" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="${hair.color}"/>
-          <stop offset="100%" stop-color="${hair.shadow}"/>
-        </linearGradient>
-      </defs>
-    `;
-
-    if (t === 'twin_roll') {
-      // 2. パステルピンクツイン（パッツン前髪＋サイドリボン＆ツインドリル）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- パッツン前髪＆頭頂部 -->
-          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q168 84 140 84 Q112 84 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
-          <!-- サイドロック -->
-          <path d="M98 70 Q90 105 96 140 Q105 125 106 90 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <path d="M182 70 Q190 105 184 140 Q175 125 174 90 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <!-- ツインテール結び目のピンクのリボン -->
-          <circle cx="70" cy="85" r="5" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
-          <path d="M70 85 L55 75 Q50 90 68 88 Z" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
-          <path d="M70 85 L85 75 Q90 90 72 88 Z" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
-          <circle cx="210" cy="85" r="5" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
-          <path d="M210 85 L195 75 Q190 90 208 88 Z" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
-          <path d="M210 85 L225 75 Q230 90 212 88 Z" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
-          <ellipse cx="140" cy="44" rx="28" ry="4" fill="rgba(255,255,255,0.65)" transform="rotate(-3 140 44)"/>
-        </svg>
-      `;
-    } else if (t === 'high_pony') {
-      // 3. クリスタルシルバー（すっきりアップバング）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- 引き締めアップ前髪 -->
-          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q170 82 155 74 Q140 85 125 74 Q110 82 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
-          <!-- 繊細な触覚サイドヘア -->
-          <path d="M100 75 Q92 110 96 145" stroke="url(#${gradId})" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-          <path d="M180 75 Q188 110 184 145" stroke="url(#${gradId})" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-          <ellipse cx="140" cy="42" rx="26" ry="4" fill="rgba(255,255,255,0.7)" transform="rotate(-2 140 42)"/>
-        </svg>
-      `;
-    } else if (t === 'half_up') {
-      // 4. オーロララベンダー（ふんわりセンターパート＋サイド編み込み）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q174 86 158 76 Q140 84 122 76 Q106 86 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
-          <!-- サイドのゆるふわウェーブ束 -->
-          <path d="M98 70 Q82 110 92 155 Q104 135 106 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <path d="M182 70 Q198 110 188 155 Q176 135 174 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <ellipse cx="140" cy="45" rx="28" ry="4" fill="rgba(255,255,255,0.65)" transform="rotate(-3 140 45)"/>
-        </svg>
-      `;
-    } else if (t === 'rose_up') {
-      // 5. エレガントローズ（ノーブルなカール前髪＋後れ毛）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q175 88 156 74 Q140 86 124 74 Q105 88 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
-          <!-- 耳前のエレガントな巻き毛 -->
-          <path d="M100 75 Q90 100 96 125 Q102 120 104 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <path d="M180 75 Q190 100 184 125 Q178 120 176 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <ellipse cx="140" cy="44" rx="28" ry="4" fill="rgba(255,255,255,0.65)"/>
-        </svg>
-      `;
-    } else if (t === 'soft_bob') {
-      // 6. ミルキーミントボブ（ほっぺを包む内巻きボブ）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q168 85 140 82 Q112 85 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
-          <!-- ほっぺを包み込む内巻きサイド -->
-          <path d="M98 70 Q78 105 88 150 Q106 160 108 140 Q104 110 106 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <path d="M182 70 Q202 105 192 150 Q174 160 172 140 Q176 110 174 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <ellipse cx="140" cy="45" rx="28" ry="4" fill="rgba(255,255,255,0.65)"/>
-        </svg>
-      `;
-    } else if (t === 'side_braid') {
-      // 7. ルビーレッドサイド（アシンメトリー前髪＋左胸に垂れる大三つ編み）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q168 86 145 78 Q118 88 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
-          <!-- 左肩から胸元に垂れる三つ編み -->
-          <path d="M98 75 Q75 110 80 160 Q65 200 78 245 Q90 240 94 200 Q104 150 106 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <circle cx="78" cy="245" r="4.5" fill="#f1c40f"/>
-          <!-- 右側はすっきり -->
-          <path d="M182 70 Q188 100 184 125 Q176 115 174 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <ellipse cx="140" cy="44" rx="28" ry="4" fill="rgba(255,255,255,0.65)"/>
-        </svg>
-      `;
-    } else if (t === 'starlight_long') {
-      // 8. 姫カット超ロング（パッツン前髪＋直角姫カットサイド）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q160 82 140 82 Q120 82 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
-          <!-- 姫カット（あごラインで水平に切り揃えられたサイド） -->
-          <polygon points="98,70 86,130 106,130 108,70" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <polygon points="182,70 194,130 174,130 172,70" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <ellipse cx="140" cy="44" rx="28" ry="4" fill="rgba(255,255,255,0.7)"/>
-        </svg>
-      `;
-    } else if (t === 'crown_braid') {
-      // 9. クラシカル王冠三つ編み
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <!-- おでこを囲む三つ編みバンド -->
-          <path d="M90 60 Q140 25 190 60" stroke="${hair.shadow}" stroke-width="8" stroke-dasharray="6,4" fill="none"/>
-          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q172 88 156 76 Q140 92 124 76 Q108 88 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
-          <path d="M98 70 Q90 100 95 130 Q104 120 106 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <path d="M182 70 Q190 100 185 130 Q176 120 174 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-        </svg>
-      `;
-    } else if (t === 'fairy_short') {
-      // 10. フェアリーショート（ハネ感のある軽快ピクシー）
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q175 88 162 76 Q150 92 140 78 Q130 92 118 76 Q105 88 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
-          <!-- 外ハネのサイド毛先 -->
-          <path d="M98 70 Q80 85 85 110 Q98 100 104 85 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <path d="M182 70 Q200 85 195 110 Q182 100 176 85 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <ellipse cx="140" cy="44" rx="28" ry="4" fill="rgba(255,255,255,0.65)"/>
-        </svg>
-      `;
-    } else {
-      // 1. ロイヤルウェーブ (デフォルト)
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          ${defs}
-          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q172 88 156 76 Q140 92 124 76 Q108 88 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
-          <path d="M98 70 Q88 115 95 160 Q105 135 108 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <path d="M182 70 Q192 115 185 160 Q175 135 172 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
-          <ellipse cx="140" cy="44" rx="28" ry="4" fill="rgba(255,255,255,0.65)" transform="rotate(-3 140 44)"/>
-        </svg>
-      `;
-    }
-  }
-
-  getHeadwearSvg(head) {
-    if (head.id === 'head_1' || head.id === 'head_4' || head.id === 'head_6') {
-      // 王冠・ティアラ
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          <path d="M118 34 L125 22 L132 30 L140 15 L148 30 L155 22 L162 34 Z" fill="${head.color}" stroke="#ffffff" stroke-width="1.8"/>
-          <circle cx="140" cy="18" r="3" fill="#ffffff"/>
-          <circle cx="125" cy="24" r="2.5" fill="#ff7675"/>
-          <circle cx="155" cy="24" r="2.5" fill="#ff7675"/>
-        </svg>
-      `;
-    } else if (head.id === 'head_2') {
-      // 薔薇の花冠
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          <path d="M108 36 Q140 28 172 36" stroke="#2ed573" stroke-width="3" fill="none"/>
-          <circle cx="120" cy="34" r="6" fill="#ff4757"/><circle cx="130" cy="31" r="5" fill="#ff7675"/>
-          <circle cx="140" cy="30" r="7" fill="#ff4757"/><circle cx="150" cy="31" r="5" fill="#ff7675"/>
-          <circle cx="160" cy="34" r="6" fill="#ff4757"/>
-        </svg>
-      `;
-    } else if (head.id === 'head_5' || head.id === 'head_7') {
-      // リボン
-      return `
-        <svg viewBox="0 0 280 400" class="doll-svg">
-          <path d="M140 26 L120 14 Q115 31 136 30 Z" fill="${head.color}" stroke="#ffffff" stroke-width="1.5"/>
-          <path d="M140 26 L160 14 Q165 31 144 30 Z" fill="${head.color}" stroke="#ffffff" stroke-width="1.5"/>
-          <circle cx="140" cy="26" r="4.5" fill="#f1c40f" stroke="#ffffff" stroke-width="1"/>
-        </svg>
-      `;
-    }
-    return `
-      <svg viewBox="0 0 280 400" class="doll-svg">
-        <text x="132" y="32" font-size="20">${head.icon || '👑'}</text>
+      <svg viewBox="0 0 40 40" class="stage-thumb-svg">
+        <rect width="40" height="40" fill="${hair.shadow}"/>
+        <circle cx="20" cy="18" r="12" fill="${hair.color}"/>
+        <path d="M12 18 Q20 30 28 18" stroke="${hair.shadow}" stroke-width="3" fill="none"/>
       </svg>
     `;
   }
 
   getStageSvg(stage) {
-    const sId = stage.id;
-    if (sId === 'stage_1') {
-      // 1. お城の豪華な大広間
+    const t = stage.type;
+    if (t === 'ballroom') {
       return `
         <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
           <defs>
-            <linearGradient id="sc_bg_1" x1="0" y1="0" x2="0" y2="100%">
-              <stop offset="0%" stop-color="#1b0a2a"/><stop offset="50%" stop-color="#3b114d"/><stop offset="100%" stop-color="#781d42"/>
+            <linearGradient id="sc_bg_1" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#1e272e"/><stop offset="50%" stop-color="#2f3542"/><stop offset="100%" stop-color="#8c7ae6"/>
             </linearGradient>
           </defs>
           <rect width="320" height="480" fill="url(#sc_bg_1)"/>
-          <!-- 中央アーチ窓＆星空 -->
-          <path d="M100 90 Q160 55 220 90 L220 220 L100 220 Z" fill="#0c1033" stroke="#f1c40f" stroke-width="3"/>
-          <line x1="160" y1="70" x2="160" y2="220" stroke="#f1c40f" stroke-width="2"/>
-          <line x1="100" y1="145" x2="220" y2="145" stroke="#f1c40f" stroke-width="2"/>
-          <circle cx="125" cy="115" r="1.5" fill="#fff"/><circle cx="190" cy="105" r="2" fill="#fff"/><circle cx="175" cy="180" r="1.5" fill="#feca57"/>
-          <!-- シャンデリア -->
-          <line x1="160" y1="0" x2="160" y2="45" stroke="#f1c40f" stroke-width="2.5"/>
-          <path d="M130 45 Q160 55 190 45" stroke="#f1c40f" stroke-width="2.5" fill="none"/>
-          <path d="M110 58 Q160 72 210 58" stroke="#f1c40f" stroke-width="2" fill="none"/>
-          <circle cx="110" cy="55" r="3.5" fill="#fffa65"/><circle cx="135" cy="43" r="3.5" fill="#fffa65"/><circle cx="160" cy="40" r="4.5" fill="#fffa65"/><circle cx="185" cy="43" r="3.5" fill="#fffa65"/><circle cx="210" cy="55" r="3.5" fill="#fffa65"/>
-          <polygon points="160,60 156,70 160,80 164,70" fill="#74b9ff" opacity="0.9"/>
-          <!-- 大理石の柱 -->
-          <rect x="0" y="0" width="40" height="480" fill="#2c2c54"/><rect x="4" y="0" width="32" height="480" fill="#40407a"/>
-          <rect x="0" y="0" width="40" height="24" fill="#f1c40f"/><rect x="0" y="450" width="40" height="30" fill="#f1c40f"/>
-          <rect x="280" y="0" width="40" height="480" fill="#2c2c54"/><rect x="284" y="0" width="32" height="480" fill="#40407a"/>
-          <rect x="280" y="0" width="40" height="24" fill="#f1c40f"/><rect x="280" y="450" width="40" height="30" fill="#f1c40f"/>
-          <!-- ドレープカーテン -->
-          <path d="M40 0 Q85 110 40 200 L40 0 Z" fill="#b33939" opacity="0.85"/>
-          <path d="M280 0 Q235 110 280 200 L280 0 Z" fill="#b33939" opacity="0.85"/>
-          <!-- レッドカーペット -->
-          <polygon points="115,310 205,310 250,480 70,480" fill="#c0392b" stroke="#f1c40f" stroke-width="2"/>
+          <path d="M0 0 L70 0 L55 480 L0 480 Z" fill="#c0392b" opacity="0.9"/>
+          <path d="M320 0 L250 0 L265 480 L320 480 Z" fill="#c0392b" opacity="0.9"/>
+          <line x1="160" y1="0" x2="160" y2="70" stroke="#f1c40f" stroke-width="2"/>
+          <circle cx="160" cy="75" r="14" fill="#f1c40f"/><circle cx="135" cy="85" r="8" fill="#f1c40f"/><circle cx="185" cy="85" r="8" fill="#f1c40f"/>
         </svg>
       `;
-    } else if (sId === 'stage_2') {
-      // 2. 星空のバルコニー
+    } else if (t === 'balcony') {
       return `
         <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
           <defs>
-            <linearGradient id="sc_bg_2" x1="0" y1="0" x2="0" y2="100%">
-              <stop offset="0%" stop-color="#05051e"/><stop offset="60%" stop-color="#0c2461"/><stop offset="100%" stop-color="#1e3799"/>
+            <linearGradient id="sc_bg_2" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#051937"/><stop offset="60%" stop-color="#004d7a"/><stop offset="100%" stop-color="#008793"/>
             </linearGradient>
           </defs>
           <rect width="320" height="480" fill="url(#sc_bg_2)"/>
-          <!-- 月＆光輪 -->
-          <circle cx="250" cy="70" r="26" fill="rgba(254, 202, 87, 0.25)"/>
-          <path d="M260 52 Q238 70 260 88 Q242 82 242 70 Q242 58 260 52 Z" fill="#ffeaa7"/>
-          <!-- 星空 -->
-          <circle cx="45" cy="45" r="2" fill="#fff"/><circle cx="110" cy="35" r="1.5" fill="#fff"/><circle cx="75" cy="85" r="2" fill="#feca57"/><circle cx="175" cy="55" r="1.5" fill="#fff"/><circle cx="285" cy="115" r="2" fill="#fff"/><circle cx="55" cy="150" r="1.5" fill="#fff"/><circle cx="215" cy="135" r="2" fill="#fffa65"/>
-          <path d="M45 45 L75 85 L110 35" stroke="rgba(255,255,255,0.3)" stroke-dasharray="2,2"/>
-          <!-- 遠くのお城の塔 -->
-          <polygon points="35,240 55,185 75,240" fill="#080c24"/><rect x="45" y="240" width="20" height="130" fill="#080c24"/>
-          <polygon points="85,260 105,215 125,260" fill="#0a1033"/><rect x="95" y="260" width="20" height="110" fill="#0a1033"/>
-          <polygon points="235,250 255,195 275,250" fill="#0a1033"/><rect x="245" y="250" width="20" height="120" fill="#0a1033"/>
-          <circle cx="55" cy="225" r="3" fill="#fffa65"/><circle cx="105" cy="245" r="3" fill="#fffa65"/><circle cx="255" cy="235" r="3" fill="#fffa65"/>
-          <!-- バルコニーの手すり -->
-          <rect x="0" y="375" width="320" height="105" fill="#2f3542"/>
-          <line x1="0" y1="375" x2="320" y2="375" stroke="#f1c40f" stroke-width="4"/>
-          <line x1="0" y1="405" x2="320" y2="405" stroke="#f1c40f" stroke-width="3"/>
-          <rect x="20" y="375" width="10" height="30" fill="#747d8c"/><rect x="55" y="375" width="10" height="30" fill="#747d8c"/><rect x="90" y="375" width="10" height="30" fill="#747d8c"/><rect x="220" y="375" width="10" height="30" fill="#747d8c"/><rect x="255" y="375" width="10" height="30" fill="#747d8c"/><rect x="290" y="375" width="10" height="30" fill="#747d8c"/>
+          <circle cx="260" cy="70" r="32" fill="#fff9db"/>
+          <circle cx="45" cy="65" r="2" fill="#ffffff"/><circle cx="120" cy="40" r="2.5" fill="#ffffff"/><circle cx="200" cy="110" r="2" fill="#ffffff"/>
         </svg>
       `;
-    } else if (sId === 'stage_3') {
-      // 3. 満開のローズガーデン
+    } else if (t === 'garden') {
       return `
         <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
           <defs>
-            <linearGradient id="sc_bg_3" x1="0" y1="0" x2="0" y2="100%">
-              <stop offset="0%" stop-color="#74b9ff"/><stop offset="50%" stop-color="#ffccd5"/><stop offset="100%" stop-color="#55efc4"/>
+            <linearGradient id="sc_bg_3" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#ffb8b8"/><stop offset="50%" stop-color="#ff7675"/><stop offset="100%" stop-color="#55efc4"/>
             </linearGradient>
           </defs>
           <rect width="320" height="480" fill="url(#sc_bg_3)"/>
-          <!-- 白いパーゴラアーチ -->
-          <path d="M50 125 Q160 55 270 125" stroke="#ffffff" stroke-width="6" fill="none"/>
-          <line x1="70" y1="125" x2="70" y2="340" stroke="#ffffff" stroke-width="6"/>
-          <line x1="250" y1="125" x2="250" y2="340" stroke="#ffffff" stroke-width="6"/>
-          <!-- 薔薇のツタ -->
-          <path d="M45 130 Q160 50 275 130" stroke="#2ed573" stroke-width="12" fill="none"/>
-          <circle cx="75" cy="100" r="9" fill="#ff4757"/><circle cx="105" cy="72" r="10" fill="#ff6b81"/><circle cx="160" cy="52" r="12" fill="#ff4757"/><circle cx="215" cy="72" r="10" fill="#ff6b81"/><circle cx="245" cy="100" r="9" fill="#ff4757"/>
-          <circle cx="60" cy="150" r="8" fill="#ff6b81"/><circle cx="60" cy="200" r="9" fill="#ff4757"/><circle cx="260" cy="150" r="8" fill="#ff6b81"/><circle cx="260" cy="200" r="9" fill="#ff4757"/>
-          <!-- 噴水 -->
-          <ellipse cx="160" cy="255" rx="35" ry="10" fill="#74b9ff" stroke="#ffffff" stroke-width="2"/>
-          <path d="M160 255 Q150 215 160 195 Q170 215 160 255" fill="rgba(255,255,255,0.7)"/>
-          <!-- 舞い散る花びら -->
-          <ellipse cx="110" cy="180" rx="5" ry="3" fill="#ff7675" transform="rotate(25 110 180)"/>
-          <ellipse cx="210" cy="200" rx="5" ry="3" fill="#ff7675" transform="rotate(-30 210 200)"/>
-          <ellipse cx="140" cy="300" rx="6" ry="3" fill="#ff4757" transform="rotate(45 140 300)"/>
-          <!-- 花壇＆芝生 -->
-          <rect x="0" y="380" width="320" height="100" fill="#20bf6b"/>
-          <circle cx="25" cy="420" r="12" fill="#eb4d4b"/><circle cx="50" cy="430" r="10" fill="#f7b731"/><circle cx="270" cy="420" r="12" fill="#eb4d4b"/><circle cx="295" cy="430" r="10" fill="#f7b731"/>
+          <circle cx="35" cy="380" r="45" fill="#ff4757" opacity="0.85"/>
+          <circle cx="285" cy="380" r="45" fill="#ff4757" opacity="0.85"/>
         </svg>
       `;
-    } else if (sId === 'stage_4') {
-      // 4. クリスタル氷の宮殿
+    } else if (t === 'ice_palace') {
       return `
         <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
           <defs>
-            <linearGradient id="sc_bg_4" x1="0" y1="0" x2="0" y2="100%">
-              <stop offset="0%" stop-color="#00cec9"/><stop offset="50%" stop-color="#0984e3"/><stop offset="100%" stop-color="#dfe6e9"/>
+            <linearGradient id="sc_bg_4" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#0984e3"/><stop offset="50%" stop-color="#74b9ff"/><stop offset="100%" stop-color="#dfe4ea"/>
             </linearGradient>
           </defs>
           <rect width="320" height="480" fill="url(#sc_bg_4)"/>
-          <!-- オーロラ -->
-          <path d="M0 40 Q80 10 160 50 Q240 90 320 40 L320 0 L0 0 Z" fill="rgba(85, 239, 196, 0.4)"/>
-          <path d="M0 70 Q100 120 200 60 Q280 20 320 80 L320 0 L0 0 Z" fill="rgba(129, 236, 236, 0.3)"/>
-          <!-- 氷の結晶マンダラ -->
-          <circle cx="160" cy="140" r="42" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2"/>
-          <line x1="160" y1="85" x2="160" y2="195" stroke="#ffffff" stroke-width="3"/>
-          <line x1="105" y1="140" x2="215" y2="140" stroke="#ffffff" stroke-width="3"/>
-          <line x1="121" y1="101" x2="199" y2="179" stroke="#ffffff" stroke-width="3"/>
-          <line x1="121" y1="179" x2="199" y2="101" stroke="#ffffff" stroke-width="3"/>
-          <!-- 氷柱＆氷の柱 -->
-          <polygon points="0,0 20,0 25,120 15,180 0,200" fill="rgba(255,255,255,0.6)" stroke="#81ecec" stroke-width="1.5"/>
-          <polygon points="320,0 300,0 295,120 305,180 320,200" fill="rgba(255,255,255,0.6)" stroke="#81ecec" stroke-width="1.5"/>
-          <polygon points="55,0 65,0 60,60" fill="#ffffff" opacity="0.8"/>
-          <polygon points="115,0 125,0 120,75" fill="#ffffff" opacity="0.8"/>
-          <polygon points="195,0 205,0 200,75" fill="#ffffff" opacity="0.8"/>
-          <polygon points="255,0 265,0 260,60" fill="#ffffff" opacity="0.8"/>
-          <!-- クリスタル床 -->
-          <rect x="0" y="375" width="320" height="105" fill="#74b9ff"/>
-          <line x1="0" y1="375" x2="320" y2="375" stroke="#ffffff" stroke-width="3"/>
-          <polygon points="45,420 65,390 85,420" fill="rgba(255,255,255,0.5)"/>
-          <polygon points="235,420 255,390 275,420" fill="rgba(255,255,255,0.5)"/>
+          <polygon points="160,20 190,180 130,180" fill="rgba(255,255,255,0.7)"/>
         </svg>
       `;
-    } else if (sId === 'stage_5') {
-      // 5. 妖精のフラワーステージ
+    } else if (t === 'fairy_forest') {
       return `
         <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
           <defs>
-            <linearGradient id="sc_bg_5" x1="0" y1="0" x2="0" y2="100%">
-              <stop offset="0%" stop-color="#006266"/><stop offset="50%" stop-color="#009432"/><stop offset="100%" stop-color="#1289A7"/>
+            <linearGradient id="sc_bg_5" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#00b894"/><stop offset="50%" stop-color="#55efc4"/><stop offset="100%" stop-color="#ffeaa7"/>
             </linearGradient>
           </defs>
           <rect width="320" height="480" fill="url(#sc_bg_5)"/>
-          <!-- 大樹の枝 -->
-          <path d="M0 0 Q60 80 0 160 L0 0 Z" fill="#3d1e06"/>
-          <path d="M320 0 Q260 80 320 160 L320 0 Z" fill="#3d1e06"/>
-          <path d="M0 20 Q160 80 320 20 L320 0 L0 0 Z" fill="#3d1e06"/>
-          <!-- 光るキノコ -->
-          <path d="M20 280 Q45 220 70 280 Z" fill="#ff4757"/><rect x="40" y="280" width="10" height="40" fill="#dfe4ea"/>
-          <circle cx="35" cy="250" r="3" fill="#fff"/><circle cx="55" cy="255" r="4" fill="#fff"/>
-          <path d="M245 270 Q275 200 305 270 Z" fill="#00d2d3"/><rect x="270" y="270" width="10" height="45" fill="#dfe4ea"/>
-          <circle cx="265" cy="235" r="3" fill="#fff"/><circle cx="285" cy="240" r="4" fill="#fff"/>
-          <!-- 妖精の光 -->
-          <circle cx="55" cy="110" r="6" fill="#f6e58d"/><circle cx="95" cy="170" r="5" fill="#55efc4"/>
-          <circle cx="225" cy="130" r="7" fill="#f6e58d"/><circle cx="265" cy="180" r="5" fill="#fd79a8"/>
-          <!-- 苔の丘の床 -->
-          <path d="M0 380 Q160 340 320 380 L320 480 L0 480 Z" fill="#1b8c3a"/>
         </svg>
       `;
-    } else if (sId === 'stage_6') {
-      // 6. 夕暮れトワイライト城
+    } else if (t === 'twilight') {
       return `
         <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
           <defs>
-            <linearGradient id="sc_bg_6" x1="0" y1="0" x2="0" y2="100%">
-              <stop offset="0%" stop-color="#6c5ce7"/><stop offset="35%" stop-color="#fd79a8"/><stop offset="70%" stop-color="#e17055"/><stop offset="100%" stop-color="#fdcb6e"/>
+            <linearGradient id="sc_bg_6" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#6c5ce7"/><stop offset="50%" stop-color="#e84393"/><stop offset="100%" stop-color="#fdcb6e"/>
             </linearGradient>
           </defs>
           <rect width="320" height="480" fill="url(#sc_bg_6)"/>
-          <!-- 夕焼け雲 -->
-          <ellipse cx="75" cy="85" rx="55" ry="16" fill="rgba(255, 234, 167, 0.45)"/>
-          <ellipse cx="245" cy="115" rx="65" ry="18" fill="rgba(255, 234, 167, 0.45)"/>
-          <!-- お城の尖塔シルエット -->
-          <polygon points="75,180 95,95 115,180" fill="#2d3436"/><rect x="83" y="180" width="24" height="150" fill="#2d3436"/>
-          <line x1="95" y1="95" x2="95" y2="80" stroke="#f1c40f" stroke-width="2"/><polygon points="95,80 115,87 95,95" fill="#e74c3c"/>
-          <polygon points="205,190 225,115 245,190" fill="#2d3436"/><rect x="213" y="190" width="24" height="140" fill="#2d3436"/>
-          <line x1="225" y1="115" x2="225" y2="100" stroke="#f1c40f" stroke-width="2"/><polygon points="225,100 245,107 225,115" fill="#e74c3c"/>
-          <rect x="105" y="240" width="110" height="90" fill="#2d3436"/>
-          <circle cx="95" cy="190" r="3" fill="#ffeaa7"/><circle cx="225" cy="200" r="3" fill="#ffeaa7"/>
-          <!-- 城壁テラス床 -->
-          <rect x="0" y="380" width="320" height="100" fill="#636e72"/>
-          <rect x="0" y="360" width="28" height="25" fill="#636e72"/><rect x="48" y="360" width="28" height="25" fill="#636e72"/><rect x="244" y="360" width="28" height="25" fill="#636e72"/><rect x="292" y="360" width="28" height="25" fill="#636e72"/>
-          <line x1="0" y1="385" x2="320" y2="385" stroke="#ffeaa7" stroke-width="3"/>
         </svg>
       `;
-    } else if (sId === 'stage_7') {
-      // 7. 魔法のかぼちゃの馬車
+    } else if (t === 'carriage') {
       return `
         <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
           <defs>
-            <linearGradient id="sc_bg_7" x1="0" y1="0" x2="0" y2="100%">
-              <stop offset="0%" stop-color="#191970"/><stop offset="60%" stop-color="#483d8b"/><stop offset="100%" stop-color="#8a2be2"/>
+            <linearGradient id="sc_bg_7" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#1e1b4b"/><stop offset="50%" stop-color="#312e81"/><stop offset="100%" stop-color="#c7d2fe"/>
             </linearGradient>
           </defs>
           <rect width="320" height="480" fill="url(#sc_bg_7)"/>
-          <!-- 街灯 -->
-          <line x1="30" y1="180" x2="30" y2="390" stroke="#f1c40f" stroke-width="4"/>
-          <path d="M15 180 Q30 150 45 180 Z" fill="#f1c40f"/><circle cx="30" cy="190" r="10" fill="#ffeaa7"/>
-          <line x1="290" y1="180" x2="290" y2="390" stroke="#f1c40f" stroke-width="4"/>
-          <path d="M275 180 Q290 150 305 180 Z" fill="#f1c40f"/><circle cx="290" cy="190" r="10" fill="#ffeaa7"/>
-          <!-- かぼちゃの馬車 -->
-          <ellipse cx="160" cy="195" rx="60" ry="50" fill="none" stroke="#f1c40f" stroke-width="3.5"/>
-          <path d="M160 145 L160 245" stroke="#f1c40f" stroke-width="2.5"/>
-          <ellipse cx="160" cy="195" rx="30" ry="50" fill="none" stroke="#f1c40f" stroke-width="2"/>
-          <circle cx="160" cy="142" r="5" fill="#f1c40f"/><polygon points="160,137 165,127 160,131 155,127" fill="#2ed573"/>
-          <circle cx="110" cy="250" r="20" fill="none" stroke="#f1c40f" stroke-width="3.5"/>
-          <circle cx="210" cy="250" r="20" fill="none" stroke="#f1c40f" stroke-width="3.5"/>
-          <!-- 魔法の軌跡 -->
-          <path d="M40 310 Q160 170 280 270" stroke="#feca57" stroke-width="3" stroke-dasharray="6,4" fill="none"/>
-          <polygon points="115,125 119,133 127,133 121,139 123,147 115,142 107,147 109,139 103,133 111,133" fill="#fffa65"/>
-          <polygon points="205,115 209,123 217,123 211,129 213,137 205,132 197,137 199,129 193,123 201,123" fill="#fffa65"/>
-          <!-- 石畳の床 -->
-          <rect x="0" y="380" width="320" height="100" fill="#2f3542"/>
-          <ellipse cx="60" cy="410" rx="20" ry="10" fill="#57606f"/><ellipse cx="120" cy="415" rx="22" ry="11" fill="#747d8c"/><ellipse cx="180" cy="410" rx="20" ry="10" fill="#57606f"/><ellipse cx="240" cy="415" rx="22" ry="11" fill="#747d8c"/>
         </svg>
       `;
-    } else if (sId === 'stage_8') {
-      // 8. ステンドグラス大聖堂
+    } else if (t === 'cathedral') {
       return `
         <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
           <defs>
-            <linearGradient id="sc_bg_8" x1="0" y1="0" x2="0" y2="100%">
-              <stop offset="0%" stop-color="#0c102b"/><stop offset="60%" stop-color="#1a1c3b"/><stop offset="100%" stop-color="#2d3436"/>
+            <linearGradient id="sc_bg_8" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#18181b"/><stop offset="50%" stop-color="#3f3f46"/><stop offset="100%" stop-color="#f59e0b"/>
             </linearGradient>
           </defs>
           <rect width="320" height="480" fill="url(#sc_bg_8)"/>
-          <!-- ローズウィンドウ（大ステンドグラス） -->
-          <circle cx="160" cy="140" r="65" fill="#1e272e" stroke="#f1c40f" stroke-width="4"/>
-          <circle cx="160" cy="140" r="55" fill="#ff4757" opacity="0.8"/>
-          <circle cx="160" cy="140" r="38" fill="#70a1ff" opacity="0.8"/>
-          <circle cx="160" cy="140" r="22" fill="#f1c40f" opacity="0.9"/>
-          <path d="M160 75 L160 205 M95 140 L225 140 M115 95 L205 185 M115 185 L205 95" stroke="#f1c40f" stroke-width="2.5"/>
-          <circle cx="160" cy="140" r="9" fill="#2ed573"/>
-          <!-- ゴシックアーチ -->
-          <path d="M0 230 Q160 50 320 230" stroke="#f1c40f" stroke-width="4" fill="none"/>
-          <path d="M40 270 Q160 110 280 270" stroke="#dfe4ea" stroke-width="2.5" fill="none"/>
-          <!-- 光の筋 -->
-          <polygon points="160,140 0,420 70,480" fill="rgba(255, 71, 87, 0.15)"/>
-          <polygon points="160,140 120,480 200,480" fill="rgba(241, 196, 15, 0.2)"/>
-          <polygon points="160,140 250,480 320,420" fill="rgba(112, 161, 255, 0.15)"/>
-          <!-- 燭台キャンドル -->
-          <rect x="25" y="310" width="8" height="28" fill="#ffffff"/><circle cx="29" cy="306" r="4" fill="#f1c40f"/>
-          <rect x="287" y="310" width="8" height="28" fill="#ffffff"/><circle cx="291" cy="306" r="4" fill="#f1c40f"/>
-          <!-- 大聖堂床 -->
-          <rect x="0" y="380" width="320" height="100" fill="#1e272e"/>
-          <line x1="0" y1="380" x2="320" y2="380" stroke="#f1c40f" stroke-width="3"/>
         </svg>
       `;
-    } else if (sId === 'stage_9') {
-      // 9. スウィートドリームルーム
+    } else if (t === 'dream_room') {
       return `
         <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
           <defs>
-            <linearGradient id="sc_bg_9" x1="0" y1="0" x2="0" y2="100%">
-              <stop offset="0%" stop-color="#fd79a8"/><stop offset="50%" stop-color="#ffb8b8"/><stop offset="100%" stop-color="#f8a5c2"/>
+            <linearGradient id="sc_bg_9" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#fda4af"/><stop offset="50%" stop-color="#fbcfe8"/><stop offset="100%" stop-color="#fef08a"/>
             </linearGradient>
           </defs>
           <rect width="320" height="480" fill="url(#sc_bg_9)"/>
-          <!-- 天蓋カーテン＆リボン -->
-          <path d="M0 0 Q160 65 320 0 L320 55 Q160 115 0 55 Z" fill="#ffffff" opacity="0.9"/>
-          <path d="M0 0 Q75 170 0 330 Z" fill="#ffffff" opacity="0.85"/>
-          <path d="M320 0 Q245 170 320 330 Z" fill="#ffffff" opacity="0.85"/>
-          <circle cx="160" cy="70" r="13" fill="#ff4757"/>
-          <path d="M160 70 L140 60 Q135 80 156 77 Z" fill="#ff6b81"/><path d="M160 70 L180 60 Q185 80 164 77 Z" fill="#ff6b81"/>
-          <!-- クモ＆クッション -->
-          <ellipse cx="55" cy="310" rx="32" ry="16" fill="#ffffff" opacity="0.8"/>
-          <ellipse cx="265" cy="310" rx="32" ry="16" fill="#ffffff" opacity="0.8"/>
-          <circle cx="265" cy="290" r="11" fill="#e17055"/><circle cx="258" cy="280" r="4" fill="#e17055"/><circle cx="272" cy="280" r="4" fill="#e17055"/>
-          <!-- フリルカーペット床 -->
-          <rect x="0" y="380" width="320" height="100" fill="#f78fb3"/>
-          <path d="M0 380 Q160 395 320 380" stroke="#ffffff" stroke-width="4" stroke-dasharray="6,6" fill="none"/>
         </svg>
       `;
     } else {
-      // 10. スポットライトランウェイ
       return `
         <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
           <defs>
-            <linearGradient id="sc_bg_10" x1="0" y1="0" x2="0" y2="100%">
+            <linearGradient id="sc_bg_10" x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stop-color="#0a0a14"/><stop offset="50%" stop-color="#1e1e38"/><stop offset="100%" stop-color="#2d1b4e"/>
             </linearGradient>
           </defs>
           <rect width="320" height="480" fill="url(#sc_bg_10)"/>
-          <!-- トラス -->
           <line x1="0" y1="28" x2="320" y2="28" stroke="#718093" stroke-width="3.5"/>
-          <line x1="0" y1="42" x2="320" y2="42" stroke="#718093" stroke-width="2.5"/>
-          <line x1="20" y1="28" x2="38" y2="42" stroke="#718093" stroke-width="1.5"/><line x1="58" y1="28" x2="76" y2="42" stroke="#718093" stroke-width="1.5"/><line x1="240" y1="28" x2="258" y2="42" stroke="#718093" stroke-width="1.5"/><line x1="280" y1="28" x2="298" y2="42" stroke="#718093" stroke-width="1.5"/>
-          <!-- 交差するスポットライト -->
           <polygon points="35,28 105,480 205,480" fill="rgba(255, 71, 87, 0.3)"/>
           <polygon points="285,28 215,480 115,480" fill="rgba(0, 210, 211, 0.3)"/>
-          <polygon points="160,28 95,480 225,480" fill="rgba(254, 202, 87, 0.25)"/>
-          <!-- フラッシュ＆ボケ光 -->
-          <circle cx="160" cy="28" r="10" fill="#fffa65"/><circle cx="35" cy="28" r="7" fill="#ff6b81"/><circle cx="285" cy="28" r="7" fill="#00d2d3"/>
-          <circle cx="65" cy="170" r="12" fill="rgba(255,255,255,0.15)"/><circle cx="255" cy="210" r="16" fill="rgba(255,255,255,0.12)"/>
-          <!-- ランウェイキャットウォーク床 -->
-          <polygon points="95,310 225,310 275,480 45,480" fill="#130f40" stroke="#ff4757" stroke-width="3"/>
-          <line x1="95" y1="310" x2="45" y2="480" stroke="#00d2d3" stroke-width="3"/>
-          <line x1="225" y1="310" x2="275" y2="480" stroke="#00d2d3" stroke-width="3"/>
         </svg>
       `;
     }
   }
 
+  // =========================================================================
+  // 📸 写真撮影（Three.js WebGL キャプチャ合成）
+  // =========================================================================
   takePrincessPhoto() {
-    window.soundSystem.playCameraShutter();
-    window.soundSystem.playFanfare();
+    if (window.soundSystem) {
+      window.soundSystem.playCameraShutter();
+      window.soundSystem.playFanfare();
+    }
 
     // フラッシュ演出
     const flash = document.createElement('div');
@@ -1517,21 +1621,25 @@ class GamePrincess {
     // パーティクル
     this.app.particles.explode(window.innerWidth / 2, window.innerHeight / 2, 80);
 
-    // ポラロイド写真プレビュー生成
+    // Three.js Canvas から現在の3Dレンダリング画像をキャプチャ
+    let imgDataUrl = '';
+    if (this.renderer && this.scene && this.camera) {
+      this.renderer.render(this.scene, this.camera);
+      imgDataUrl = this.renderer.domElement.toDataURL('image/png');
+    }
+
     if (this.photoPreviewCardEl) {
       const dress = this.database.dress.find(d => d.id === this.selected.dress);
       const stage = this.database.stage.find(s => s.id === this.selected.stage);
 
       this.photoPreviewCardEl.innerHTML = `
         <div class="polaroid-frame">
-          <div class="polaroid-photo-view" style="position: relative; overflow: hidden;">
+          <div class="polaroid-photo-view" style="position: relative; overflow: hidden; background: #1e272e;">
             <div style="position: absolute; inset: 0; pointer-events: none; z-index: 0;">
               ${this.getStageSvg(stage)}
             </div>
-            <div class="doll-clone-preview" style="position: relative; z-index: 1;">
-              ${this.dollContainerEl.innerHTML}
-            </div>
-            <span class="photo-sparkle-decor" style="position: relative; z-index: 2;">✨ ⭐ ✨</span>
+            ${imgDataUrl ? `<img src="${imgDataUrl}" style="position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain;" alt="Princess 3D Photo">` : ''}
+            <span class="photo-sparkle-decor" style="position: absolute; top: 8px; right: 8px; z-index: 2;">✨ ⭐ ✨</span>
           </div>
           <div class="polaroid-caption">
             <h3 class="polaroid-title">👑 ロイヤル・プリンセス 👑</h3>
