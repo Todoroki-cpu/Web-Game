@@ -1,4 +1,4 @@
-﻿/**
+/**
  * game_hiragana_karuta.js - サンリオ風 キャラクターかるた大会
  * キャラクター：キティ風 (kitty) または メロディ風 (melody)
  */
@@ -199,7 +199,7 @@ class GameHiraganaKaruta {
         } else {
           this.nextRound();
         }
-      }, 2500);
+      }, 1600);
 
     } else {
       cardEl.classList.add('shake-card');

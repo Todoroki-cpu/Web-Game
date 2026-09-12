@@ -1,4 +1,4 @@
-﻿/**
+/**
  * game_hiragana_trace.js - サンリオ風 キラキラ ひらがな なぞり書きゲーム
  * キャラクター：シナモン風 (cinna) または キティ風 (kitty)
  */
@@ -337,7 +337,7 @@ class GameHiraganaTrace {
       } else {
         this.loadLetter(this.currentLetterIdx + 1);
       }
-    }, 3200);
+    }, 2000);
   }
 
   render() {

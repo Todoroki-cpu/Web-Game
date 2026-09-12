@@ -1,4 +1,4 @@
-﻿/**
+/**
  * game_hiragana_word.js - サンリオ風 ことばの もぐもぐパズル
  * キャラクター：ポムポムプリン風 (purin)
  */
@@ -257,8 +257,8 @@ class GameHiraganaWord {
           } else {
             this.nextRound();
           }
-        }, 2800);
-      }, 1000);
+        }, 1800);
+      }, 600);
 
     } else {
       // 不正解：やり直し

@@ -37,6 +37,11 @@ class SoundSystem {
       }
 
       const audio = this.audioPool[name];
+      audio.playbackRate = 1.45;
+      audio.preservesPitch = true;
+      if ('webkitPreservesPitch' in audio) audio.webkitPreservesPitch = true;
+      if ('mozPreservesPitch' in audio) audio.mozPreservesPitch = true;
+
       this.currentAudio = audio;
       audio.currentTime = 0;
       
