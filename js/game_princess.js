@@ -653,9 +653,9 @@ class GamePrincess {
         <!-- 頭部・顔の輪郭 -->
         <path d="M102 75 Q100 115 140 125 Q180 115 178 75 Q175 40 140 40 Q105 40 102 75 Z" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1.5"/>
         
-        <!-- 脚・レッグ -->
-        <path d="M120 250 L116 350 L130 350 L134 250 Z" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1.5"/>
-        <path d="M146 250 L150 350 L164 350 L160 250 Z" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1.5"/>
+        <!-- 脚・レッグ（すらりと伸びたきれいな足） -->
+        <path d="M118 245 L116 344 L130 344 L132 245 Z" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1.5"/>
+        <path d="M148 245 L150 344 L164 344 L162 245 Z" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1.5"/>
 
         <!-- キャミソール＆ペチパンツ（ベース下着） -->
         <path d="M115 145 Q140 155 165 145 L170 210 Q140 215 110 210 Z" fill="#ffccd5" stroke="#ff8da1" stroke-width="1.5"/>
@@ -669,15 +669,19 @@ class GamePrincess {
   getShoesSvg(shoe) {
     return `
       <svg viewBox="0 0 280 400" class="doll-svg">
-        <!-- 左足の靴 -->
-        <ellipse cx="123" cy="355" rx="10" ry="6" fill="${shoe.color}" stroke="#2f3542" stroke-width="1.5"/>
-        <path d="M117 353 Q123 348 129 353" stroke="#ffffff" stroke-width="2" fill="none"/>
-        <text x="119" y="358" font-size="7">${shoe.gem || '✨'}</text>
+        <!-- 左足の靴（ガラスの靴・ストラップパンプス） -->
+        <path d="M114 340 L132 340 L134 354 Q123 358 112 352 Z" fill="${shoe.color}" stroke="#2f3542" stroke-width="1.5"/>
+        <ellipse cx="123" cy="348" rx="8" ry="4" fill="${shoe.color}"/>
+        <path d="M115 342 Q123 338 131 342" stroke="#ffffff" stroke-width="2" fill="none"/>
+        <circle cx="123" cy="347" r="3" fill="#ffffff"/>
+        <text x="119" y="350" font-size="8">${shoe.gem || '✨'}</text>
         
-        <!-- 右足の靴 -->
-        <ellipse cx="157" cy="355" rx="10" ry="6" fill="${shoe.color}" stroke="#2f3542" stroke-width="1.5"/>
-        <path d="M151 353 Q157 348 163 353" stroke="#ffffff" stroke-width="2" fill="none"/>
-        <text x="153" y="358" font-size="7">${shoe.gem || '✨'}</text>
+        <!-- 右足の靴（ガラスの靴・ストラップパンプス） -->
+        <path d="M148 340 L166 340 L168 352 Q157 358 146 354 Z" fill="${shoe.color}" stroke="#2f3542" stroke-width="1.5"/>
+        <ellipse cx="157" cy="348" rx="8" ry="4" fill="${shoe.color}"/>
+        <path d="M149 342 Q157 338 165 342" stroke="#ffffff" stroke-width="2" fill="none"/>
+        <circle cx="157" cy="347" r="3" fill="#ffffff"/>
+        <text x="153" y="350" font-size="8">${shoe.gem || '✨'}</text>
       </svg>
     `;
   }
