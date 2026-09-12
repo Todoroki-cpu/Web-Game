@@ -509,10 +509,10 @@ class GamePrincess {
             <stop offset="100%" stop-color="${hair.shadow}"/>
           </linearGradient>
         </defs>
-        <!-- ボリュームある後ろ髪 -->
-        <path d="M85 85 Q50 140 55 240 Q70 290 95 300 Q140 310 185 300 Q210 290 225 240 Q230 140 195 85 Z" fill="url(#backHairGrad)" stroke="${hair.shadow}" stroke-width="2"/>
-        <path d="M55 230 Q45 280 65 315 Q80 325 100 310" fill="${hair.color}" opacity="0.7"/>
-        <path d="M225 230 Q235 280 215 315 Q200 325 180 310" fill="${hair.color}" opacity="0.7"/>
+        <!-- 頭頂部から背中へ広がるボリューム豊かな後ろ髪 -->
+        <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q235 140 230 250 Q215 315 185 320 Q140 330 95 320 Q65 315 50 250 Q45 140 85 75 Z" fill="url(#backHairGrad)" stroke="${hair.shadow}" stroke-width="2"/>
+        <path d="M50 230 Q40 290 65 325 Q85 335 105 315" fill="${hair.color}" opacity="0.6"/>
+        <path d="M230 230 Q240 290 215 325 Q195 335 175 315" fill="${hair.color}" opacity="0.6"/>
       </svg>
     `;
   }
@@ -715,15 +715,15 @@ class GamePrincess {
           </linearGradient>
         </defs>
 
-        <!-- 前髪（ふんわりカールバング） -->
-        <path d="M102 65 Q115 48 140 48 Q165 48 178 65 Q170 85 155 75 Q140 90 125 75 Q110 85 102 65 Z" fill="url(#frontHairGrad)" stroke="${hair.shadow}" stroke-width="1.8"/>
+        <!-- 前髪＆頭頂部（頭のてっぺんから包み込むフルキャップヘア） -->
+        <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q172 88 156 76 Q140 92 124 76 Q108 88 96 75 Z" fill="url(#frontHairGrad)" stroke="${hair.shadow}" stroke-width="1.8"/>
         
-        <!-- サイドの髪束 -->
-        <path d="M100 68 Q92 110 98 150 Q106 130 108 95 Z" fill="url(#frontHairGrad)" stroke="${hair.shadow}" stroke-width="1.5"/>
-        <path d="M180 68 Q188 110 182 150 Q174 130 172 95 Z" fill="url(#frontHairGrad)" stroke="${hair.shadow}" stroke-width="1.5"/>
+        <!-- サイドの髪束（顔まわり） -->
+        <path d="M98 70 Q88 115 95 160 Q105 135 108 95 Z" fill="url(#frontHairGrad)" stroke="${hair.shadow}" stroke-width="1.5"/>
+        <path d="M182 70 Q192 115 185 160 Q175 135 172 95 Z" fill="url(#frontHairGrad)" stroke="${hair.shadow}" stroke-width="1.5"/>
 
         <!-- 天使の輪・髪の光沢ハイライト -->
-        <ellipse cx="140" cy="56" rx="28" ry="4" fill="rgba(255,255,255,0.6)" transform="rotate(-4 140 56)"/>
+        <ellipse cx="140" cy="44" rx="28" ry="4" fill="rgba(255,255,255,0.65)" transform="rotate(-3 140 44)"/>
       </svg>
     `;
   }
@@ -733,35 +733,35 @@ class GamePrincess {
       // 王冠・ティアラ
       return `
         <svg viewBox="0 0 280 400" class="doll-svg">
-          <path d="M118 45 L125 32 L132 42 L140 26 L148 42 L155 32 L162 45 Z" fill="${head.color}" stroke="#ffffff" stroke-width="1.8"/>
-          <circle cx="140" cy="30" r="3" fill="#ffffff"/>
-          <circle cx="125" cy="34" r="2.5" fill="#ff7675"/>
-          <circle cx="155" cy="34" r="2.5" fill="#ff7675"/>
+          <path d="M118 34 L125 22 L132 30 L140 15 L148 30 L155 22 L162 34 Z" fill="${head.color}" stroke="#ffffff" stroke-width="1.8"/>
+          <circle cx="140" cy="18" r="3" fill="#ffffff"/>
+          <circle cx="125" cy="24" r="2.5" fill="#ff7675"/>
+          <circle cx="155" cy="24" r="2.5" fill="#ff7675"/>
         </svg>
       `;
     } else if (head.id === 'head_2') {
       // 薔薇の花冠
       return `
         <svg viewBox="0 0 280 400" class="doll-svg">
-          <path d="M108 48 Q140 40 172 48" stroke="#2ed573" stroke-width="3" fill="none"/>
-          <circle cx="120" cy="46" r="6" fill="#ff4757"/><circle cx="130" cy="43" r="5" fill="#ff7675"/>
-          <circle cx="140" cy="42" r="7" fill="#ff4757"/><circle cx="150" cy="43" r="5" fill="#ff7675"/>
-          <circle cx="160" cy="46" r="6" fill="#ff4757"/>
+          <path d="M108 36 Q140 28 172 36" stroke="#2ed573" stroke-width="3" fill="none"/>
+          <circle cx="120" cy="34" r="6" fill="#ff4757"/><circle cx="130" cy="31" r="5" fill="#ff7675"/>
+          <circle cx="140" cy="30" r="7" fill="#ff4757"/><circle cx="150" cy="31" r="5" fill="#ff7675"/>
+          <circle cx="160" cy="34" r="6" fill="#ff4757"/>
         </svg>
       `;
     } else if (head.id === 'head_5' || head.id === 'head_7') {
       // リボン
       return `
         <svg viewBox="0 0 280 400" class="doll-svg">
-          <path d="M140 40 L120 28 Q115 45 136 44 Z" fill="${head.color}" stroke="#ffffff" stroke-width="1.5"/>
-          <path d="M140 40 L160 28 Q165 45 144 44 Z" fill="${head.color}" stroke="#ffffff" stroke-width="1.5"/>
-          <circle cx="140" cy="40" r="4.5" fill="#f1c40f" stroke="#ffffff" stroke-width="1"/>
+          <path d="M140 26 L120 14 Q115 31 136 30 Z" fill="${head.color}" stroke="#ffffff" stroke-width="1.5"/>
+          <path d="M140 26 L160 14 Q165 31 144 30 Z" fill="${head.color}" stroke="#ffffff" stroke-width="1.5"/>
+          <circle cx="140" cy="26" r="4.5" fill="#f1c40f" stroke="#ffffff" stroke-width="1"/>
         </svg>
       `;
     }
     return `
       <svg viewBox="0 0 280 400" class="doll-svg">
-        <text x="132" y="44" font-size="20">${head.icon || '👑'}</text>
+        <text x="132" y="32" font-size="20">${head.icon || '👑'}</text>
       </svg>
     `;
   }

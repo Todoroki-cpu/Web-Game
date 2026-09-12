@@ -881,13 +881,15 @@ html, body {
   display: flex; align-items: center; justify-content: center;
 }
 .turntable-floor {
-  position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%) rotateX(75deg);
-  width: 200px; height: 200px; border-radius: 50%;
-  border: 4px solid #ffffff; box-shadow: 0 0 20px rgba(241, 196, 15, 0.6), inset 0 0 10px rgba(0,0,0,0.2);
+  position: absolute; bottom: -65px; left: 50%; transform: translateX(-50%) rotateX(78deg);
+  width: 240px; height: 240px; border-radius: 50%;
+  border: 4px solid #ffffff; box-shadow: 0 0 25px rgba(241, 196, 15, 0.7), inset 0 0 15px rgba(0,0,0,0.2);
   pointer-events: none; transition: background-color 0.5s;
+  z-index: 1;
 }
 .doll-3d-wrapper {
   position: relative; width: 220px; height: 320px; transform-style: preserve-3d;
+  z-index: 2;
 }
 .doll-layer {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
