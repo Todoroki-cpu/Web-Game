@@ -349,7 +349,7 @@ class GamePrincess {
       } else if (categoryId === 'hair') {
         thumbPreview = `<div class="item-thumb-color" style="background: radial-gradient(circle, ${item.color} 30%, ${item.shadow} 100%);">👸</div>`;
       } else if (categoryId === 'stage') {
-        thumbPreview = `<div class="item-thumb-color" style="background: ${item.bg};">${item.emoji || '🏰'}</div>`;
+        thumbPreview = `<div class="item-thumb-color" style="padding:0; overflow:hidden; border:1.5px solid #ffbe76;">${this.getStageSvg(item)}</div>`;
       } else if (categoryId === 'makeup') {
         thumbPreview = `<div class="item-thumb-color" style="background: #ffeaa7;">${item.mood === 'wink' ? '😉' : (item.mood === 'heart' ? '😍' : '✨')}</div>`;
       } else {
@@ -411,8 +411,9 @@ class GamePrincess {
 
   updateStageBackground() {
     const stageItem = this.database.stage.find(s => s.id === this.selected.stage) || this.database.stage[0];
-    if (this.stageWrapperEl) {
-      this.stageWrapperEl.style.background = stageItem.bg;
+    const sceneryBgEl = document.getElementById('princess-scenery-bg');
+    if (sceneryBgEl) {
+      sceneryBgEl.innerHTML = this.getStageSvg(stageItem);
     }
     const floorEl = document.getElementById('princess-turntable-floor');
     if (floorEl) {
@@ -781,6 +782,302 @@ class GamePrincess {
     `;
   }
 
+  getStageSvg(stage) {
+    const sId = stage.id;
+    if (sId === 'stage_1') {
+      // 1. お城の豪華な大広間
+      return `
+        <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
+          <defs>
+            <linearGradient id="sc_bg_1" x1="0" y1="0" x2="0" y2="100%">
+              <stop offset="0%" stop-color="#1b0a2a"/><stop offset="50%" stop-color="#3b114d"/><stop offset="100%" stop-color="#781d42"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="480" fill="url(#sc_bg_1)"/>
+          <!-- 中央アーチ窓＆星空 -->
+          <path d="M100 90 Q160 55 220 90 L220 220 L100 220 Z" fill="#0c1033" stroke="#f1c40f" stroke-width="3"/>
+          <line x1="160" y1="70" x2="160" y2="220" stroke="#f1c40f" stroke-width="2"/>
+          <line x1="100" y1="145" x2="220" y2="145" stroke="#f1c40f" stroke-width="2"/>
+          <circle cx="125" cy="115" r="1.5" fill="#fff"/><circle cx="190" cy="105" r="2" fill="#fff"/><circle cx="175" cy="180" r="1.5" fill="#feca57"/>
+          <!-- シャンデリア -->
+          <line x1="160" y1="0" x2="160" y2="45" stroke="#f1c40f" stroke-width="2.5"/>
+          <path d="M130 45 Q160 55 190 45" stroke="#f1c40f" stroke-width="2.5" fill="none"/>
+          <path d="M110 58 Q160 72 210 58" stroke="#f1c40f" stroke-width="2" fill="none"/>
+          <circle cx="110" cy="55" r="3.5" fill="#fffa65"/><circle cx="135" cy="43" r="3.5" fill="#fffa65"/><circle cx="160" cy="40" r="4.5" fill="#fffa65"/><circle cx="185" cy="43" r="3.5" fill="#fffa65"/><circle cx="210" cy="55" r="3.5" fill="#fffa65"/>
+          <polygon points="160,60 156,70 160,80 164,70" fill="#74b9ff" opacity="0.9"/>
+          <!-- 大理石の柱 -->
+          <rect x="0" y="0" width="40" height="480" fill="#2c2c54"/><rect x="4" y="0" width="32" height="480" fill="#40407a"/>
+          <rect x="0" y="0" width="40" height="24" fill="#f1c40f"/><rect x="0" y="450" width="40" height="30" fill="#f1c40f"/>
+          <rect x="280" y="0" width="40" height="480" fill="#2c2c54"/><rect x="284" y="0" width="32" height="480" fill="#40407a"/>
+          <rect x="280" y="0" width="40" height="24" fill="#f1c40f"/><rect x="280" y="450" width="40" height="30" fill="#f1c40f"/>
+          <!-- ドレープカーテン -->
+          <path d="M40 0 Q85 110 40 200 L40 0 Z" fill="#b33939" opacity="0.85"/>
+          <path d="M280 0 Q235 110 280 200 L280 0 Z" fill="#b33939" opacity="0.85"/>
+          <!-- レッドカーペット -->
+          <polygon points="115,310 205,310 250,480 70,480" fill="#c0392b" stroke="#f1c40f" stroke-width="2"/>
+        </svg>
+      `;
+    } else if (sId === 'stage_2') {
+      // 2. 星空のバルコニー
+      return `
+        <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
+          <defs>
+            <linearGradient id="sc_bg_2" x1="0" y1="0" x2="0" y2="100%">
+              <stop offset="0%" stop-color="#05051e"/><stop offset="60%" stop-color="#0c2461"/><stop offset="100%" stop-color="#1e3799"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="480" fill="url(#sc_bg_2)"/>
+          <!-- 月＆光輪 -->
+          <circle cx="250" cy="70" r="26" fill="rgba(254, 202, 87, 0.25)"/>
+          <path d="M260 52 Q238 70 260 88 Q242 82 242 70 Q242 58 260 52 Z" fill="#ffeaa7"/>
+          <!-- 星空 -->
+          <circle cx="45" cy="45" r="2" fill="#fff"/><circle cx="110" cy="35" r="1.5" fill="#fff"/><circle cx="75" cy="85" r="2" fill="#feca57"/><circle cx="175" cy="55" r="1.5" fill="#fff"/><circle cx="285" cy="115" r="2" fill="#fff"/><circle cx="55" cy="150" r="1.5" fill="#fff"/><circle cx="215" cy="135" r="2" fill="#fffa65"/>
+          <path d="M45 45 L75 85 L110 35" stroke="rgba(255,255,255,0.3)" stroke-dasharray="2,2"/>
+          <!-- 遠くのお城の塔 -->
+          <polygon points="35,240 55,185 75,240" fill="#080c24"/><rect x="45" y="240" width="20" height="130" fill="#080c24"/>
+          <polygon points="85,260 105,215 125,260" fill="#0a1033"/><rect x="95" y="260" width="20" height="110" fill="#0a1033"/>
+          <polygon points="235,250 255,195 275,250" fill="#0a1033"/><rect x="245" y="250" width="20" height="120" fill="#0a1033"/>
+          <circle cx="55" cy="225" r="3" fill="#fffa65"/><circle cx="105" cy="245" r="3" fill="#fffa65"/><circle cx="255" cy="235" r="3" fill="#fffa65"/>
+          <!-- バルコニーの手すり -->
+          <rect x="0" y="375" width="320" height="105" fill="#2f3542"/>
+          <line x1="0" y1="375" x2="320" y2="375" stroke="#f1c40f" stroke-width="4"/>
+          <line x1="0" y1="405" x2="320" y2="405" stroke="#f1c40f" stroke-width="3"/>
+          <rect x="20" y="375" width="10" height="30" fill="#747d8c"/><rect x="55" y="375" width="10" height="30" fill="#747d8c"/><rect x="90" y="375" width="10" height="30" fill="#747d8c"/><rect x="220" y="375" width="10" height="30" fill="#747d8c"/><rect x="255" y="375" width="10" height="30" fill="#747d8c"/><rect x="290" y="375" width="10" height="30" fill="#747d8c"/>
+        </svg>
+      `;
+    } else if (sId === 'stage_3') {
+      // 3. 満開のローズガーデン
+      return `
+        <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
+          <defs>
+            <linearGradient id="sc_bg_3" x1="0" y1="0" x2="0" y2="100%">
+              <stop offset="0%" stop-color="#74b9ff"/><stop offset="50%" stop-color="#ffccd5"/><stop offset="100%" stop-color="#55efc4"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="480" fill="url(#sc_bg_3)"/>
+          <!-- 白いパーゴラアーチ -->
+          <path d="M50 125 Q160 55 270 125" stroke="#ffffff" stroke-width="6" fill="none"/>
+          <line x1="70" y1="125" x2="70" y2="340" stroke="#ffffff" stroke-width="6"/>
+          <line x1="250" y1="125" x2="250" y2="340" stroke="#ffffff" stroke-width="6"/>
+          <!-- 薔薇のツタ -->
+          <path d="M45 130 Q160 50 275 130" stroke="#2ed573" stroke-width="12" fill="none"/>
+          <circle cx="75" cy="100" r="9" fill="#ff4757"/><circle cx="105" cy="72" r="10" fill="#ff6b81"/><circle cx="160" cy="52" r="12" fill="#ff4757"/><circle cx="215" cy="72" r="10" fill="#ff6b81"/><circle cx="245" cy="100" r="9" fill="#ff4757"/>
+          <circle cx="60" cy="150" r="8" fill="#ff6b81"/><circle cx="60" cy="200" r="9" fill="#ff4757"/><circle cx="260" cy="150" r="8" fill="#ff6b81"/><circle cx="260" cy="200" r="9" fill="#ff4757"/>
+          <!-- 噴水 -->
+          <ellipse cx="160" cy="255" rx="35" ry="10" fill="#74b9ff" stroke="#ffffff" stroke-width="2"/>
+          <path d="M160 255 Q150 215 160 195 Q170 215 160 255" fill="rgba(255,255,255,0.7)"/>
+          <!-- 舞い散る花びら -->
+          <ellipse cx="110" cy="180" rx="5" ry="3" fill="#ff7675" transform="rotate(25 110 180)"/>
+          <ellipse cx="210" cy="200" rx="5" ry="3" fill="#ff7675" transform="rotate(-30 210 200)"/>
+          <ellipse cx="140" cy="300" rx="6" ry="3" fill="#ff4757" transform="rotate(45 140 300)"/>
+          <!-- 花壇＆芝生 -->
+          <rect x="0" y="380" width="320" height="100" fill="#20bf6b"/>
+          <circle cx="25" cy="420" r="12" fill="#eb4d4b"/><circle cx="50" cy="430" r="10" fill="#f7b731"/><circle cx="270" cy="420" r="12" fill="#eb4d4b"/><circle cx="295" cy="430" r="10" fill="#f7b731"/>
+        </svg>
+      `;
+    } else if (sId === 'stage_4') {
+      // 4. クリスタル氷の宮殿
+      return `
+        <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
+          <defs>
+            <linearGradient id="sc_bg_4" x1="0" y1="0" x2="0" y2="100%">
+              <stop offset="0%" stop-color="#00cec9"/><stop offset="50%" stop-color="#0984e3"/><stop offset="100%" stop-color="#dfe6e9"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="480" fill="url(#sc_bg_4)"/>
+          <!-- オーロラ -->
+          <path d="M0 40 Q80 10 160 50 Q240 90 320 40 L320 0 L0 0 Z" fill="rgba(85, 239, 196, 0.4)"/>
+          <path d="M0 70 Q100 120 200 60 Q280 20 320 80 L320 0 L0 0 Z" fill="rgba(129, 236, 236, 0.3)"/>
+          <!-- 氷の結晶マンダラ -->
+          <circle cx="160" cy="140" r="42" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2"/>
+          <line x1="160" y1="85" x2="160" y2="195" stroke="#ffffff" stroke-width="3"/>
+          <line x1="105" y1="140" x2="215" y2="140" stroke="#ffffff" stroke-width="3"/>
+          <line x1="121" y1="101" x2="199" y2="179" stroke="#ffffff" stroke-width="3"/>
+          <line x1="121" y1="179" x2="199" y2="101" stroke="#ffffff" stroke-width="3"/>
+          <!-- 氷柱＆氷の柱 -->
+          <polygon points="0,0 20,0 25,120 15,180 0,200" fill="rgba(255,255,255,0.6)" stroke="#81ecec" stroke-width="1.5"/>
+          <polygon points="320,0 300,0 295,120 305,180 320,200" fill="rgba(255,255,255,0.6)" stroke="#81ecec" stroke-width="1.5"/>
+          <polygon points="55,0 65,0 60,60" fill="#ffffff" opacity="0.8"/>
+          <polygon points="115,0 125,0 120,75" fill="#ffffff" opacity="0.8"/>
+          <polygon points="195,0 205,0 200,75" fill="#ffffff" opacity="0.8"/>
+          <polygon points="255,0 265,0 260,60" fill="#ffffff" opacity="0.8"/>
+          <!-- クリスタル床 -->
+          <rect x="0" y="375" width="320" height="105" fill="#74b9ff"/>
+          <line x1="0" y1="375" x2="320" y2="375" stroke="#ffffff" stroke-width="3"/>
+          <polygon points="45,420 65,390 85,420" fill="rgba(255,255,255,0.5)"/>
+          <polygon points="235,420 255,390 275,420" fill="rgba(255,255,255,0.5)"/>
+        </svg>
+      `;
+    } else if (sId === 'stage_5') {
+      // 5. 妖精のフラワーステージ
+      return `
+        <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
+          <defs>
+            <linearGradient id="sc_bg_5" x1="0" y1="0" x2="0" y2="100%">
+              <stop offset="0%" stop-color="#006266"/><stop offset="50%" stop-color="#009432"/><stop offset="100%" stop-color="#1289A7"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="480" fill="url(#sc_bg_5)"/>
+          <!-- 大樹の枝 -->
+          <path d="M0 0 Q60 80 0 160 L0 0 Z" fill="#3d1e06"/>
+          <path d="M320 0 Q260 80 320 160 L320 0 Z" fill="#3d1e06"/>
+          <path d="M0 20 Q160 80 320 20 L320 0 L0 0 Z" fill="#3d1e06"/>
+          <!-- 光るキノコ -->
+          <path d="M20 280 Q45 220 70 280 Z" fill="#ff4757"/><rect x="40" y="280" width="10" height="40" fill="#dfe4ea"/>
+          <circle cx="35" cy="250" r="3" fill="#fff"/><circle cx="55" cy="255" r="4" fill="#fff"/>
+          <path d="M245 270 Q275 200 305 270 Z" fill="#00d2d3"/><rect x="270" y="270" width="10" height="45" fill="#dfe4ea"/>
+          <circle cx="265" cy="235" r="3" fill="#fff"/><circle cx="285" cy="240" r="4" fill="#fff"/>
+          <!-- 妖精の光 -->
+          <circle cx="55" cy="110" r="6" fill="#f6e58d"/><circle cx="95" cy="170" r="5" fill="#55efc4"/>
+          <circle cx="225" cy="130" r="7" fill="#f6e58d"/><circle cx="265" cy="180" r="5" fill="#fd79a8"/>
+          <!-- 苔の丘の床 -->
+          <path d="M0 380 Q160 340 320 380 L320 480 L0 480 Z" fill="#1b8c3a"/>
+        </svg>
+      `;
+    } else if (sId === 'stage_6') {
+      // 6. 夕暮れトワイライト城
+      return `
+        <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
+          <defs>
+            <linearGradient id="sc_bg_6" x1="0" y1="0" x2="0" y2="100%">
+              <stop offset="0%" stop-color="#6c5ce7"/><stop offset="35%" stop-color="#fd79a8"/><stop offset="70%" stop-color="#e17055"/><stop offset="100%" stop-color="#fdcb6e"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="480" fill="url(#sc_bg_6)"/>
+          <!-- 夕焼け雲 -->
+          <ellipse cx="75" cy="85" rx="55" ry="16" fill="rgba(255, 234, 167, 0.45)"/>
+          <ellipse cx="245" cy="115" rx="65" ry="18" fill="rgba(255, 234, 167, 0.45)"/>
+          <!-- お城の尖塔シルエット -->
+          <polygon points="75,180 95,95 115,180" fill="#2d3436"/><rect x="83" y="180" width="24" height="150" fill="#2d3436"/>
+          <line x1="95" y1="95" x2="95" y2="80" stroke="#f1c40f" stroke-width="2"/><polygon points="95,80 115,87 95,95" fill="#e74c3c"/>
+          <polygon points="205,190 225,115 245,190" fill="#2d3436"/><rect x="213" y="190" width="24" height="140" fill="#2d3436"/>
+          <line x1="225" y1="115" x2="225" y2="100" stroke="#f1c40f" stroke-width="2"/><polygon points="225,100 245,107 225,115" fill="#e74c3c"/>
+          <rect x="105" y="240" width="110" height="90" fill="#2d3436"/>
+          <circle cx="95" cy="190" r="3" fill="#ffeaa7"/><circle cx="225" cy="200" r="3" fill="#ffeaa7"/>
+          <!-- 城壁テラス床 -->
+          <rect x="0" y="380" width="320" height="100" fill="#636e72"/>
+          <rect x="0" y="360" width="28" height="25" fill="#636e72"/><rect x="48" y="360" width="28" height="25" fill="#636e72"/><rect x="244" y="360" width="28" height="25" fill="#636e72"/><rect x="292" y="360" width="28" height="25" fill="#636e72"/>
+          <line x1="0" y1="385" x2="320" y2="385" stroke="#ffeaa7" stroke-width="3"/>
+        </svg>
+      `;
+    } else if (sId === 'stage_7') {
+      // 7. 魔法のかぼちゃの馬車
+      return `
+        <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
+          <defs>
+            <linearGradient id="sc_bg_7" x1="0" y1="0" x2="0" y2="100%">
+              <stop offset="0%" stop-color="#191970"/><stop offset="60%" stop-color="#483d8b"/><stop offset="100%" stop-color="#8a2be2"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="480" fill="url(#sc_bg_7)"/>
+          <!-- 街灯 -->
+          <line x1="30" y1="180" x2="30" y2="390" stroke="#f1c40f" stroke-width="4"/>
+          <path d="M15 180 Q30 150 45 180 Z" fill="#f1c40f"/><circle cx="30" cy="190" r="10" fill="#ffeaa7"/>
+          <line x1="290" y1="180" x2="290" y2="390" stroke="#f1c40f" stroke-width="4"/>
+          <path d="M275 180 Q290 150 305 180 Z" fill="#f1c40f"/><circle cx="290" cy="190" r="10" fill="#ffeaa7"/>
+          <!-- かぼちゃの馬車 -->
+          <ellipse cx="160" cy="195" rx="60" ry="50" fill="none" stroke="#f1c40f" stroke-width="3.5"/>
+          <path d="M160 145 L160 245" stroke="#f1c40f" stroke-width="2.5"/>
+          <ellipse cx="160" cy="195" rx="30" ry="50" fill="none" stroke="#f1c40f" stroke-width="2"/>
+          <circle cx="160" cy="142" r="5" fill="#f1c40f"/><polygon points="160,137 165,127 160,131 155,127" fill="#2ed573"/>
+          <circle cx="110" cy="250" r="20" fill="none" stroke="#f1c40f" stroke-width="3.5"/>
+          <circle cx="210" cy="250" r="20" fill="none" stroke="#f1c40f" stroke-width="3.5"/>
+          <!-- 魔法の軌跡 -->
+          <path d="M40 310 Q160 170 280 270" stroke="#feca57" stroke-width="3" stroke-dasharray="6,4" fill="none"/>
+          <polygon points="115,125 119,133 127,133 121,139 123,147 115,142 107,147 109,139 103,133 111,133" fill="#fffa65"/>
+          <polygon points="205,115 209,123 217,123 211,129 213,137 205,132 197,137 199,129 193,123 201,123" fill="#fffa65"/>
+          <!-- 石畳の床 -->
+          <rect x="0" y="380" width="320" height="100" fill="#2f3542"/>
+          <ellipse cx="60" cy="410" rx="20" ry="10" fill="#57606f"/><ellipse cx="120" cy="415" rx="22" ry="11" fill="#747d8c"/><ellipse cx="180" cy="410" rx="20" ry="10" fill="#57606f"/><ellipse cx="240" cy="415" rx="22" ry="11" fill="#747d8c"/>
+        </svg>
+      `;
+    } else if (sId === 'stage_8') {
+      // 8. ステンドグラス大聖堂
+      return `
+        <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
+          <defs>
+            <linearGradient id="sc_bg_8" x1="0" y1="0" x2="0" y2="100%">
+              <stop offset="0%" stop-color="#0c102b"/><stop offset="60%" stop-color="#1a1c3b"/><stop offset="100%" stop-color="#2d3436"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="480" fill="url(#sc_bg_8)"/>
+          <!-- ローズウィンドウ（大ステンドグラス） -->
+          <circle cx="160" cy="140" r="65" fill="#1e272e" stroke="#f1c40f" stroke-width="4"/>
+          <circle cx="160" cy="140" r="55" fill="#ff4757" opacity="0.8"/>
+          <circle cx="160" cy="140" r="38" fill="#70a1ff" opacity="0.8"/>
+          <circle cx="160" cy="140" r="22" fill="#f1c40f" opacity="0.9"/>
+          <path d="M160 75 L160 205 M95 140 L225 140 M115 95 L205 185 M115 185 L205 95" stroke="#f1c40f" stroke-width="2.5"/>
+          <circle cx="160" cy="140" r="9" fill="#2ed573"/>
+          <!-- ゴシックアーチ -->
+          <path d="M0 230 Q160 50 320 230" stroke="#f1c40f" stroke-width="4" fill="none"/>
+          <path d="M40 270 Q160 110 280 270" stroke="#dfe4ea" stroke-width="2.5" fill="none"/>
+          <!-- 光の筋 -->
+          <polygon points="160,140 0,420 70,480" fill="rgba(255, 71, 87, 0.15)"/>
+          <polygon points="160,140 120,480 200,480" fill="rgba(241, 196, 15, 0.2)"/>
+          <polygon points="160,140 250,480 320,420" fill="rgba(112, 161, 255, 0.15)"/>
+          <!-- 燭台キャンドル -->
+          <rect x="25" y="310" width="8" height="28" fill="#ffffff"/><circle cx="29" cy="306" r="4" fill="#f1c40f"/>
+          <rect x="287" y="310" width="8" height="28" fill="#ffffff"/><circle cx="291" cy="306" r="4" fill="#f1c40f"/>
+          <!-- 大聖堂床 -->
+          <rect x="0" y="380" width="320" height="100" fill="#1e272e"/>
+          <line x1="0" y1="380" x2="320" y2="380" stroke="#f1c40f" stroke-width="3"/>
+        </svg>
+      `;
+    } else if (sId === 'stage_9') {
+      // 9. スウィートドリームルーム
+      return `
+        <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
+          <defs>
+            <linearGradient id="sc_bg_9" x1="0" y1="0" x2="0" y2="100%">
+              <stop offset="0%" stop-color="#fd79a8"/><stop offset="50%" stop-color="#ffb8b8"/><stop offset="100%" stop-color="#f8a5c2"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="480" fill="url(#sc_bg_9)"/>
+          <!-- 天蓋カーテン＆リボン -->
+          <path d="M0 0 Q160 65 320 0 L320 55 Q160 115 0 55 Z" fill="#ffffff" opacity="0.9"/>
+          <path d="M0 0 Q75 170 0 330 Z" fill="#ffffff" opacity="0.85"/>
+          <path d="M320 0 Q245 170 320 330 Z" fill="#ffffff" opacity="0.85"/>
+          <circle cx="160" cy="70" r="13" fill="#ff4757"/>
+          <path d="M160 70 L140 60 Q135 80 156 77 Z" fill="#ff6b81"/><path d="M160 70 L180 60 Q185 80 164 77 Z" fill="#ff6b81"/>
+          <!-- クモ＆クッション -->
+          <ellipse cx="55" cy="310" rx="32" ry="16" fill="#ffffff" opacity="0.8"/>
+          <ellipse cx="265" cy="310" rx="32" ry="16" fill="#ffffff" opacity="0.8"/>
+          <circle cx="265" cy="290" r="11" fill="#e17055"/><circle cx="258" cy="280" r="4" fill="#e17055"/><circle cx="272" cy="280" r="4" fill="#e17055"/>
+          <!-- フリルカーペット床 -->
+          <rect x="0" y="380" width="320" height="100" fill="#f78fb3"/>
+          <path d="M0 380 Q160 395 320 380" stroke="#ffffff" stroke-width="4" stroke-dasharray="6,6" fill="none"/>
+        </svg>
+      `;
+    } else {
+      // 10. スポットライトランウェイ
+      return `
+        <svg viewBox="0 0 320 480" preserveAspectRatio="xMidYMid slice" class="princess-scenery-svg">
+          <defs>
+            <linearGradient id="sc_bg_10" x1="0" y1="0" x2="0" y2="100%">
+              <stop offset="0%" stop-color="#0a0a14"/><stop offset="50%" stop-color="#1e1e38"/><stop offset="100%" stop-color="#2d1b4e"/>
+            </linearGradient>
+          </defs>
+          <rect width="320" height="480" fill="url(#sc_bg_10)"/>
+          <!-- トラス -->
+          <line x1="0" y1="28" x2="320" y2="28" stroke="#718093" stroke-width="3.5"/>
+          <line x1="0" y1="42" x2="320" y2="42" stroke="#718093" stroke-width="2.5"/>
+          <line x1="20" y1="28" x2="38" y2="42" stroke="#718093" stroke-width="1.5"/><line x1="58" y1="28" x2="76" y2="42" stroke="#718093" stroke-width="1.5"/><line x1="240" y1="28" x2="258" y2="42" stroke="#718093" stroke-width="1.5"/><line x1="280" y1="28" x2="298" y2="42" stroke="#718093" stroke-width="1.5"/>
+          <!-- 交差するスポットライト -->
+          <polygon points="35,28 105,480 205,480" fill="rgba(255, 71, 87, 0.3)"/>
+          <polygon points="285,28 215,480 115,480" fill="rgba(0, 210, 211, 0.3)"/>
+          <polygon points="160,28 95,480 225,480" fill="rgba(254, 202, 87, 0.25)"/>
+          <!-- フラッシュ＆ボケ光 -->
+          <circle cx="160" cy="28" r="10" fill="#fffa65"/><circle cx="35" cy="28" r="7" fill="#ff6b81"/><circle cx="285" cy="28" r="7" fill="#00d2d3"/>
+          <circle cx="65" cy="170" r="12" fill="rgba(255,255,255,0.15)"/><circle cx="255" cy="210" r="16" fill="rgba(255,255,255,0.12)"/>
+          <!-- ランウェイキャットウォーク床 -->
+          <polygon points="95,310 225,310 275,480 45,480" fill="#130f40" stroke="#ff4757" stroke-width="3"/>
+          <line x1="95" y1="310" x2="45" y2="480" stroke="#00d2d3" stroke-width="3"/>
+          <line x1="225" y1="310" x2="275" y2="480" stroke="#00d2d3" stroke-width="3"/>
+        </svg>
+      `;
+    }
+  }
+
   takePrincessPhoto() {
     window.soundSystem.playCameraShutter();
     window.soundSystem.playFanfare();
@@ -801,15 +1098,18 @@ class GamePrincess {
 
       this.photoPreviewCardEl.innerHTML = `
         <div class="polaroid-frame">
-          <div class="polaroid-photo-view" style="background: ${stage.bg};">
-            <div class="doll-clone-preview">
+          <div class="polaroid-photo-view" style="position: relative; overflow: hidden;">
+            <div style="position: absolute; inset: 0; pointer-events: none; z-index: 0;">
+              ${this.getStageSvg(stage)}
+            </div>
+            <div class="doll-clone-preview" style="position: relative; z-index: 1;">
               ${this.dollContainerEl.innerHTML}
             </div>
-            <span class="photo-sparkle-decor">✨ ⭐ ✨</span>
+            <span class="photo-sparkle-decor" style="position: relative; z-index: 2;">✨ ⭐ ✨</span>
           </div>
           <div class="polaroid-caption">
             <h3 class="polaroid-title">👑 ロイヤル・プリンセス 👑</h3>
-            <p class="polaroid-desc">「${dress.name}」コーデ</p>
+            <p class="polaroid-desc">「${dress.name}」コーデ ＆ 「${stage.name}」</p>
           </div>
         </div>
       `;
