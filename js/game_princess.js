@@ -345,9 +345,9 @@ class GamePrincess {
 
       let thumbPreview = '';
       if (categoryId === 'dress') {
-        thumbPreview = `<div class="item-thumb-color" style="background: radial-gradient(circle, ${item.mainColor} 30%, ${item.subColor} 100%);">👗</div>`;
+        thumbPreview = `<div class="item-thumb-color" style="padding:0; overflow:hidden; border:1.5px solid ${item.subColor || '#ff4757'};">${this.getDressSvgThumbnail(item)}</div>`;
       } else if (categoryId === 'hair') {
-        thumbPreview = `<div class="item-thumb-color" style="background: radial-gradient(circle, ${item.color} 30%, ${item.shadow} 100%);">👸</div>`;
+        thumbPreview = `<div class="item-thumb-color" style="padding:0; overflow:hidden; border:1.5px solid ${item.shadow || '#f1c40f'};">${this.getHairSvgThumbnail(item)}</div>`;
       } else if (categoryId === 'stage') {
         thumbPreview = `<div class="item-thumb-color" style="padding:0; overflow:hidden; border:1.5px solid #ffbe76;">${this.getStageSvg(item)}</div>`;
       } else if (categoryId === 'makeup') {
@@ -517,20 +517,131 @@ class GamePrincess {
   }
 
   getBackHairSvg(hair) {
-    return `
-      <svg viewBox="0 0 280 400" class="doll-svg">
-        <defs>
-          <linearGradient id="backHairGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="${hair.color}"/>
-            <stop offset="100%" stop-color="${hair.shadow}"/>
-          </linearGradient>
-        </defs>
-        <!-- 頭頂部から背中へ広がるボリューム豊かな後ろ髪 -->
-        <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q235 140 230 250 Q215 315 185 320 Q140 330 95 320 Q65 315 50 250 Q45 140 85 75 Z" fill="url(#backHairGrad)" stroke="${hair.shadow}" stroke-width="2"/>
-        <path d="M50 230 Q40 290 65 325 Q85 335 105 315" fill="${hair.color}" opacity="0.6"/>
-        <path d="M230 230 Q240 290 215 325 Q195 335 175 315" fill="${hair.color}" opacity="0.6"/>
-      </svg>
+    const t = hair.type;
+    const gradId = `backHairGrad_${hair.id}`;
+    const defs = `
+      <defs>
+        <linearGradient id="${gradId}" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="${hair.color}"/>
+          <stop offset="100%" stop-color="${hair.shadow}"/>
+        </linearGradient>
+      </defs>
     `;
+
+    if (t === 'twin_roll') {
+      // 2. ツインロール
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- ツインテール根本お団子 -->
+          <circle cx="70" cy="85" r="18" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <circle cx="210" cy="85" r="18" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <!-- 縦ロールツインドリル -->
+          <path d="M55 85 Q30 150 50 250 Q75 260 85 235 Q65 150 85 85 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <path d="M225 85 Q250 150 230 250 Q205 260 195 235 Q215 150 195 85 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <!-- ロールの螺旋ハイライト -->
+          <path d="M40 140 Q65 160 80 140 M45 190 Q65 210 82 190" stroke="#ffffff" stroke-width="2.5" opacity="0.6" fill="none"/>
+          <path d="M240 140 Q215 160 200 140 M235 190 Q215 210 198 190" stroke="#ffffff" stroke-width="2.5" opacity="0.6" fill="none"/>
+        </svg>
+      `;
+    } else if (t === 'high_pony') {
+      // 3. 高めポニーテール
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- ポニーテール結び目 -->
+          <ellipse cx="140" cy="45" rx="30" ry="20" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <!-- なびくポニーテール -->
+          <path d="M150 40 Q210 20 240 90 Q260 180 225 260 Q195 240 215 170 Q210 90 160 48 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <circle cx="160" cy="42" r="6" fill="#ff4757"/>
+        </svg>
+      `;
+    } else if (t === 'half_up') {
+      // 4. ハーフアップ
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- 上半分まとめ髪 -->
+          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q210 120 140 130 Q70 120 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <!-- 下半分の流れるウェーブ -->
+          <path d="M90 120 Q60 200 70 290 Q140 315 210 290 Q220 200 190 120 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <ellipse cx="140" cy="70" rx="14" ry="8" fill="#a29bfe" stroke="#ffffff" stroke-width="1.5"/>
+        </svg>
+      `;
+    } else if (t === 'rose_up') {
+      // 5. エレガントローズ（アップスタイル）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- 頭頂部の大きなローズシニヨン -->
+          <ellipse cx="140" cy="18" rx="38" ry="26" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <path d="M115 18 Q140 2 165 18 Q140 34 115 18" stroke="${hair.shadow}" stroke-width="2.5" fill="none"/>
+          <circle cx="125" cy="14" r="3.5" fill="#ffffff"/><circle cx="155" cy="14" r="3.5" fill="#ffffff"/>
+          <circle cx="140" cy="18" r="4" fill="#ff7675"/>
+        </svg>
+      `;
+    } else if (t === 'soft_bob') {
+      // 6. ふんわり内巻きボブ
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- 肩上の短め丸みボブ -->
+          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q215 125 195 175 Q140 188 85 175 Q65 125 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <path d="M85 175 Q140 192 195 175" stroke="${hair.shadow}" stroke-width="3" fill="none"/>
+        </svg>
+      `;
+    } else if (t === 'side_braid') {
+      // 7. サイドテール三つ編み
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q210 130 140 140 Q85 130 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <!-- 左肩に垂れる三つ編み -->
+          <path d="M95 120 Q65 170 70 230 Q60 275 75 310 Q90 300 95 240 Q110 170 115 120 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <circle cx="75" cy="305" r="5" fill="#ff4757"/>
+        </svg>
+      `;
+    } else if (t === 'starlight_long') {
+      // 8. 姫カット超ロングストレート
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- 膝下までまっすぐ伸びるスーパーロング -->
+          <polygon points="85,75 78,22 140,20 202,22 195,75 228,200 220,365 60,365 52,200" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <line x1="100" y1="120" x2="100" y2="360" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+          <line x1="180" y1="120" x2="180" y2="360" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+        </svg>
+      `;
+    } else if (t === 'crown_braid') {
+      // 9. クラシカル王冠三つ編み
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q205 130 140 135 Q75 130 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <!-- 後頭部を包む三つ編みクラウン -->
+          <path d="M85 70 Q140 100 195 70" stroke="${hair.shadow}" stroke-width="8" stroke-dasharray="6,4" fill="none"/>
+        </svg>
+      `;
+    } else if (t === 'fairy_short') {
+      // 10. フェアリーショート
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- すっきり短いピクシーショート -->
+          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q205 110 170 130 Q140 135 110 130 Q75 110 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+        </svg>
+      `;
+    } else {
+      // 1. ロイヤルウェーブ (デフォルト)
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q240 140 235 260 Q215 320 185 325 Q140 335 95 325 Q65 320 45 260 Q40 140 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <path d="M50 230 Q40 290 65 325 Q85 335 105 315" fill="${hair.color}" opacity="0.6"/>
+          <path d="M230 230 Q240 290 215 325 Q195 335 175 315" fill="${hair.color}" opacity="0.6"/>
+        </svg>
+      `;
+    }
   }
 
   getBodySvg(makeup) {
@@ -571,41 +682,143 @@ class GamePrincess {
     `;
   }
 
-  getDressSvg(dress) {
+  getHairSvgThumbnail(hair) {
     return `
-      <svg viewBox="0 0 280 400" class="doll-svg">
-        <defs>
-          <linearGradient id="dressGrad_${dress.id}" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="${dress.mainColor}"/>
-            <stop offset="60%" stop-color="${dress.subColor}"/>
-            <stop offset="100%" stop-color="${dress.mainColor}"/>
-          </linearGradient>
-          <linearGradient id="dressShine" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="rgba(255,255,255,0.4)"/>
-            <stop offset="50%" stop-color="rgba(255,255,255,0)"/>
-            <stop offset="100%" stop-color="rgba(255,255,255,0.4)"/>
-          </linearGradient>
-        </defs>
-
-        <!-- ドレスのパニエ・スカート（ゴージャスなフリルとボリューム） -->
-        <path d="M118 190 Q140 195 162 190 Q215 260 225 345 Q140 360 55 345 Q65 260 118 190 Z" fill="url(#dressGrad_${dress.id})" stroke="#2f3542" stroke-width="2"/>
-        <path d="M118 190 Q140 195 162 190 Q215 260 225 345 Q140 360 55 345 Q65 260 118 190 Z" fill="url(#dressShine)"/>
-
-        <!-- スカートのオーバースカート・ドレープ -->
-        <path d="M125 192 Q140 240 90 320 Q140 340 190 320 Q140 240 155 192" fill="none" stroke="${dress.glow}" stroke-width="3" opacity="0.85"/>
-        <path d="M65 340 Q140 365 215 340" stroke="#ffffff" stroke-width="4" stroke-dasharray="6,6" fill="none"/>
-
-        <!-- トップ・コルセット部 -->
-        <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#dressGrad_${dress.id})" stroke="#2f3542" stroke-width="1.8"/>
-        <!-- 胸元のジュエル＆リボン -->
-        <circle cx="140" cy="155" r="5" fill="${dress.glow}" stroke="#ffffff" stroke-width="1.5"/>
-        <path d="M135 155 L130 162 M145 155 L150 162" stroke="#ffffff" stroke-width="2"/>
-
-        <!-- ショルダーフリル・オフショルダー -->
-        <path d="M98 145 Q115 135 125 145 Q112 155 98 145 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
-        <path d="M182 145 Q165 135 155 145 Q168 155 182 145 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
+      <svg viewBox="50 10 180 220" style="width:100%; height:100%; display:block; background:#fff5f7;">
+        ${this.getBackHairSvg(hair)}
+        <ellipse cx="140" cy="85" rx="34" ry="40" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1.5"/>
+        <circle cx="126" cy="82" r="3" fill="#0984e3"/><circle cx="154" cy="82" r="3" fill="#0984e3"/>
+        <path d="M136 98 Q140 102 144 98" stroke="#ff7675" stroke-width="2" fill="#ff7675"/>
+        ${this.getFrontHairSvg(hair)}
       </svg>
     `;
+  }
+
+  getDressSvgThumbnail(dress) {
+    return `
+      <svg viewBox="45 130 190 230" style="width:100%; height:100%; display:block; background:#fbfbfb;">
+        ${this.getDressSvg(dress)}
+      </svg>
+    `;
+  }
+
+  getDressSvg(dress) {
+    const t = dress.type;
+    const gId = `dressGrad_${dress.id}`;
+    const defs = `
+      <defs>
+        <linearGradient id="${gId}" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="${dress.mainColor}"/>
+          <stop offset="60%" stop-color="${dress.subColor}"/>
+          <stop offset="100%" stop-color="${dress.mainColor}"/>
+        </linearGradient>
+        <linearGradient id="dressShine_${dress.id}" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="rgba(255,255,255,0.4)"/>
+          <stop offset="50%" stop-color="rgba(255,255,255,0)"/>
+          <stop offset="100%" stop-color="rgba(255,255,255,0.4)"/>
+        </linearGradient>
+      </defs>
+    `;
+
+    if (t === 'rose_frill') {
+      // 2. ロイヤルローズピンク（3段ティアードフリル）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- 3段フリルスカート -->
+          <path d="M118 190 Q140 196 162 190 Q190 225 198 245 Q140 255 82 245 Q90 225 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <path d="M90 240 Q140 255 190 240 Q212 285 215 300 Q140 310 65 300 Q68 285 90 240 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <path d="M72 295 Q140 310 208 295 Q228 340 230 350 Q140 365 50 350 Q52 340 72 295 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <!-- フリル白レース縁取り -->
+          <path d="M80 245 Q140 258 200 245" stroke="#ffffff" stroke-width="3" stroke-dasharray="4,4" fill="none"/>
+          <path d="M65 300 Q140 315 215 300" stroke="#ffffff" stroke-width="3" stroke-dasharray="4,4" fill="none"/>
+          <path d="M50 350 Q140 365 230 350" stroke="#ffffff" stroke-width="4" stroke-dasharray="5,5" fill="none"/>
+          <!-- トップ -->
+          <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <circle cx="140" cy="155" r="5" fill="#ffffff" stroke="#ff4757" stroke-width="1.5"/>
+          <path d="M98 145 Q115 135 125 145 Q112 155 98 145 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
+          <path d="M182 145 Q165 135 155 145 Q168 155 182 145 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
+        </svg>
+      `;
+    } else if (t === 'aurora_mermaid') {
+      // 5. オーロラマーメイド（タイト＆フィッシュテール）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- マーメイドラインスカート -->
+          <path d="M118 190 Q140 195 162 190 Q175 250 165 295 Q140 298 115 295 Q105 250 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <!-- 裾の広がった魚尾フリル -->
+          <path d="M115 295 Q140 298 165 295 Q210 330 230 355 Q140 348 50 355 Q70 330 115 295 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <path d="M50 355 Q140 345 230 355" stroke="${dress.glow}" stroke-width="3" fill="none"/>
+          <!-- トップ -->
+          <path d="M112 140 Q140 148 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <circle cx="140" cy="155" r="5" fill="${dress.glow}" stroke="#ffffff" stroke-width="1.5"/>
+          <!-- 貝殻風ショルダー -->
+          <path d="M96 142 Q115 130 125 142 Z" fill="${dress.subColor}" stroke="#ffffff" stroke-width="1.5"/>
+          <path d="M184 142 Q165 130 155 142 Z" fill="${dress.subColor}" stroke="#ffffff" stroke-width="1.5"/>
+        </svg>
+      `;
+    } else if (t === 'sweet_lolita') {
+      // 8. スイートロリータ（ひざ丈カップケーキパニエ）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- ふんわり丸いひざ丈スカート -->
+          <path d="M118 190 Q140 195 162 190 Q225 240 215 295 Q140 310 65 295 Q55 240 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <path d="M65 295 Q140 310 215 295" stroke="#ffffff" stroke-width="6" stroke-dasharray="6,4" fill="none"/>
+          <!-- エプロン風ホワイトリボン -->
+          <path d="M125 192 Q140 230 110 270 Q140 280 170 270 Q140 230 155 192 Z" fill="rgba(255,255,255,0.7)"/>
+          <circle cx="140" cy="205" r="5" fill="#ff4757"/>
+          <!-- トップ -->
+          <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <!-- パフスリーブ -->
+          <circle cx="106" cy="146" r="12" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
+          <circle cx="174" cy="146" r="12" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
+        </svg>
+      `;
+    } else if (t === 'snow_frost') {
+      // 7. スノークイーン（純白ハイネック＆氷のケープマント）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- 氷のマントトレイン -->
+          <path d="M100 145 Q40 260 45 350 Q140 360 235 350 Q240 260 180 145 Z" fill="rgba(129, 236, 236, 0.35)" stroke="#81ecec" stroke-width="1.5"/>
+          <!-- ドレス本体 -->
+          <path d="M118 190 Q140 195 162 190 Q205 260 215 345 Q140 355 65 345 Q75 260 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <path d="M65 345 Q140 355 215 345" stroke="#74b9ff" stroke-width="4" stroke-dasharray="5,5" fill="none"/>
+          <!-- ハイネック＆トップ -->
+          <path d="M112 135 L128 128 L152 128 L168 135 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <polygon points="140,145 144,153 140,161 136,153" fill="#81ecec" stroke="#ffffff" stroke-width="1"/>
+          <!-- クリスタルショルダー -->
+          <polygon points="98,142 110,132 124,142 112,150" fill="#ffffff" stroke="#81ecec" stroke-width="1.5"/>
+          <polygon points="182,142 170,132 156,142 168,150" fill="#ffffff" stroke="#81ecec" stroke-width="1.5"/>
+        </svg>
+      `;
+    } else {
+      // 1, 3, 4, 6, 9, 10. クラシカルロイヤルプリンセスガウン (大舞踏会ボリューム)
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- ドレスのパニエ・スカート（ゴージャスなフリルとボリューム） -->
+          <path d="M118 190 Q140 195 162 190 Q215 260 225 345 Q140 360 55 345 Q65 260 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <path d="M118 190 Q140 195 162 190 Q215 260 225 345 Q140 360 55 345 Q65 260 118 190 Z" fill="url(#dressShine_${dress.id})"/>
+
+          <!-- スカートのオーバースカート・ドレープ -->
+          <path d="M125 192 Q140 240 90 320 Q140 340 190 320 Q140 240 155 192" fill="none" stroke="${dress.glow}" stroke-width="3" opacity="0.85"/>
+          <path d="M65 340 Q140 365 215 340" stroke="#ffffff" stroke-width="4" stroke-dasharray="6,6" fill="none"/>
+
+          <!-- トップ・コルセット部 -->
+          <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <!-- 胸元のジュエル＆リボン -->
+          <circle cx="140" cy="155" r="5" fill="${dress.glow}" stroke="#ffffff" stroke-width="1.5"/>
+          <path d="M135 155 L130 162 M145 155 L150 162" stroke="#ffffff" stroke-width="2"/>
+
+          <!-- ショルダーフリル・オフショルダー -->
+          <path d="M98 145 Q115 135 125 145 Q112 155 98 145 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
+          <path d="M182 145 Q165 135 155 145 Q168 155 182 145 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.5"/>
+        </svg>
+      `;
+    }
   }
 
   getJewelrySvg(jewel) {
@@ -722,26 +935,148 @@ class GamePrincess {
   }
 
   getFrontHairSvg(hair) {
-    return `
-      <svg viewBox="0 0 280 400" class="doll-svg">
-        <defs>
-          <linearGradient id="frontHairGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="${hair.color}"/>
-            <stop offset="100%" stop-color="${hair.shadow}"/>
-          </linearGradient>
-        </defs>
-
-        <!-- 前髪＆頭頂部（頭のてっぺんから包み込むフルキャップヘア） -->
-        <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q172 88 156 76 Q140 92 124 76 Q108 88 96 75 Z" fill="url(#frontHairGrad)" stroke="${hair.shadow}" stroke-width="1.8"/>
-        
-        <!-- サイドの髪束（顔まわり） -->
-        <path d="M98 70 Q88 115 95 160 Q105 135 108 95 Z" fill="url(#frontHairGrad)" stroke="${hair.shadow}" stroke-width="1.5"/>
-        <path d="M182 70 Q192 115 185 160 Q175 135 172 95 Z" fill="url(#frontHairGrad)" stroke="${hair.shadow}" stroke-width="1.5"/>
-
-        <!-- 天使の輪・髪の光沢ハイライト -->
-        <ellipse cx="140" cy="44" rx="28" ry="4" fill="rgba(255,255,255,0.65)" transform="rotate(-3 140 44)"/>
-      </svg>
+    const t = hair.type;
+    const gradId = `frontHairGrad_${hair.id}`;
+    const defs = `
+      <defs>
+        <linearGradient id="${gradId}" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="${hair.color}"/>
+          <stop offset="100%" stop-color="${hair.shadow}"/>
+        </linearGradient>
+      </defs>
     `;
+
+    if (t === 'twin_roll') {
+      // 2. パステルピンクツイン（パッツン前髪＋サイドリボン＆ツインドリル）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- パッツン前髪＆頭頂部 -->
+          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q168 84 140 84 Q112 84 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
+          <!-- サイドロック -->
+          <path d="M98 70 Q90 105 96 140 Q105 125 106 90 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <path d="M182 70 Q190 105 184 140 Q175 125 174 90 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <!-- ツインテール結び目のピンクのリボン -->
+          <circle cx="70" cy="85" r="5" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
+          <path d="M70 85 L55 75 Q50 90 68 88 Z" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
+          <path d="M70 85 L85 75 Q90 90 72 88 Z" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
+          <circle cx="210" cy="85" r="5" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
+          <path d="M210 85 L195 75 Q190 90 208 88 Z" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
+          <path d="M210 85 L225 75 Q230 90 212 88 Z" fill="#ff7675" stroke="#ffffff" stroke-width="1"/>
+          <ellipse cx="140" cy="44" rx="28" ry="4" fill="rgba(255,255,255,0.65)" transform="rotate(-3 140 44)"/>
+        </svg>
+      `;
+    } else if (t === 'high_pony') {
+      // 3. クリスタルシルバー（すっきりアップバング）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- 引き締めアップ前髪 -->
+          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q170 82 155 74 Q140 85 125 74 Q110 82 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
+          <!-- 繊細な触覚サイドヘア -->
+          <path d="M100 75 Q92 110 96 145" stroke="url(#${gradId})" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+          <path d="M180 75 Q188 110 184 145" stroke="url(#${gradId})" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+          <ellipse cx="140" cy="42" rx="26" ry="4" fill="rgba(255,255,255,0.7)" transform="rotate(-2 140 42)"/>
+        </svg>
+      `;
+    } else if (t === 'half_up') {
+      // 4. オーロララベンダー（ふんわりセンターパート＋サイド編み込み）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q174 86 158 76 Q140 84 122 76 Q106 86 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
+          <!-- サイドのゆるふわウェーブ束 -->
+          <path d="M98 70 Q82 110 92 155 Q104 135 106 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <path d="M182 70 Q198 110 188 155 Q176 135 174 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <ellipse cx="140" cy="45" rx="28" ry="4" fill="rgba(255,255,255,0.65)" transform="rotate(-3 140 45)"/>
+        </svg>
+      `;
+    } else if (t === 'rose_up') {
+      // 5. エレガントローズ（ノーブルなカール前髪＋後れ毛）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q175 88 156 74 Q140 86 124 74 Q105 88 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
+          <!-- 耳前のエレガントな巻き毛 -->
+          <path d="M100 75 Q90 100 96 125 Q102 120 104 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <path d="M180 75 Q190 100 184 125 Q178 120 176 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <ellipse cx="140" cy="44" rx="28" ry="4" fill="rgba(255,255,255,0.65)"/>
+        </svg>
+      `;
+    } else if (t === 'soft_bob') {
+      // 6. ミルキーミントボブ（ほっぺを包む内巻きボブ）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q168 85 140 82 Q112 85 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
+          <!-- ほっぺを包み込む内巻きサイド -->
+          <path d="M98 70 Q78 105 88 150 Q106 160 108 140 Q104 110 106 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <path d="M182 70 Q202 105 192 150 Q174 160 172 140 Q176 110 174 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <ellipse cx="140" cy="45" rx="28" ry="4" fill="rgba(255,255,255,0.65)"/>
+        </svg>
+      `;
+    } else if (t === 'side_braid') {
+      // 7. ルビーレッドサイド（アシンメトリー前髪＋左胸に垂れる大三つ編み）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q168 86 145 78 Q118 88 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
+          <!-- 左肩から胸元に垂れる三つ編み -->
+          <path d="M98 75 Q75 110 80 160 Q65 200 78 245 Q90 240 94 200 Q104 150 106 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <circle cx="78" cy="245" r="4.5" fill="#f1c40f"/>
+          <!-- 右側はすっきり -->
+          <path d="M182 70 Q188 100 184 125 Q176 115 174 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <ellipse cx="140" cy="44" rx="28" ry="4" fill="rgba(255,255,255,0.65)"/>
+        </svg>
+      `;
+    } else if (t === 'starlight_long') {
+      // 8. 姫カット超ロング（パッツン前髪＋直角姫カットサイド）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q160 82 140 82 Q120 82 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
+          <!-- 姫カット（あごラインで水平に切り揃えられたサイド） -->
+          <polygon points="98,70 86,130 106,130 108,70" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <polygon points="182,70 194,130 174,130 172,70" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <ellipse cx="140" cy="44" rx="28" ry="4" fill="rgba(255,255,255,0.7)"/>
+        </svg>
+      `;
+    } else if (t === 'crown_braid') {
+      // 9. クラシカル王冠三つ編み
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <!-- おでこを囲む三つ編みバンド -->
+          <path d="M90 60 Q140 25 190 60" stroke="${hair.shadow}" stroke-width="8" stroke-dasharray="6,4" fill="none"/>
+          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q172 88 156 76 Q140 92 124 76 Q108 88 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
+          <path d="M98 70 Q90 100 95 130 Q104 120 106 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <path d="M182 70 Q190 100 185 130 Q176 120 174 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+        </svg>
+      `;
+    } else if (t === 'fairy_short') {
+      // 10. フェアリーショート（ハネ感のある軽快ピクシー）
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q175 88 162 76 Q150 92 140 78 Q130 92 118 76 Q105 88 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
+          <!-- 外ハネのサイド毛先 -->
+          <path d="M98 70 Q80 85 85 110 Q98 100 104 85 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <path d="M182 70 Q200 85 195 110 Q182 100 176 85 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <ellipse cx="140" cy="44" rx="28" ry="4" fill="rgba(255,255,255,0.65)"/>
+        </svg>
+      `;
+    } else {
+      // 1. ロイヤルウェーブ (デフォルト)
+      return `
+        <svg viewBox="0 0 280 400" class="doll-svg">
+          ${defs}
+          <path d="M96 75 Q92 24 140 22 Q188 24 184 75 Q172 88 156 76 Q140 92 124 76 Q108 88 96 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.8"/>
+          <path d="M98 70 Q88 115 95 160 Q105 135 108 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <path d="M182 70 Q192 115 185 160 Q175 135 172 95 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="1.5"/>
+          <ellipse cx="140" cy="44" rx="28" ry="4" fill="rgba(255,255,255,0.65)" transform="rotate(-3 140 44)"/>
+        </svg>
+      `;
+    }
   }
 
   getHeadwearSvg(head) {
