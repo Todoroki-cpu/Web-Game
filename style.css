@@ -1086,3 +1086,466 @@ html, body {
 }
 .aura-sparkle { animation: auraSpin 3s infinite linear; }
 
+/* ==========================================================================
+   プリンセス ミニゲーム 1: お城のたからさがし (Castle Door Treasure Hunt)
+   ========================================================================== */
+.doors-game-layout {
+  display: flex; flex-direction: column; width: 100%; height: 100%;
+  padding: 8px 12px; gap: 8px; box-sizing: border-box;
+}
+.doors-header-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: rgba(255, 255, 255, 0.92); border-radius: 18px; padding: 6px 14px;
+  border: 3px solid #fbc531; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.doors-speech-bubble {
+  display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;
+}
+.doors-prompt-text {
+  font-size: 15px; font-weight: 900; color: #2f3542;
+}
+.doors-voice-replay {
+  background: #fffa65; border: 2px solid #f1c40f; border-radius: 50%;
+  width: 32px; height: 32px; font-size: 14px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0;
+}
+.doors-treasure-tray {
+  display: flex; align-items: center; gap: 6px; background: #fff0f5;
+  padding: 4px 10px; border-radius: 14px; border: 2px solid #ff7597;
+}
+.tray-label { font-size: 12px; font-weight: 900; color: #ff4757; white-space: nowrap; }
+.tray-slots { display: flex; gap: 4px; }
+.treasure-slot {
+  width: 28px; height: 28px; border-radius: 8px; background: #ffffff;
+  border: 1.5px solid #ffb8b8; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; transition: transform 0.2s;
+}
+.treasure-slot.filled {
+  background: #fff9db; border-color: #f1c40f; transform: scale(1.1);
+  box-shadow: 0 0 6px rgba(241, 196, 15, 0.5);
+}
+
+.doors-hallway-scene {
+  flex: 1; min-height: 0; position: relative; border-radius: 22px;
+  overflow: hidden; border: 4px solid #fbc531;
+  background: linear-gradient(180deg, #1e272e 0%, #2f3542 50%, #57606f 100%);
+  display: flex; flex-direction: column; justify-content: space-between; padding: 12px;
+}
+.doors-hallway-bg {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+}
+.hallway-chandelier {
+  position: absolute; top: 8px; font-size: 20px;
+  filter: drop-shadow(0 0 8px rgba(254, 202, 87, 0.8));
+}
+.hallway-chandelier.c-left { left: 15%; }
+.hallway-chandelier.c-center { left: 50%; transform: translateX(-50%); font-size: 26px; }
+.hallway-chandelier.c-right { right: 15%; }
+.hallway-carpet {
+  position: absolute; bottom: 0; left: 10%; right: 10%; height: 110px;
+  background: linear-gradient(180deg, #c0392b 0%, #eb4d4b 100%);
+  clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
+  border-top: 3px solid #f1c40f; opacity: 0.9;
+}
+
+.doors-row {
+  display: flex; justify-content: space-around; align-items: flex-end;
+  position: relative; z-index: 2; height: 65%; padding: 0 10px;
+}
+.castle-door-unit {
+  display: flex; flex-direction: column; align-items: center;
+  cursor: pointer; transition: transform 0.15s; width: 28%; max-width: 140px; height: 100%;
+}
+.castle-door-unit:active { transform: scale(0.96); }
+.door-frame {
+  width: 100%; flex: 1; border-radius: 50px 50px 8px 8px;
+  border: 5px solid #ffeaa7; position: relative; overflow: hidden;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.35); perspective: 600px;
+}
+.door-arch-header {
+  position: absolute; top: 0; left: 0; right: 0; height: 32px;
+  display: flex; align-items: center; justify-content: center; z-index: 5;
+  border-bottom: 2px solid rgba(0,0,0,0.15);
+}
+.door-arch-icon { font-size: 18px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3)); }
+.door-leaf {
+  position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; transform-origin: left center;
+  transition: transform 0.75s cubic-bezier(0.25, 1, 0.5, 1);
+  box-shadow: inset 0 0 12px rgba(0,0,0,0.3);
+}
+.door-leaf.open-door-3d {
+  transform: rotateY(-85deg);
+}
+.door-panel-crest {
+  width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 255, 255, 0.85);
+  border: 2px solid #ffffff; display: flex; align-items: center; justify-content: center;
+  margin-top: 14px; box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+.door-crest-symbol { font-size: 22px; }
+.door-knob {
+  position: absolute; right: 10px; top: 58%; font-size: 14px;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+}
+.door-interior {
+  position: absolute; inset: 0; background: radial-gradient(circle at 50% 60%, #fff9db 0%, #feca57 60%, #2f3542 100%);
+  display: flex; align-items: center; justify-content: center; z-index: 1;
+}
+.door-treasure-box {
+  font-size: 38px; filter: drop-shadow(0 0 10px rgba(255, 234, 167, 0.9));
+  animation: chestBounce 1s infinite alternate;
+}
+@keyframes chestBounce {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-6px) scale(1.08); }
+}
+.door-plate-label {
+  margin-top: 6px; padding: 4px 8px; border-radius: 12px; color: #ffffff;
+  font-size: 11px; font-weight: 900; text-align: center; white-space: nowrap;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3); text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.doors-princess-track {
+  position: relative; z-index: 3; height: 35%; display: flex;
+  justify-content: center; align-items: flex-end; pointer-events: none;
+}
+.doors-princess-avatar {
+  position: relative; width: 140px; height: 180px; transform-origin: bottom center;
+}
+.doors-princess-avatar .doll-layer { position: absolute; width: 100%; height: 100%; }
+.doors-princess-avatar.walking {
+  animation: dollStepWalk 0.3s infinite ease-in-out alternate;
+}
+.doors-princess-avatar.cheering {
+  animation: dollCheerJump 0.4s infinite ease-in-out alternate;
+}
+@keyframes dollStepWalk {
+  0% { transform: translateY(0) rotate(-2deg); }
+  100% { transform: translateY(-8px) rotate(2deg); }
+}
+@keyframes dollCheerJump {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-16px) scale(1.06); }
+}
+
+.doors-reward-popup {
+  position: absolute; inset: 0; z-index: 999; background: rgba(0,0,0,0.65);
+  display: flex; align-items: center; justify-content: center; opacity: 0;
+  pointer-events: none; transition: opacity 0.3s ease;
+}
+.doors-reward-popup.show { opacity: 1; pointer-events: auto; }
+.reward-box-card {
+  background: #ffffff; border-radius: 24px; border: 4px solid #f1c40f;
+  padding: 20px 30px; text-align: center; box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  max-width: 280px;
+}
+.reward-item-icon { font-size: 56px; margin: 8px 0; filter: drop-shadow(0 0 12px rgba(254, 202, 87, 0.8)); }
+.reward-item-name { font-size: 18px; font-weight: 900; color: #e84118; margin-bottom: 4px; }
+.reward-item-desc { font-size: 13px; font-weight: bold; color: #57606f; }
+
+
+/* ==========================================================================
+   プリンセス ミニゲーム 2: ファッションショー (Princess Runway Fashion Show)
+   ========================================================================== */
+.runway-game-layout {
+  display: flex; flex-direction: column; width: 100%; height: 100%;
+  padding: 8px 12px; gap: 8px; box-sizing: border-box;
+}
+.runway-header-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  background: rgba(255, 255, 255, 0.94); border-radius: 18px; padding: 6px 12px;
+  border: 3px solid #fbc531; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.runway-theme-badge {
+  display: flex; align-items: center; gap: 4px; background: #fff0f5;
+  padding: 4px 10px; border-radius: 12px; border: 2px solid #ff7597;
+  font-size: 12px; font-weight: 900; color: #ff4757; white-space: nowrap;
+}
+.runway-prompt-box { flex: 1; text-align: center; min-width: 0; }
+.runway-prompt-text { font-size: 14px; font-weight: 900; color: #2f3542; }
+.runway-shutter-btn {
+  background: linear-gradient(135deg, #ff4757, #ff6b81); color: #ffffff;
+  border: 3px solid #ffffff; border-radius: 16px; padding: 8px 16px;
+  font-size: 14px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
+  transition: transform 0.15s; white-space: nowrap;
+}
+.runway-shutter-btn:disabled {
+  background: #a4b0be; opacity: 0.6; cursor: not-allowed; box-shadow: none;
+}
+.runway-shutter-btn.active-pulse {
+  animation: shutterPulse 0.7s infinite alternate;
+}
+@keyframes shutterPulse {
+  0% { transform: scale(1); box-shadow: 0 0 8px rgba(255, 71, 87, 0.5); }
+  100% { transform: scale(1.08); box-shadow: 0 0 18px rgba(255, 71, 87, 0.9); }
+}
+
+.runway-stage-scene {
+  flex: 1; min-height: 0; position: relative; border-radius: 22px;
+  overflow: hidden; border: 4px solid #fbc531; perspective: 700px;
+  display: flex; align-items: center; justify-content: center;
+}
+.runway-lighting-layer {
+  position: absolute; inset: 0; pointer-events: none; z-index: 1;
+}
+.runway-spotlight {
+  position: absolute; top: -50px; width: 140px; height: 380px;
+  background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.4) 0%, rgba(255, 234, 167, 0.15) 60%, transparent 100%);
+  transform-origin: top center; pointer-events: none;
+}
+.runway-spotlight.spot-left { left: 10%; transform: rotate(20deg); }
+.runway-spotlight.spot-center { left: 50%; transform: translateX(-50%); width: 180px; }
+.runway-spotlight.spot-right { right: 10%; transform: rotate(-20deg); }
+
+.runway-catwalk-3d {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  display: flex; justify-content: center; align-items: flex-end;
+}
+.runway-carpet-lane {
+  width: 45%; height: 80%; background: #ff4757;
+  clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%);
+  border-left: 4px solid #f1c40f; border-right: 4px solid #f1c40f; opacity: 0.95;
+}
+.runway-audience {
+  position: absolute; bottom: 10px; font-size: 16px; opacity: 0.85;
+}
+.runway-audience.audience-left { left: 15px; }
+.runway-audience.audience-right { right: 15px; }
+.audience-cheer { animation: cheerWiggle 1s infinite alternate; display: inline-block; }
+@keyframes cheerWiggle {
+  0% { transform: translateY(0) rotate(-5deg); }
+  100% { transform: translateY(-6px) rotate(5deg); }
+}
+
+.runway-model-stage {
+  position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  display: flex; align-items: center; justify-content: center;
+}
+.runway-model-wrapper {
+  position: absolute; top: 50%; left: 50%; width: 180px; height: 260px;
+  transform-style: preserve-3d;
+}
+.runway-model-wrapper .doll-layer { position: absolute; width: 100%; height: 100%; }
+.runway-walking {
+  animation: catwalkSway 0.35s infinite ease-in-out alternate;
+}
+@keyframes catwalkSway {
+  0% { transform: translate(-50%, -50%) rotate(-3deg); }
+  100% { transform: translate(-50%, -50%) rotate(3deg); }
+}
+.runway-model-wrapper.waving {
+  animation: modelWave 0.5s infinite ease-in-out alternate;
+}
+@keyframes modelWave {
+  0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+  100% { transform: translate(-50%, -50%) rotate(4deg) scale(1.03); }
+}
+.runway-model-wrapper.magic-pose {
+  animation: modelMagic 0.6s infinite ease-in-out alternate;
+}
+@keyframes modelMagic {
+  0% { transform: translate(-50%, -50%) translateY(0) scale(1); }
+  100% { transform: translate(-50%, -50%) translateY(-10px) scale(1.05); }
+}
+.runway-model-wrapper.curtsey-pose {
+  animation: modelCurtsey 1.2s infinite ease-in-out;
+}
+@keyframes modelCurtsey {
+  0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+  50% { transform: translate(-50%, -50%) rotateY(180deg) scale(0.98); }
+}
+
+.runway-flash-screen {
+  position: absolute; inset: 0; background: #ffffff; opacity: 0;
+  pointer-events: none; z-index: 99;
+}
+.runway-flash-screen.flash { animation: flashAnim 0.35s ease-out forwards; }
+
+.runway-judges-bar {
+  position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 10px; z-index: 10; opacity: 0; transition: opacity 0.3s;
+}
+.runway-judges-bar.show { opacity: 1; }
+.judge-box {
+  background: rgba(255, 255, 255, 0.95); border: 2.5px solid #dfe4ea;
+  border-radius: 14px; padding: 4px 10px; display: flex; align-items: center;
+  gap: 6px; font-size: 13px; font-weight: 900; opacity: 0.4; transition: all 0.3s;
+}
+.judge-box.scored {
+  border-color: #ff4757; background: #fff0f5; opacity: 1; transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+}
+
+.runway-magazine-modal {
+  position: absolute; inset: 0; z-index: 999; background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center; opacity: 0;
+  pointer-events: none; transition: opacity 0.3s;
+}
+.runway-magazine-modal.show { opacity: 1; pointer-events: auto; }
+.magazine-cover-card {
+  background: #ffffff; border-radius: 20px; border: 4px solid #f1c40f;
+  padding: 14px 18px; max-width: 320px; width: 90%; text-align: center;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.4);
+}
+.magazine-header {
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 2px solid #2f3542; padding-bottom: 4px; margin-bottom: 8px;
+}
+.mag-logo { font-size: 12px; font-weight: 900; color: #2f3542; }
+.mag-issue { font-size: 10px; font-weight: 900; color: #ff4757; }
+.magazine-photo-box {
+  position: relative; background: linear-gradient(180deg, #ffecd2 0%, #fcb69f 100%);
+  border-radius: 12px; overflow: hidden; height: 210px; display: flex;
+  align-items: center; justify-content: center; border: 2px solid #dfe4ea;
+}
+.magazine-score-badge {
+  position: absolute; top: 8px; right: 8px; background: #ff4757; color: #ffffff;
+  padding: 4px 8px; border-radius: 10px; font-size: 11px; font-weight: 900;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+.magazine-footer { margin-top: 10px; }
+.mag-headline { font-size: 16px; font-weight: 900; color: #e84118; margin-bottom: 2px; }
+.mag-subtext { font-size: 11px; font-weight: bold; color: #636e72; margin-bottom: 10px; }
+
+
+/* ==========================================================================
+   プリンセス ミニゲーム 3: ジュエルつなぎパズル (Magic Jewel Connect)
+   ========================================================================== */
+.puzzle-game-layout {
+  display: flex; flex-direction: column; width: 100%; height: 100%;
+  padding: 8px 12px; gap: 8px; box-sizing: border-box;
+}
+.puzzle-header-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: rgba(255, 255, 255, 0.94); border-radius: 18px; padding: 6px 14px;
+  border: 3px solid #fbc531; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.puzzle-mission-bubble { flex: 1; min-width: 0; }
+.puzzle-mission-text { font-size: 14.5px; font-weight: 900; color: #2f3542; }
+.puzzle-target-badge {
+  display: flex; align-items: center; gap: 6px; background: #fff0f5;
+  padding: 4px 12px; border-radius: 14px; border: 2px solid #ff7597;
+}
+.target-label { font-size: 12px; font-weight: 900; color: #ff4757; white-space: nowrap; }
+.target-count-number {
+  font-size: 18px; font-weight: 900; color: #e84118; min-width: 20px; text-align: center;
+}
+
+.puzzle-main-stage {
+  flex: 1; min-height: 0; display: flex; gap: 12px; position: relative;
+}
+.puzzle-supporter-box {
+  width: 130px; display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-end; position: relative; flex-shrink: 0;
+}
+.puzzle-princess-avatar {
+  position: relative; width: 120px; height: 160px; transform-origin: bottom center;
+}
+.puzzle-princess-avatar .doll-layer { position: absolute; width: 100%; height: 100%; }
+.puzzle-princess-avatar.spell-casting {
+  animation: castSpellWand 0.4s infinite alternate;
+}
+@keyframes castSpellWand {
+  0% { transform: translateY(0) rotate(-4deg) scale(1); }
+  100% { transform: translateY(-10px) rotate(6deg) scale(1.08); filter: drop-shadow(0 0 10px #f1c40f); }
+}
+.puzzle-princess-avatar.cheering {
+  animation: dollCheerJump 0.4s infinite alternate;
+}
+.princess-cheer-bubble {
+  background: #ffffff; border: 2px solid #fbc531; border-radius: 14px;
+  padding: 4px 8px; font-size: 11px; font-weight: 900; color: #2f3542;
+  text-align: center; margin-top: 4px; box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+
+.puzzle-board-wrapper {
+  flex: 1; min-width: 0; position: relative; border-radius: 20px;
+  border: 4px solid #fbc531; background: #1e1e38; overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25); display: flex;
+  align-items: center; justify-content: center; padding: 6px;
+  touch-action: none;
+}
+.puzzle-trace-svg {
+  position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;
+}
+.puzzle-grid-matrix {
+  display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(6, 1fr);
+  gap: 6px; width: 100%; height: 100%; max-width: 360px; max-height: 360px;
+}
+.jewel-cell {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  border-radius: 12px; cursor: pointer; transition: transform 0.12s;
+}
+.jewel-gem-body {
+  width: 90%; height: 90%; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.7);
+  border: 1.5px solid rgba(255,255,255,0.6); transition: all 0.15s;
+}
+.jewel-symbol { font-size: 16px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4)); }
+.jewel-cell.selected .jewel-gem-body {
+  transform: scale(1.15);
+  box-shadow: 0 0 14px var(--jewel-glow), inset 0 0 8px #ffffff;
+  border-color: #ffffff;
+}
+.jewel-cell.path-head .jewel-gem-body {
+  animation: jewelHeadPulse 0.4s infinite alternate;
+}
+@keyframes jewelHeadPulse {
+  0% { transform: scale(1.15); }
+  100% { transform: scale(1.25); }
+}
+.jewel-cell.clearing {
+  animation: jewelPopShatter 0.35s ease-out forwards;
+}
+@keyframes jewelPopShatter {
+  0% { transform: scale(1.2); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.8; }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+.puzzle-fever-banner {
+  position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) scale(0.6);
+  background: linear-gradient(135deg, #f1c40f, #ff4757); color: #ffffff;
+  padding: 10px 24px; border-radius: 20px; font-size: 18px; font-weight: 900;
+  border: 3px solid #ffffff; box-shadow: 0 8px 24px rgba(241, 196, 15, 0.6);
+  opacity: 0; pointer-events: none; z-index: 100; transition: all 0.3s;
+}
+.puzzle-fever-banner.show {
+  opacity: 1; transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* ==========================================================================
+   プリンセス ミニゲーム選択モーダル
+   ========================================================================== */
+.princess-play-modal-card {
+  max-width: 520px; width: 92%; padding: 20px 16px;
+}
+.play-modal-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  margin: 16px 0;
+}
+.play-modal-card {
+  background: #ffffff; border-radius: 16px; border: 3px solid #dfe4ea;
+  padding: 12px 6px; text-align: center; cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.play-modal-card:active { transform: scale(0.95); }
+.play-modal-card:hover {
+  border-color: #ff4757; transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(255, 71, 87, 0.25);
+}
+.play-card-icon { font-size: 28px; margin-bottom: 4px; }
+.play-card-title {
+  font-size: 13px; font-weight: 900; color: #2f3542; margin-bottom: 2px;
+  line-height: 1.2;
+}
+.play-card-desc { font-size: 10.5px; font-weight: bold; color: #747d8c; line-height: 1.2; }
+
+.secondary-style {
+  background: #dfe4ea !important; color: #2f3542 !important; box-shadow: none !important;
+}
+
+
+

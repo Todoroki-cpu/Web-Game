@@ -164,7 +164,7 @@ class GameApp {
     this.particles = new ParticleSystem('effects-canvas');
     this.timer = new CountdownTimer(this);
 
-    // 全15ゲームのインスタンス化
+    // 全18ゲームのインスタンス化
     this.gameCounting = new GameCounting(this);
     this.gameDots = new GameDots(this);
     this.gameBubble = new GameBubble(this);
@@ -181,6 +181,9 @@ class GameApp {
     this.gameHiraganaKaruta = new GameHiraganaKaruta(this);
     this.gameHiraganaWord = new GameHiraganaWord(this);
     this.gamePrincess = new GamePrincess(this);
+    this.gamePrincessDoors = new GamePrincessDoors(this);
+    this.gamePrincessRunway = new GamePrincessRunway(this);
+    this.gamePrincessPuzzle = new GamePrincessPuzzle(this);
 
     this.homeCharManager = new CharacterManager('home-character-stage');
 
@@ -202,7 +205,10 @@ class GameApp {
       hiragana_trace: document.getElementById('view-game-hiragana-trace'),
       hiragana_karuta: document.getElementById('view-game-hiragana-karuta'),
       hiragana_word: document.getElementById('view-game-hiragana-word'),
-      princess: document.getElementById('view-game-princess')
+      princess: document.getElementById('view-game-princess'),
+      princess_doors: document.getElementById('view-game-princess-doors'),
+      princess_runway: document.getElementById('view-game-princess-runway'),
+      princess_puzzle: document.getElementById('view-game-princess-puzzle')
     };
 
     this.homeBtn = document.getElementById('home-btn');
@@ -313,6 +319,9 @@ class GameApp {
     bindCard('menu-card-hiragana-karuta', 'game_title_14', 'hiragana_karuta');
     bindCard('menu-card-hiragana-word', 'game_title_15', 'hiragana_word');
     bindCard('menu-card-princess', 'praise_kitty_1', 'princess');
+    bindCard('menu-card-princess-doors', 'praise_kitty_1', 'princess_doors');
+    bindCard('menu-card-princess-runway', 'praise_kitty_2', 'princess_runway');
+    bindCard('menu-card-princess-puzzle', 'praise_kitty_3', 'princess_puzzle');
 
     // もう1回遊ぶボタン
     if (this.restartBtn) {
@@ -336,6 +345,9 @@ class GameApp {
         else if (v === 'hiragana_karuta') this.gameHiraganaKaruta.start();
         else if (v === 'hiragana_word') this.gameHiraganaWord.start();
         else if (v === 'princess') this.gamePrincess.start();
+        else if (v === 'princess_doors') this.gamePrincessDoors.start();
+        else if (v === 'princess_runway') this.gamePrincessRunway.start();
+        else if (v === 'princess_puzzle') this.gamePrincessPuzzle.start();
         else this.switchView('home');
       });
     }
@@ -427,6 +439,9 @@ class GameApp {
       else if (viewName === 'hiragana_karuta') this.gameHiraganaKaruta.start();
       else if (viewName === 'hiragana_word') this.gameHiraganaWord.start();
       else if (viewName === 'princess') this.gamePrincess.start();
+      else if (viewName === 'princess_doors') this.gamePrincessDoors.start();
+      else if (viewName === 'princess_runway') this.gamePrincessRunway.start();
+      else if (viewName === 'princess_puzzle') this.gamePrincessPuzzle.start();
     }
   }
 

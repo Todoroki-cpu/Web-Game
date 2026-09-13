@@ -173,6 +173,13 @@ class GamePrincess {
     this.photoPreviewCardEl = document.getElementById('princess-photo-card');
     this.photoCloseBtn = document.getElementById('princess-photo-close-btn');
 
+    this.playMenuBtn = document.getElementById('btn-princess-play-menu');
+    this.playModalEl = document.getElementById('princess-play-modal');
+    this.playCloseBtn = document.getElementById('princess-play-close-btn');
+    this.playDoorsBtn = document.getElementById('play-modal-doors');
+    this.playRunwayBtn = document.getElementById('play-modal-runway');
+    this.playPuzzleBtn = document.getElementById('play-modal-puzzle');
+
     this.bindEvents();
   }
 
@@ -265,6 +272,42 @@ class GamePrincess {
     if (this.photoCloseBtn) {
       this.photoCloseBtn.addEventListener('click', () => {
         if (this.photoModalEl) this.photoModalEl.classList.remove('show');
+      });
+    }
+
+    // 🎮 ミニゲームメニューを開く
+    if (this.playMenuBtn) {
+      this.playMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.soundSystem.playSparkle();
+        if (this.playModalEl) this.playModalEl.classList.add('show');
+      });
+    }
+
+    if (this.playCloseBtn) {
+      this.playCloseBtn.addEventListener('click', () => {
+        if (this.playModalEl) this.playModalEl.classList.remove('show');
+      });
+    }
+
+    if (this.playDoorsBtn) {
+      this.playDoorsBtn.addEventListener('click', () => {
+        if (this.playModalEl) this.playModalEl.classList.remove('show');
+        this.app.switchView('princess_doors');
+      });
+    }
+
+    if (this.playRunwayBtn) {
+      this.playRunwayBtn.addEventListener('click', () => {
+        if (this.playModalEl) this.playModalEl.classList.remove('show');
+        this.app.switchView('princess_runway');
+      });
+    }
+
+    if (this.playPuzzleBtn) {
+      this.playPuzzleBtn.addEventListener('click', () => {
+        if (this.playModalEl) this.playModalEl.classList.remove('show');
+        this.app.switchView('princess_puzzle');
       });
     }
   }
@@ -423,19 +466,17 @@ class GamePrincess {
     }
   }
 
-  renderDoll() {
-    if (!this.dollContainerEl) return;
+  getDollSvgHtml(selectedOverride = null, pose = 'normal') {
+    const sel = selectedOverride || this.selected;
+    const hair = this.database.hair.find(h => h.id === sel.hair) || this.database.hair[0];
+    const dress = this.database.dress.find(d => d.id === sel.dress) || this.database.dress[0];
+    const head = this.database.headwear.find(h => h.id === sel.headwear) || this.database.headwear[0];
+    const makeup = this.database.makeup.find(m => m.id === sel.makeup) || this.database.makeup[0];
+    const jewel = this.database.jewelry.find(j => j.id === sel.jewelry) || this.database.jewelry[0];
+    const prop = this.database.props.find(p => p.id === sel.props) || this.database.props[0];
+    const shoe = this.database.shoes.find(s => s.id === sel.shoes) || this.database.shoes[0];
 
-    const hair = this.database.hair.find(h => h.id === this.selected.hair) || this.database.hair[0];
-    const dress = this.database.dress.find(d => d.id === this.selected.dress) || this.database.dress[0];
-    const head = this.database.headwear.find(h => h.id === this.selected.headwear) || this.database.headwear[0];
-    const makeup = this.database.makeup.find(m => m.id === this.selected.makeup) || this.database.makeup[0];
-    const jewel = this.database.jewelry.find(j => j.id === this.selected.jewelry) || this.database.jewelry[0];
-    const prop = this.database.props.find(p => p.id === this.selected.props) || this.database.props[0];
-    const shoe = this.database.shoes.find(s => s.id === this.selected.shoes) || this.database.shoes[0];
-
-    // レイヤー構築（SVG 3D レイヤリング）
-    this.dollContainerEl.innerHTML = `
+    return `
       <!-- レイヤー1: 後ろ髪 ＆ 背中の羽・オーラ -->
       <div class="doll-layer layer-back-wings">
         ${this.getWingsSvg(jewel)}
@@ -484,6 +525,11 @@ class GamePrincess {
         ${this.getHeadwearSvg(head)}
       </div>
     `;
+  }
+
+  renderDoll() {
+    if (!this.dollContainerEl) return;
+    this.dollContainerEl.innerHTML = this.getDollSvgHtml();
   }
 
   // --- SVG レンダリングヘルパー ---

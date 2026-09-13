@@ -198,7 +198,7 @@
         </div>
       </div>
 
-      <!-- パネル5: プリンセス着せ替え (新カテゴリ) -->
+      <!-- パネル5: プリンセス着せ替え ＆ ミニゲーム (4ゲーム) -->
       <div class="home-cat-panel" id="cat-panel-princess">
         <div class="menu-cards-grid">
           <div class="menu-card card-princess-dress" id="menu-card-princess">
@@ -206,6 +206,24 @@
             <div class="card-icon">👑 👗 👠 🪄</div>
             <h2 class="card-title">プリンセス・ドレスアップ 3D</h2>
             <p class="card-desc">80種類の豪華アイテムで変身！360度3D回転！</p>
+          </div>
+          <div class="menu-card card-princess-doors" id="menu-card-princess-doors">
+            <div class="card-badge">たんけん・きおく</div>
+            <div class="card-icon">🏰 🚪 🦄 🎁</div>
+            <h2 class="card-title">お城のたからさがし</h2>
+            <p class="card-desc">ヒントの扉をあけて ステキなお宝をみつけよう！</p>
+          </div>
+          <div class="menu-card card-princess-runway" id="menu-card-princess-runway">
+            <div class="card-badge">ランウェイ・さつえい</div>
+            <div class="card-icon">📸 🌟 💃 👑</div>
+            <h2 class="card-title">プリンセス・ファッションショー</h2>
+            <p class="card-desc">ランウェイでポーズ！300点満点で雑誌の表紙へ！</p>
+          </div>
+          <div class="menu-card card-princess-puzzle" id="menu-card-princess-puzzle">
+            <div class="card-badge">ジュエルパズル</div>
+            <div class="card-icon">💎 🔴 🔵 🪄</div>
+            <h2 class="card-title">まほうのジュエルパズル</h2>
+            <p class="card-desc">同じ色のジュエルをつなげて 魔法を発動！</p>
           </div>
         </div>
       </div>
@@ -574,6 +592,7 @@
               <button class="stage-action-btn" id="btn-princess-spin">✨ 3D かいてん</button>
               <button class="stage-action-btn" id="btn-princess-random">🎲 おまかせ</button>
               <button class="stage-action-btn photo-btn" id="btn-princess-photo">📸 さつえい</button>
+              <button class="stage-action-btn play-menu-btn" id="btn-princess-play-menu" style="background: linear-gradient(135deg, #a29bfe, #6c5ce7); color: #fff;">🎮 あそぶ！</button>
             </div>
           </div>
 
@@ -603,6 +622,21 @@
       </div>
     </main>
 
+    <!-- ==========================================
+         18. お城のたからさがし (Princess Game 3)
+         ========================================== -->
+    <main class="view-panel" id="view-game-princess-doors"></main>
+
+    <!-- ==========================================
+         19. プリンセス・ファッションショー (Princess Game 4)
+         ========================================== -->
+    <main class="view-panel" id="view-game-princess-runway"></main>
+
+    <!-- ==========================================
+         20. まほうのジュエルパズル (Princess Game 5)
+         ========================================== -->
+    <main class="view-panel" id="view-game-princess-puzzle"></main>
+
   </div>
 
   <!-- 全クリアモーダル -->
@@ -620,6 +654,32 @@
     <div class="modal-card princess-photo-modal-card">
       <div id="princess-photo-card"></div>
       <button class="primary-btn" id="princess-photo-close-btn">💖 とじる</button>
+    </div>
+  </div>
+
+  <!-- プリンセス ミニゲーム選択モーダル -->
+  <div class="modal-backdrop" id="princess-play-modal">
+    <div class="modal-card princess-play-modal-card">
+      <h2 class="modal-title">🎮 この女の子であそぶ！</h2>
+      <p class="modal-subtitle">すきなミニゲームを えらんでね！</p>
+      <div class="play-modal-grid">
+        <div class="play-modal-card" id="play-modal-doors">
+          <span class="play-card-icon">🏰 🎁</span>
+          <h3 class="play-card-title">お城のたからさがし</h3>
+          <p class="play-card-desc">扉をあけて宝箱を発見！</p>
+        </div>
+        <div class="play-modal-card" id="play-modal-runway">
+          <span class="play-card-icon">📸 💃</span>
+          <h3 class="play-card-title">ファッションショー</h3>
+          <p class="play-card-desc">ランウェイでポーズさつえい！</p>
+        </div>
+        <div class="play-modal-card" id="play-modal-puzzle">
+          <span class="play-card-icon">💎 🪄</span>
+          <h3 class="play-card-title">ジュエルパズル</h3>
+          <p class="play-card-desc">ジュエルをつなげて魔法発動！</p>
+        </div>
+      </div>
+      <button class="primary-btn secondary-style" id="princess-play-close-btn">💖 ドレスアップにもどる</button>
     </div>
   </div>
 
@@ -643,6 +703,9 @@
   <script src="js/game_hiragana_karuta.js"></script>
   <script src="js/game_hiragana_word.js"></script>
   <script src="js/game_princess.js"></script>
+  <script src="js/game_princess_doors.js"></script>
+  <script src="js/game_princess_runway.js"></script>
+  <script src="js/game_princess_puzzle.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -488,6 +488,139 @@ class SoundSystem {
     osc.stop(now + 0.2);
   }
 
+  // まほうのチャイム（ハープ・きらめきグリッサンド）
+  playMagicChime() {
+    if (this.isMuted || !this.ctx) return;
+    const freqs = [523.25, 659.25, 783.99, 1046.5, 1318.51, 1567.98, 2093.0];
+    freqs.forEach((freq, idx) => {
+      setTimeout(() => {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.35);
+      }, idx * 45);
+    });
+  }
+
+  // お城のドアが開く音（ギィィ・パァァ✨）
+  playDoorOpen() {
+    if (this.isMuted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(120, now);
+    osc.frequency.linearRampToValueAtTime(280, now + 0.25);
+    gain.gain.setValueAtTime(0.12, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.3);
+
+    setTimeout(() => this.playSparkle(), 180);
+  }
+
+  // 宝箱オープン（ファンファーレ）
+  playTreasureChest() {
+    if (this.isMuted || !this.ctx) return;
+    const melody = [
+      { f: 523.25, t: 0, d: 0.12 },
+      { f: 659.25, t: 0.12, d: 0.12 },
+      { f: 783.99, t: 0.24, d: 0.12 },
+      { f: 1046.5, t: 0.36, d: 0.4 }
+    ];
+    melody.forEach(m => {
+      setTimeout(() => {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(m.f, now);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + m.d);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + m.d);
+      }, m.t * 1000);
+    });
+  }
+
+  // ジュエルつなぎの音階（ド・レ・ミ・ファ・ソ・ラ・シ・ド）
+  playJewelTone(step = 0) {
+    if (this.isMuted || !this.ctx) return;
+    const scale = [523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.5, 1174.66, 1318.51];
+    const freq = scale[Math.min(step, scale.length - 1)];
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.18);
+  }
+
+  // ジュエル消去音（クリスタルポップ）
+  playJewelClear() {
+    if (this.isMuted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(987.77, now);
+    osc.frequency.exponentialRampToValueAtTime(1567.98, now + 0.12);
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.15);
+  }
+
+  // フィーバー大爆発音
+  playFeverBurst() {
+    if (this.isMuted || !this.ctx) return;
+    this.playMagicChime();
+    setTimeout(() => this.playFanfare(), 200);
+  }
+
+  // ランウェイ歓声・拍手
+  playCheerCrowd() {
+    if (this.isMuted || !this.ctx) return;
+    this.playSparkle();
+    const now = this.ctx.currentTime;
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => {
+        if (!this.ctx) return;
+        const cNow = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1200 + Math.random() * 600, cNow);
+        gain.gain.setValueAtTime(0.15, cNow);
+        gain.gain.exponentialRampToValueAtTime(0.001, cNow + 0.08);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(cNow);
+        osc.stop(cNow + 0.08);
+      }, i * 60);
+    }
+  }
+
   stopBgm() {
     this.isBgmPlaying = false;
     this.currentBgmType = null;
