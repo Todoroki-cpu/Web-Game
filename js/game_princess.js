@@ -1056,18 +1056,18 @@ class GamePrincess {
     `;
 
     if (t === 'cinderella_gown') {
-      // 1. シンデレラクリスタル（ペプラム付き大舞踏会ガウン）
+      // 1. シンデレラクリスタル（ペプラム付き大舞踏会ガウン・アンクル丈）
       return `
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
           <!-- ドーム型大パニエスカート -->
-          <path d="M118 190 Q140 195 162 190 Q220 260 225 348 Q140 360 55 348 Q60 260 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
-          <path d="M118 190 Q140 195 162 190 Q220 260 225 348 Q140 360 55 348 Q60 260 118 190 Z" fill="url(#dressShine_${dress.id})"/>
+          <path d="M118 190 Q140 195 162 190 Q218 255 220 332 Q140 336 60 332 Q62 255 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <path d="M118 190 Q140 195 162 190 Q218 255 220 332 Q140 336 60 332 Q62 255 118 190 Z" fill="url(#dressShine_${dress.id})"/>
           <!-- 左右のシルバードレープペプラム（腰の羽根飾り） -->
           <path d="M118 190 Q85 190 70 215 Q95 235 120 210 Z" fill="#ffffff" stroke="#74b9ff" stroke-width="1.5"/>
           <path d="M162 190 Q195 190 210 215 Q185 235 160 210 Z" fill="#ffffff" stroke="#74b9ff" stroke-width="1.5"/>
           <!-- 裾のクリスタルレース -->
-          <path d="M65 344 Q140 365 215 344" stroke="#ffffff" stroke-width="5" stroke-dasharray="6,6" fill="none"/>
+          <path d="M68 330 Q140 336 212 330" stroke="#ffffff" stroke-width="5" stroke-dasharray="6,6" fill="none"/>
           <!-- トップ＆オフショルダー -->
           <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
           <circle cx="140" cy="155" r="5" fill="#ffffff" stroke="#74b9ff" stroke-width="1.5"/>
@@ -1076,18 +1076,18 @@ class GamePrincess {
         </svg>
       `;
     } else if (t === 'rose_frill') {
-      // 2. ロイヤルローズピンク（3段ティアードフリル）
+      // 2. ロイヤルローズピンク（3段ティアードフリル・アンクル丈）
       return `
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
           <!-- 3段フリルスカート -->
-          <path d="M118 190 Q140 196 162 190 Q190 225 198 245 Q140 255 82 245 Q90 225 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <path d="M90 240 Q140 255 190 240 Q212 285 215 300 Q140 310 65 300 Q68 285 90 240 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <path d="M72 295 Q140 310 208 295 Q228 340 230 350 Q140 365 50 350 Q52 340 72 295 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <path d="M118 190 Q140 196 162 190 Q190 220 196 238 Q140 246 84 238 Q90 220 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <path d="M90 234 Q140 248 190 234 Q210 275 212 288 Q140 296 68 288 Q70 275 90 234 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <path d="M76 284 Q140 296 204 284 Q220 322 222 332 Q140 336 58 332 Q60 322 76 284 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
           <!-- フリル白レース縁取り -->
-          <path d="M80 245 Q140 258 200 245" stroke="#ffffff" stroke-width="3" stroke-dasharray="4,4" fill="none"/>
-          <path d="M65 300 Q140 315 215 300" stroke="#ffffff" stroke-width="3" stroke-dasharray="4,4" fill="none"/>
-          <path d="M50 350 Q140 365 230 350" stroke="#ffffff" stroke-width="4" stroke-dasharray="5,5" fill="none"/>
+          <path d="M84 238 Q140 248 196 238" stroke="#ffffff" stroke-width="3" stroke-dasharray="4,4" fill="none"/>
+          <path d="M68 288 Q140 298 212 288" stroke="#ffffff" stroke-width="3" stroke-dasharray="4,4" fill="none"/>
+          <path d="M58 332 Q140 336 222 332" stroke="#ffffff" stroke-width="4" stroke-dasharray="5,5" fill="none"/>
           <!-- トップ -->
           <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
           <circle cx="140" cy="155" r="5" fill="#ffffff" stroke="#ff4757" stroke-width="1.5"/>
@@ -1101,11 +1101,11 @@ class GamePrincess {
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
           <!-- 星空のサイドシアートレイン -->
-          <path d="M110 190 Q40 270 45 350 Q75 350 100 290 Z" fill="rgba(87, 96, 111, 0.45)" stroke="#feca57" stroke-width="1"/>
-          <path d="M170 190 Q240 270 235 350 Q205 350 180 290 Z" fill="rgba(87, 96, 111, 0.45)" stroke="#feca57" stroke-width="1"/>
+          <path d="M110 190 Q40 255 48 332 Q75 332 100 275 Z" fill="rgba(87, 96, 111, 0.45)" stroke="#feca57" stroke-width="1"/>
+          <path d="M170 190 Q240 255 232 332 Q205 332 180 275 Z" fill="rgba(87, 96, 111, 0.45)" stroke="#feca57" stroke-width="1"/>
           <!-- 星形カットのスカート -->
-          <polygon points="118,190 162,190 220,290 195,355 160,315 140,355 120,315 85,355 60,290" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
-          <polygon points="195,355 160,315 140,355 120,315 85,355" fill="none" stroke="#feca57" stroke-width="2.5"/>
+          <polygon points="118,190 162,190 215,275 190,332 160,305 140,332 120,305 90,332 65,275" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <polygon points="190,332 160,305 140,332 120,305 90,332" fill="none" stroke="#feca57" stroke-width="2.5"/>
           <!-- トップ＆星屑ブローチ -->
           <path d="M112 140 Q140 148 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
           <polygon points="140,150 142,155 148,155 143,159 145,164 140,161 135,164 137,159 132,155 138,155" fill="#feca57"/>
@@ -1119,9 +1119,9 @@ class GamePrincess {
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
           <!-- 重なる花びらスカート -->
-          <path d="M118 190 Q140 195 162 190 L205 250 L160 340 L120 250 Z" fill="url(#${gId})" stroke="#00b894" stroke-width="1.8"/>
-          <path d="M118 190 Q140 195 162 190 L160 250 L120 340 L75 250 Z" fill="url(#${gId})" stroke="#00b894" stroke-width="1.8"/>
-          <path d="M118 190 Q140 195 162 190 L185 270 L140 350 L95 270 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.8"/>
+          <path d="M118 190 Q140 195 162 190 L200 245 L158 332 L120 245 Z" fill="url(#${gId})" stroke="#00b894" stroke-width="1.8"/>
+          <path d="M118 190 Q140 195 162 190 L160 245 L122 332 L80 245 Z" fill="url(#${gId})" stroke="#00b894" stroke-width="1.8"/>
+          <path d="M118 190 Q140 195 162 190 L180 260 L140 334 L100 260 Z" fill="${dress.mainColor}" stroke="#ffffff" stroke-width="1.8"/>
           <!-- つる草ベルト＆花飾り -->
           <path d="M116 195 Q140 202 164 195" stroke="#2ed573" stroke-width="4" fill="none"/>
           <circle cx="140" cy="198" r="5" fill="#ff7675"/><circle cx="132" cy="197" r="3.5" fill="#ffeaa7"/><circle cx="148" cy="197" r="3.5" fill="#ffeaa7"/>
@@ -1137,10 +1137,10 @@ class GamePrincess {
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
           <!-- マーメイドラインスカート -->
-          <path d="M118 190 Q140 195 162 190 Q175 250 165 295 Q140 298 115 295 Q105 250 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <path d="M118 190 Q140 195 162 190 Q175 245 165 285 Q140 288 115 285 Q105 245 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
           <!-- 裾の広がった魚尾フリル -->
-          <path d="M115 295 Q140 298 165 295 Q210 330 230 355 Q140 348 50 355 Q70 330 115 295 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
-          <path d="M50 355 Q140 345 230 355" stroke="${dress.glow}" stroke-width="3" fill="none"/>
+          <path d="M115 285 Q140 288 165 285 Q205 315 222 334 Q140 330 58 334 Q75 315 115 285 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
+          <path d="M58 334 Q140 330 222 334" stroke="${dress.glow}" stroke-width="3" fill="none"/>
           <!-- トップ -->
           <path d="M112 140 Q140 148 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
           <circle cx="140" cy="155" r="5" fill="${dress.glow}" stroke="#ffffff" stroke-width="1.5"/>
@@ -1155,12 +1155,12 @@ class GamePrincess {
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
           <!-- 超ワイド横広がりパニエスカート -->
-          <path d="M118 190 Q140 195 162 190 Q240 220 235 348 Q140 360 45 348 Q40 220 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
-          <path d="M118 190 Q140 195 162 190 Q240 220 235 348 Q140 360 45 348 Q40 220 118 190 Z" fill="url(#dressShine_${dress.id})"/>
+          <path d="M118 190 Q140 195 162 190 Q235 215 230 332 Q140 336 50 332 Q45 215 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <path d="M118 190 Q140 195 162 190 Q235 215 230 332 Q140 336 50 332 Q45 215 118 190 Z" fill="url(#dressShine_${dress.id})"/>
           <!-- ロココ調ゴールドフェストゥーン（花綱ドレープ） -->
-          <path d="M120 210 Q80 260 50 320" stroke="#f1c40f" stroke-width="3" fill="none"/>
-          <path d="M160 210 Q200 260 230 320" stroke="#f1c40f" stroke-width="3" fill="none"/>
-          <circle cx="80" cy="260" r="4" fill="#ffffff"/><circle cx="200" cy="260" r="4" fill="#ffffff"/>
+          <path d="M120 210 Q80 255 55 310" stroke="#f1c40f" stroke-width="3" fill="none"/>
+          <path d="M160 210 Q200 255 225 310" stroke="#f1c40f" stroke-width="3" fill="none"/>
+          <circle cx="80" cy="255" r="4" fill="#ffffff"/><circle cx="200" cy="255" r="4" fill="#ffffff"/>
           <!-- トップ -->
           <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
           <circle cx="140" cy="155" r="5" fill="#f1c40f" stroke="#ffffff" stroke-width="1.5"/>
@@ -1174,10 +1174,10 @@ class GamePrincess {
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
           <!-- 氷のマントトレイン -->
-          <path d="M100 145 Q40 260 45 350 Q140 360 235 350 Q240 260 180 145 Z" fill="rgba(129, 236, 236, 0.35)" stroke="#81ecec" stroke-width="1.5"/>
+          <path d="M100 145 Q40 250 48 335 Q140 338 232 335 Q240 250 180 145 Z" fill="rgba(129, 236, 236, 0.35)" stroke="#81ecec" stroke-width="1.5"/>
           <!-- ドレス本体 -->
-          <path d="M118 190 Q140 195 162 190 Q205 260 215 345 Q140 355 65 345 Q75 260 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
-          <path d="M65 345 Q140 355 215 345" stroke="#74b9ff" stroke-width="4" stroke-dasharray="5,5" fill="none"/>
+          <path d="M118 190 Q140 195 162 190 Q202 250 210 332 Q140 336 70 332 Q78 250 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <path d="M70 332 Q140 336 210 332" stroke="#74b9ff" stroke-width="4" stroke-dasharray="5,5" fill="none"/>
           <!-- ハイネック＆トップ -->
           <path d="M112 135 L128 128 L152 128 L168 135 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
           <polygon points="140,145 144,153 140,161 136,153" fill="#81ecec" stroke="#ffffff" stroke-width="1"/>
@@ -1209,7 +1209,7 @@ class GamePrincess {
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
           <!-- 後ろのロングトレイン -->
-          <path d="M105 190 Q45 280 50 355 Q140 365 230 355 Q235 280 175 190 Z" fill="#4834d4" stroke="#e0c3fc" stroke-width="1.8"/>
+          <path d="M105 190 Q48 260 52 338 Q140 342 228 338 Q232 260 175 190 Z" fill="#4834d4" stroke="#e0c3fc" stroke-width="1.8"/>
           <!-- 前側の短いハイロースカート（脚が見える） -->
           <path d="M118 190 Q140 195 162 190 Q195 230 175 265 Q140 275 105 265 Q85 230 118 190 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
           <path d="M105 265 Q140 275 175 265" stroke="#f1c40f" stroke-width="3" fill="none"/>
@@ -1227,10 +1227,10 @@ class GamePrincess {
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
           <!-- 下地のゴールド刺繍アンダースカート -->
-          <path d="M118 190 Q140 195 162 190 Q215 260 220 348 Q140 360 60 348 Q65 260 118 190 Z" fill="#f5cd79" stroke="#f1c40f" stroke-width="2"/>
+          <path d="M118 190 Q140 195 162 190 Q210 250 215 332 Q140 336 65 332 Q70 250 118 190 Z" fill="#f5cd79" stroke="#f1c40f" stroke-width="2"/>
           <!-- 前開きベルベットローブ（左右に分かれた真紅のガウン） -->
-          <path d="M118 190 Q95 240 60 348 Q100 350 120 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
-          <path d="M162 190 Q185 240 220 348 Q180 350 160 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <path d="M118 190 Q95 235 65 332 Q100 334 120 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
+          <path d="M162 190 Q185 235 215 332 Q180 334 160 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="2"/>
           <!-- 襟元のファー＆ジュエル -->
           <path d="M112 140 Q140 150 168 140 L164 195 Q140 200 116 195 Z" fill="url(#${gId})" stroke="#2f3542" stroke-width="1.8"/>
           <ellipse cx="140" cy="144" rx="26" ry="7" fill="#ffffff" stroke="#ced6e0" stroke-width="1.5"/>
