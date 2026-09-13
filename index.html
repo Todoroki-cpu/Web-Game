@@ -198,7 +198,7 @@
         </div>
       </div>
 
-      <!-- パネル5: プリンセス着せ替え ＆ ミニゲーム (4ゲーム) -->
+      <!-- パネル5: プリンセス着せ替え ＆ ミニゲーム (6ゲーム) -->
       <div class="home-cat-panel" id="cat-panel-princess">
         <div class="menu-cards-grid">
           <div class="menu-card card-princess-dress" id="menu-card-princess">
@@ -224,6 +224,18 @@
             <div class="card-icon">💎 🔴 🔵 🪄</div>
             <h2 class="card-title">まほうのジュエルパズル</h2>
             <p class="card-desc">同じ色のジュエルをつなげて 魔法を発動！</p>
+          </div>
+          <div class="menu-card card-princess-target" id="menu-card-princess-target">
+            <div class="card-badge">まほう・2ケタ大小</div>
+            <div class="card-icon">🎯 🪄 ⭐ 👑</div>
+            <h2 class="card-title">まほうの数字的あて</h2>
+            <p class="card-desc">ステッキから星の魔法！数字の的を倒そう！</p>
+          </div>
+          <div class="menu-card card-princess-word" id="menu-card-princess-word">
+            <div class="card-badge">ことば・スイーツ</div>
+            <div class="card-icon">🍰 🍓 🍮 🫖</div>
+            <h2 class="card-title">ロイヤル・スイーツパズル</h2>
+            <p class="card-desc">文字をならべて ごちそう！プリンセスもぐもぐ♪</p>
           </div>
         </div>
       </div>
@@ -637,6 +649,16 @@
          ========================================== -->
     <main class="view-panel" id="view-game-princess-puzzle"></main>
 
+    <!-- ==========================================
+         21. まほうの数字的あて (Princess Game Target)
+         ========================================== -->
+    <main class="view-panel" id="view-game-princess-target"></main>
+
+    <!-- ==========================================
+         22. ロイヤル・スイーツパズル (Princess Game Word)
+         ========================================== -->
+    <main class="view-panel" id="view-game-princess-word"></main>
+
   </div>
 
   <!-- 全クリアモーダル -->
@@ -678,6 +700,16 @@
           <h3 class="play-card-title">ジュエルパズル</h3>
           <p class="play-card-desc">ジュエルをつなげて魔法発動！</p>
         </div>
+        <div class="play-modal-card" id="play-modal-target">
+          <span class="play-card-icon">🎯 ⭐</span>
+          <h3 class="play-card-title">まほうの数字的あて</h3>
+          <p class="play-card-desc">ステッキから星の魔法発射！</p>
+        </div>
+        <div class="play-modal-card" id="play-modal-word">
+          <span class="play-card-icon">🍰 🍓</span>
+          <h3 class="play-card-title">スイーツパズル</h3>
+          <p class="play-card-desc">ことばを作ってごちそう！</p>
+        </div>
       </div>
       <button class="primary-btn secondary-style" id="princess-play-close-btn">💖 ドレスアップにもどる</button>
     </div>
@@ -706,6 +738,8 @@
   <script src="js/game_princess_doors.js"></script>
   <script src="js/game_princess_runway.js"></script>
   <script src="js/game_princess_puzzle.js"></script>
+  <script src="js/game_princess_target.js"></script>
+  <script src="js/game_princess_word.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
