@@ -32,14 +32,14 @@ class GamePrincess {
 
   initItemDatabase() {
     this.categories = [
-      { id: 'dress', name: '👗 ドレス', icon: '👗' },
-      { id: 'hair', name: '👸 かみがた', icon: '👸' },
-      { id: 'headwear', name: '👑 ティアラ', icon: '👑' },
-      { id: 'makeup', name: '✨ メイク', icon: '✨' },
-      { id: 'jewelry', name: '💎 ジュエリー', icon: '💎' },
-      { id: 'props', name: '🪄 アイテム', icon: '🪄' },
-      { id: 'shoes', name: '👠 くつ', icon: '👠' },
-      { id: 'stage', name: '🏰 ステージ', icon: '🏰' }
+      { id: 'dress', name: 'ドレス', icon: '👗' },
+      { id: 'hair', name: 'かみがた', icon: '👸' },
+      { id: 'headwear', name: 'ティアラ', icon: '👑' },
+      { id: 'makeup', name: 'メイク', icon: '✨' },
+      { id: 'jewelry', name: 'ジュエリー', icon: '💎' },
+      { id: 'props', name: 'アイテム', icon: '🪄' },
+      { id: 'shoes', name: 'くつ', icon: '👠' },
+      { id: 'stage', name: 'ステージ', icon: '🏰' }
     ];
 
     this.database = {
@@ -334,7 +334,7 @@ class GamePrincess {
     const items = this.database[categoryId] || [];
     const catMeta = this.categories.find(c => c.id === categoryId);
     if (this.currentCategoryTitleEl && catMeta) {
-      this.currentCategoryTitleEl.textContent = `${catMeta.name}（全10種類）`;
+      this.currentCategoryTitleEl.textContent = `${catMeta.icon} ${catMeta.name}（全10種類）`;
     }
 
     items.forEach((item, idx) => {
