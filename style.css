@@ -905,13 +905,26 @@ html, body {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
-.doll-svg { width: 100%; height: 100%; }
+/* レイヤー基本 z-index */
+.doll-layer.layer-back-wings { z-index: 1; }
+.doll-layer.layer-back-hair  { z-index: 2; }
+.doll-layer.layer-body       { z-index: 3; }
+.doll-layer.layer-shoes      { z-index: 4; }
+.doll-layer.layer-dress      { z-index: 5; }
+.doll-layer.layer-jewelry    { z-index: 6; }
+.doll-layer.layer-props      { z-index: 7; }
+.doll-layer.layer-face       { z-index: 8; }
+.doll-layer.layer-front-hair { z-index: 9; }
+.doll-layer.layer-headwear   { z-index: 10; }
 
-/* 裏面を向いたときの自然な深度切り替え */
-.doll-3d-wrapper.viewing-back .layer-face { opacity: 0; }
-.doll-3d-wrapper.viewing-back .layer-front-hair { opacity: 0.15; }
-.doll-3d-wrapper.viewing-back .layer-back-hair { transform: scale(1.05) translateZ(10px); }
-.doll-3d-wrapper.viewing-back .layer-back-wings { transform: translateZ(12px); }
+/* 裏面（後ろ姿）を向いたときの自然な深度・レイヤー切り替え */
+.doll-3d-wrapper.viewing-back .layer-face       { opacity: 0; pointer-events: none; }
+.doll-3d-wrapper.viewing-back .layer-front-hair { opacity: 0; pointer-events: none; }
+.doll-3d-wrapper.viewing-back .layer-jewelry    { opacity: 0; pointer-events: none; }
+.doll-3d-wrapper.viewing-back .layer-props      { opacity: 0.15; z-index: 1; }
+.doll-3d-wrapper.viewing-back .layer-headwear   { z-index: 8; opacity: 0.6; }
+.doll-3d-wrapper.viewing-back .layer-back-hair  { z-index: 20 !important; }
+.doll-3d-wrapper.viewing-back .layer-back-wings { z-index: 25 !important; }
 
 .stage-drag-hint {
   text-align: center; font-size: 11px; font-weight: bold; color: #ffffff;

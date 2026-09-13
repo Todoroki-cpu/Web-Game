@@ -535,6 +535,9 @@ class GamePrincess {
       return `
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
+          <!-- 後頭部ベース -->
+          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q205 130 140 135 Q75 130 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <path d="M95 65 Q140 80 185 65" stroke="#ffffff" stroke-width="3" opacity="0.4" fill="none"/>
           <!-- ツインテール根本お団子 -->
           <circle cx="70" cy="85" r="18" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
           <circle cx="210" cy="85" r="18" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
@@ -551,11 +554,15 @@ class GamePrincess {
       return `
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
-          <!-- ポニーテール結び目 -->
+          <!-- 後頭部ベース（上に向かって毛束がまとまるライン） -->
+          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q205 130 140 135 Q75 130 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <path d="M95 90 Q120 60 140 45 M185 90 Q160 60 140 45" stroke="${hair.shadow}" stroke-width="2" fill="none"/>
+          <!-- ポニーテール結び目 ＆ リボン -->
           <ellipse cx="140" cy="45" rx="30" ry="20" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <circle cx="140" cy="45" r="8" fill="#ff4757"/>
           <!-- なびくポニーテール -->
           <path d="M150 40 Q210 20 240 90 Q260 180 225 260 Q195 240 215 170 Q210 90 160 48 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
-          <circle cx="160" cy="42" r="6" fill="#ff4757"/>
+          <path d="M165 70 Q215 90 220 180" stroke="#ffffff" stroke-width="2.5" opacity="0.5" fill="none"/>
         </svg>
       `;
     } else if (t === 'half_up') {
@@ -568,6 +575,7 @@ class GamePrincess {
           <!-- 下半分の流れるウェーブ -->
           <path d="M90 120 Q60 200 70 290 Q140 315 210 290 Q220 200 190 120 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
           <ellipse cx="140" cy="70" rx="14" ry="8" fill="#a29bfe" stroke="#ffffff" stroke-width="1.5"/>
+          <path d="M100 55 Q140 70 180 55" stroke="#ffffff" stroke-width="3" opacity="0.4" fill="none"/>
         </svg>
       `;
     } else if (t === 'rose_up') {
@@ -575,6 +583,9 @@ class GamePrincess {
       return `
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
+          <!-- 後頭部ベース（襟足から頭頂部へスッキリ持ち上げた毛流れ） -->
+          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q205 130 140 135 Q75 130 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <path d="M100 110 Q120 60 140 30 M180 110 Q160 60 140 30" stroke="${hair.shadow}" stroke-width="2" fill="none"/>
           <!-- 頭頂部の大きなローズシニヨン -->
           <ellipse cx="140" cy="18" rx="38" ry="26" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
           <path d="M115 18 Q140 2 165 18 Q140 34 115 18" stroke="${hair.shadow}" stroke-width="2.5" fill="none"/>
@@ -587,9 +598,10 @@ class GamePrincess {
       return `
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
-          <!-- 肩上の短め丸みボブ -->
+          <!-- 肩上の短め丸みボブ（後頭部全体を包む） -->
           <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q215 125 195 175 Q140 188 85 175 Q65 125 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
           <path d="M85 175 Q140 192 195 175" stroke="${hair.shadow}" stroke-width="3" fill="none"/>
+          <path d="M95 65 Q140 82 185 65" stroke="#ffffff" stroke-width="3.5" opacity="0.4" fill="none"/>
         </svg>
       `;
     } else if (t === 'side_braid') {
@@ -597,7 +609,9 @@ class GamePrincess {
       return `
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
+          <!-- 後頭部ベース -->
           <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q210 130 140 140 Q85 130 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <path d="M160 80 Q120 110 95 120" stroke="${hair.shadow}" stroke-width="2.5" fill="none"/>
           <!-- 左肩に垂れる三つ編み -->
           <path d="M95 120 Q65 170 70 230 Q60 275 75 310 Q90 300 95 240 Q110 170 115 120 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
           <circle cx="75" cy="305" r="5" fill="#ff4757"/>
@@ -608,8 +622,9 @@ class GamePrincess {
       return `
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
-          <!-- 膝下までまっすぐ伸びるスーパーロング -->
+          <!-- 膝下までまっすぐ伸びるスーパーロング（後頭部から全面カバー） -->
           <polygon points="85,75 78,22 140,20 202,22 195,75 228,200 220,365 60,365 52,200" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <path d="M95 60 Q140 75 185 60" stroke="#ffffff" stroke-width="4" opacity="0.5" fill="none"/>
           <line x1="100" y1="120" x2="100" y2="360" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
           <line x1="180" y1="120" x2="180" y2="360" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
         </svg>
@@ -631,6 +646,7 @@ class GamePrincess {
           ${defs}
           <!-- すっきり短いピクシーショート -->
           <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q205 110 170 130 Q140 135 110 130 Q75 110 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <path d="M95 65 Q140 80 185 65" stroke="#ffffff" stroke-width="3" opacity="0.4" fill="none"/>
         </svg>
       `;
     } else {
@@ -638,7 +654,10 @@ class GamePrincess {
       return `
         <svg viewBox="0 0 280 400" class="doll-svg">
           ${defs}
-          <path d="M85 75 Q78 22 140 20 Q202 22 195 75 Q240 140 235 260 Q215 320 185 325 Q140 335 95 325 Q65 320 45 260 Q40 140 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <!-- 後頭部ベース ＆ 豊かに広がるウェーブ -->
+          <path d="M85 75 Q78 20 140 18 Q202 20 195 75 Q240 140 235 260 Q215 320 185 325 Q140 335 95 325 Q65 320 45 260 Q40 140 85 75 Z" fill="url(#${gradId})" stroke="${hair.shadow}" stroke-width="2"/>
+          <path d="M95 60 Q140 75 185 60" stroke="#ffffff" stroke-width="4" opacity="0.5" fill="none"/>
+          <path d="M100 110 Q140 130 180 110" stroke="#ffffff" stroke-width="2.5" opacity="0.4" fill="none"/>
           <path d="M50 230 Q40 290 65 325 Q85 335 105 315" fill="${hair.color}" opacity="0.6"/>
           <path d="M230 230 Q240 290 215 325 Q195 335 175 315" fill="${hair.color}" opacity="0.6"/>
         </svg>
