@@ -292,7 +292,7 @@ class GamePrincessDrop {
     // 1〜100 のランダムな数字
     this.currentNum = Math.floor(Math.random() * 100) + 1;
     this.currentLane = Math.floor(Math.random() * 6) + 2; // 中央付近スタート
-    this.currentPosY = 0;
+    this.currentPosY = 4;
     this.isDroppingFast = false;
 
     const numEl = document.getElementById('p-falling-gem-num');
@@ -310,18 +310,48 @@ class GamePrincessDrop {
     this.updateFallingGemY();
   }
 
+  getTargetLandingY() {
+    const board = document.getElementById('p-drop-well-board');
+    const gem = document.getElementById('p-falling-gem');
+    const stackContainer = document.getElementById(`lane-stack-${this.currentLane}`);
+    if (!board || !gem || !stackContainer) return 300;
+
+    const boardRect = board.getBoundingClientRect();
+    const gemHeight = gem.offsetHeight || 44;
+
+    // もしすでにブロックが積まれている場合、最上段ブロックのtop位置を正確に取得
+    if (stackContainer.lastElementChild) {
+      const topBlockRect = stackContainer.lastElementChild.getBoundingClientRect();
+      return Math.max(10, topBlockRect.top - boardRect.top - gemHeight + 2);
+    }
+
+    // まだ何も積まれていない場合、スタック領域の底面（ラベルの直上）に着地
+    const stackRect = stackContainer.getBoundingClientRect();
+    return Math.max(10, stackRect.bottom - boardRect.top - gemHeight - 2);
+  }
+
   updateFallingGemX() {
     const gem = document.getElementById('p-falling-gem');
-    if (!gem) return;
-    // 10レーンの中央位置 (0%〜90% + 5%)
-    const pct = this.currentLane * 10 + 5;
-    gem.style.left = `${pct}%`;
+    const board = document.getElementById('p-drop-well-board');
+    const matrixEl = document.getElementById('p-drop-lanes-matrix');
+    if (!gem || !board || !matrixEl) return;
+
+    const laneCol = matrixEl.children[this.currentLane];
+    if (laneCol) {
+      const colRect = laneCol.getBoundingClientRect();
+      const boardRect = board.getBoundingClientRect();
+      const centerX = (colRect.left - boardRect.left) + colRect.width / 2;
+      gem.style.left = `${centerX}px`;
+    } else {
+      const pct = this.currentLane * 10 + 5;
+      gem.style.left = `${pct}%`;
+    }
   }
 
   updateFallingGemY() {
     const gem = document.getElementById('p-falling-gem');
     if (!gem) return;
-    gem.style.top = `${this.currentPosY}%`;
+    gem.style.top = `${this.currentPosY}px`;
   }
 
   startFallLoop() {
@@ -329,15 +359,16 @@ class GamePrincessDrop {
       if (!this.isGameActive) return;
 
       if (!this.isPaused) {
-        const speed = this.isDroppingFast ? 3.5 : this.fallSpeed;
+        const board = document.getElementById('p-drop-well-board');
+        const boardHeight = board ? board.clientHeight : 500;
+        const speed = this.isDroppingFast ? Math.max(26, boardHeight * 0.05) : Math.max(1.8, boardHeight * 0.0035);
         this.currentPosY += speed;
 
-        // 対象レーンの現在の高さに応じた着地判定
-        const stackHeight = this.laneStacks[this.currentLane].length;
-        // 1ブロックあたり約12%の高さ、底面は80%
-        const landThreshold = Math.max(15, 80 - stackHeight * 12.5);
+        const targetY = this.getTargetLandingY();
 
-        if (this.currentPosY >= landThreshold) {
+        if (this.currentPosY >= targetY) {
+          this.currentPosY = targetY;
+          this.updateFallingGemY();
           this.handleLand();
         } else {
           this.updateFallingGemY();

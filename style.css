@@ -2018,14 +2018,14 @@ html, body {
 }
 
 .p-drop-danger-line {
-  position: absolute; top: 18%; left: 0; right: 0;
+  position: absolute; top: calc(14% + 8px); left: 0; right: 0;
   border-top: 2.5px dashed #ff4757; z-index: 4;
   display: flex; justify-content: flex-end; padding-right: 8px; pointer-events: none;
 }
 .p-drop-danger-line .danger-text {
-  font-size: 10px; font-weight: 900; color: #ff4757;
-  background: rgba(255, 255, 255, 0.92); padding: 2px 6px; border-radius: 8px;
-  border: 1px solid #ff4757; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-size: 11px; font-weight: 900; color: #ff4757;
+  background: rgba(255, 255, 255, 0.95); padding: 2px 8px; border-radius: 8px;
+  border: 1.5px solid #ff4757; box-shadow: 0 2px 5px rgba(0,0,0,0.12);
 }
 
 .p-drop-lanes-matrix {
@@ -2055,25 +2055,28 @@ html, body {
 }
 
 .stacked-block {
-  width: 90%; max-width: 44px; height: 34px; border-radius: 8px;
+  width: 90%; max-width: 48px;
+  height: calc((100% - 24px) / 7);
+  min-height: 36px; max-height: 56px;
+  border-radius: 9px;
   display: flex; align-items: center; justify-content: center;
-  font-weight: 900; font-size: 14px; color: #ffffff;
+  font-weight: 900; font-size: 15px; color: #ffffff;
   box-shadow: 0 3px 6px rgba(0,0,0,0.2); flex-shrink: 0;
 }
 .stacked-gem {
-  border: 2px solid rgba(255, 255, 255, 0.9);
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
 }
 .stacked-rock {
   background: linear-gradient(135deg, #747d8c, #2f3542);
-  border: 2px solid #57606f; font-size: 20px;
+  border: 2px solid #57606f; font-size: 22px;
 }
-.stacked-num { font-weight: 900; font-size: 13px; }
+.stacked-num { font-weight: 900; font-size: 15px; }
 
 .p-falling-gem-avatar {
-  position: absolute; width: 42px; height: 42px;
+  position: absolute; width: 44px; height: 44px;
   transform: translate(-50%, 0); z-index: 10; pointer-events: none;
-  transition: left 0.08s ease-out;
+  transition: left 0.06s ease-out;
 }
 .falling-gem-glow {
   position: absolute; width: 100%; height: 100%; border-radius: 50%;
