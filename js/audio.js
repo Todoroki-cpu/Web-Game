@@ -598,6 +598,74 @@ class SoundSystem {
     setTimeout(() => this.playFanfare(), 200);
   }
 
+  // ジュエル連鎖レベル別演出音 (3個〜10個以上)
+  playJewelComboTier(count) {
+    if (this.isMuted || !this.ctx) return;
+
+    if (count <= 3) {
+      // Level 1 (3個): クリスタルポップ
+      this.playJewelClear();
+    } else if (count === 4) {
+      // Level 2 (4個): 2音上昇ポップ
+      this.playJewelClear();
+      setTimeout(() => {
+        if (!this.ctx) return;
+        const cNow = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1318.51, cNow);
+        gain.gain.setValueAtTime(0.22, cNow);
+        gain.gain.exponentialRampToValueAtTime(0.001, cNow + 0.15);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(cNow);
+        osc.stop(cNow + 0.15);
+      }, 70);
+    } else if (count === 5) {
+      // Level 3 (5個): スーパーマジック（ハープ＋チャイム）
+      this.playMagicChime();
+    } else if (count === 6) {
+      // Level 4 (6個): エクセレント（ハープ＋高音アルペジオ）
+      this.playMagicChime();
+      const notes = [1046.5, 1318.51, 1567.98, 2093.0];
+      notes.forEach((f, i) => {
+        setTimeout(() => {
+          if (!this.ctx) return;
+          const cNow = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, cNow);
+          gain.gain.setValueAtTime(0.2, cNow);
+          gain.gain.exponentialRampToValueAtTime(0.001, cNow + 0.2);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(cNow);
+          osc.stop(cNow + 0.2);
+        }, i * 50);
+      });
+    } else if (count === 7) {
+      // Level 5 (7個): プリンセスフィーバー
+      this.playFeverBurst();
+    } else if (count === 8) {
+      // Level 6 (8個): ミラクル（フィーバー＋歓声）
+      this.playFeverBurst();
+      setTimeout(() => this.playCheerCrowd(), 150);
+    } else if (count === 9) {
+      // Level 7 (9個): レジェンド（大ファンファーレ＋歓声）
+      this.playFeverBurst();
+      setTimeout(() => this.playTreasureChest(), 100);
+      setTimeout(() => this.playCheerCrowd(), 250);
+    } else {
+      // Level 8 (10個以上): アルティメット・ロイヤル（超特大ファンファーレ＋全効果音）
+      this.playFeverBurst();
+      setTimeout(() => this.playFanfare(), 80);
+      setTimeout(() => this.playMagicChime(), 180);
+      setTimeout(() => this.playCheerCrowd(), 300);
+    }
+  }
+
   // ランウェイ歓声・拍手
   playCheerCrowd() {
     if (this.isMuted || !this.ctx) return;
