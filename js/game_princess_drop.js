@@ -413,19 +413,32 @@ class GamePrincessDrop {
     if (chosenLane === correctLane) {
       // 正解！
       this.placedCount++;
-      this.laneStacks[chosenLane].push({ type: 'gem', num: num });
-      this.renderAllStacks();
+      const stack = this.laneStacks[chosenLane];
+      const hadRockOnTop = stack.length > 0 && stack[stack.length - 1].type === 'rock';
 
-      // サウンド ＆ パーティクル
-      window.soundSystem.playJewelTone(Math.min(9, Math.floor(this.placedCount / 2)));
-      window.soundSystem.playSparkle();
+      if (hadRockOnTop) {
+        // 石の上に着地して正解：直下の石を消滅させてジュエルに置き換える！
+        stack.pop();
+        stack.push({ type: 'gem', num: num });
+        this.renderAllStacks();
+
+        // 石消滅＆魔法SE
+        window.soundSystem.playTargetHit();
+        window.soundSystem.playJewelTone(Math.min(9, Math.floor(this.placedCount / 2)));
+        window.soundSystem.playMagicChime();
+      } else {
+        stack.push({ type: 'gem', num: num });
+        this.renderAllStacks();
+        window.soundSystem.playJewelTone(Math.min(9, Math.floor(this.placedCount / 2)));
+        window.soundSystem.playSparkle();
+      }
 
       const board = document.getElementById('p-drop-well-board');
       if (board) {
         const boardRect = board.getBoundingClientRect();
         const posX = boardRect.left + (chosenLane * 10 + 5) * (boardRect.width / 100);
         const posY = boardRect.top + boardRect.height * 0.75;
-        this.app.particles.explode(posX, posY, 35);
+        this.app.particles.explode(posX, posY, hadRockOnTop ? 55 : 35);
       }
 
       // プリンセスの喜びアニメーション
@@ -437,12 +450,11 @@ class GamePrincessDrop {
 
       this.updateProgress();
 
-      // 10個達成時にスピードアップ案内
-      if (this.placedCount === 10) {
-        const promptEl = document.getElementById('p-drop-prompt-text');
-        if (promptEl) {
-          promptEl.innerHTML = `✨ 10個クリア！ここから スピードアップするよ！ 💨`;
-        }
+      const promptEl = document.getElementById('p-drop-prompt-text');
+      if (hadRockOnTop && promptEl) {
+        promptEl.innerHTML = `✨ すばらしい！ 魔法のジュエルで <strong>邪魔な石を消滅</strong> させたよ！ 🪨💥`;
+      } else if (this.placedCount === 10 && promptEl) {
+        promptEl.innerHTML = `✨ 10個クリア！ここから スピードアップするよ！ 💨`;
       }
 
       // クリアチェック
@@ -454,7 +466,7 @@ class GamePrincessDrop {
       setTimeout(() => {
         this.isPaused = false;
         this.spawnNextNumber();
-      }, 500);
+      }, hadRockOnTop ? 650 : 500);
 
     } else {
       // 不正解！
