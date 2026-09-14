@@ -361,7 +361,13 @@ class GamePrincessDrop {
       if (!this.isPaused) {
         const board = document.getElementById('p-drop-well-board');
         const boardHeight = board ? board.clientHeight : 500;
-        const speed = this.isDroppingFast ? Math.max(26, boardHeight * 0.05) : Math.max(1.8, boardHeight * 0.0035);
+
+        // 10個までは半分のスピード（ゆっくり）、10個を超えたら元のスピード
+        const normalSpeed = (this.placedCount > 10)
+          ? Math.max(1.8, boardHeight * 0.0035)
+          : Math.max(0.9, boardHeight * 0.00175);
+
+        const speed = this.isDroppingFast ? Math.max(26, boardHeight * 0.05) : normalSpeed;
         this.currentPosY += speed;
 
         const targetY = this.getTargetLandingY();
@@ -414,6 +420,14 @@ class GamePrincessDrop {
       }
 
       this.updateProgress();
+
+      // 10個達成時にスピードアップ案内
+      if (this.placedCount === 10) {
+        const promptEl = document.getElementById('p-drop-prompt-text');
+        if (promptEl) {
+          promptEl.innerHTML = `✨ 10個クリア！ここから スピードアップするよ！ 💨`;
+        }
+      }
 
       // クリアチェック
       if (this.placedCount >= this.totalGoal) {
