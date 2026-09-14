@@ -324,13 +324,13 @@ class GameApp {
     bindCard('menu-card-hiragana-trace', 'game_title_13', 'hiragana_trace');
     bindCard('menu-card-hiragana-karuta', 'game_title_14', 'hiragana_karuta');
     bindCard('menu-card-hiragana-word', 'game_title_15', 'hiragana_word');
-    bindCard('menu-card-princess', 'praise_kitty_1', 'princess');
-    bindCard('menu-card-princess-doors', 'praise_kitty_1', 'princess_doors');
-    bindCard('menu-card-princess-runway', 'praise_kitty_2', 'princess_runway');
-    bindCard('menu-card-princess-puzzle', 'praise_kitty_3', 'princess_puzzle');
-    bindCard('menu-card-princess-target', 'praise_kitty_2', 'princess_target');
-    bindCard('menu-card-princess-word', 'praise_kitty_3', 'princess_word');
-    bindCard('menu-card-princess-drop', 'praise_kitty_1', 'princess_drop');
+    bindCard('menu-card-princess', 'praise_1', 'princess');
+    bindCard('menu-card-princess-doors', 'praise_1', 'princess_doors');
+    bindCard('menu-card-princess-runway', 'praise_2', 'princess_runway');
+    bindCard('menu-card-princess-puzzle', 'praise_3', 'princess_puzzle');
+    bindCard('menu-card-princess-target', 'praise_2', 'princess_target');
+    bindCard('menu-card-princess-word', 'praise_3', 'princess_word');
+    bindCard('menu-card-princess-drop', 'praise_1', 'princess_drop');
 
     // もう1回遊ぶボタン
     if (this.restartBtn) {
@@ -386,7 +386,7 @@ class GameApp {
       clock: 'cat_clock',
       days: 'cat_days',
       seasons: 'cat_seasons',
-      princess: 'praise_kitty_2'
+      princess: 'praise_1'
     };
     if (catVoices[categoryName]) {
       window.soundSystem.playVoice(catVoices[categoryName]);

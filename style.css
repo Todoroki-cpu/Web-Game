@@ -248,9 +248,16 @@ html, body {
   display: flex; justify-content: center; gap: 14px; width: 100%;
 }
 .menu-cards-grid-scroll {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 10px; width: 100%; max-height: calc(100dvh - 155px);
-  overflow-y: auto; padding: 4px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px; width: 100%; max-height: calc(100dvh - 150px);
+  overflow-y: auto; padding: 6px 4px;
+}
+
+@media (min-width: 600px) {
+  .menu-cards-grid-scroll {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .menu-card {
@@ -275,6 +282,13 @@ html, body {
 .card-hiragana-trace { border-color: #ff9ff3; }
 .card-hiragana-karuta { border-color: #ff6b81; }
 .card-hiragana-word { border-color: #feca57; }
+.card-princess-dress { border-color: #ff7597; }
+.card-princess-doors { border-color: #a29bfe; }
+.card-princess-runway { border-color: #ff6b81; }
+.card-princess-puzzle { border-color: #00cec9; }
+.card-princess-target { border-color: #f1c40f; }
+.card-princess-word { border-color: #e17055; }
+.card-princess-drop { border-color: #6c5ce7; }
 
 .card-badge {
   position: absolute; top: -9px; color: #ffffff; font-size: 10px;

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * game_princess_drop.js - プリンセスのまほうの数字ドロップ (Princess Magic Number Drop)
  * 1〜100の数字が書かれた魔法のジュエルが上から落ちてきます！
  * 下の10個の領域（1〜9, 10〜19, ..., 90〜100）へ正しく移動させて積み上げよう！
@@ -78,6 +78,7 @@ class GamePrincessDrop {
   }
 
   renderStage() {
+    this.containerEl = document.getElementById('view-game-princess-drop');
     if (!this.containerEl) return;
 
     this.containerEl.innerHTML = `
