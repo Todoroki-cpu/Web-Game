@@ -181,6 +181,7 @@ class GamePrincess {
     this.playPuzzleBtn = document.getElementById('play-modal-puzzle');
     this.playTargetBtn = document.getElementById('play-modal-target');
     this.playWordBtn = document.getElementById('play-modal-word');
+    this.playDropBtn = document.getElementById('play-modal-drop');
 
     this.bindEvents();
   }
@@ -324,6 +325,13 @@ class GamePrincess {
       this.playWordBtn.addEventListener('click', () => {
         if (this.playModalEl) this.playModalEl.classList.remove('show');
         this.app.switchView('princess_word');
+      });
+    }
+
+    if (this.playDropBtn) {
+      this.playDropBtn.addEventListener('click', () => {
+        if (this.playModalEl) this.playModalEl.classList.remove('show');
+        this.app.switchView('princess_drop');
       });
     }
   }

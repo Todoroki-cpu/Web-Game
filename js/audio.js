@@ -689,6 +689,37 @@ class SoundSystem {
     }
   }
 
+  // 邪魔な石の落下・激突音（ドスッ・ゴロゴロ）
+  playRockDrop() {
+    if (this.isMuted || !this.ctx) return;
+    const now = this.ctx.currentTime;
+    // 重い衝撃音
+    const osc1 = this.ctx.createOscillator();
+    const gain1 = this.ctx.createGain();
+    osc1.type = 'sawtooth';
+    osc1.frequency.setValueAtTime(160, now);
+    osc1.frequency.exponentialRampToValueAtTime(40, now + 0.22);
+    gain1.gain.setValueAtTime(0.35, now);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+    osc1.connect(gain1);
+    gain1.connect(this.ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.25);
+
+    // ガラガラ音
+    const osc2 = this.ctx.createOscillator();
+    const gain2 = this.ctx.createGain();
+    osc2.type = 'square';
+    osc2.frequency.setValueAtTime(90, now + 0.05);
+    osc2.frequency.linearRampToValueAtTime(30, now + 0.28);
+    gain2.gain.setValueAtTime(0.2, now + 0.05);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc2.connect(gain2);
+    gain2.connect(this.ctx.destination);
+    osc2.start(now + 0.05);
+    osc2.stop(now + 0.3);
+  }
+
   stopBgm() {
     this.isBgmPlaying = false;
     this.currentBgmType = null;

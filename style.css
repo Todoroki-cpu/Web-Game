@@ -1944,6 +1944,173 @@ html, body {
 .p-tile-letter { font-size: 22px; font-weight: 900; color: #2f3542; }
 
 
+/* ==========================================================================
+   プリンセス ミニゲーム 6: プリンセスのまほうの数字ドロップ (Princess Number Drop)
+   ========================================================================== */
+.p-drop-game-layout {
+  display: flex; flex-direction: column; width: 100%; height: 100%;
+  padding: 8px 12px; gap: 8px; box-sizing: border-box;
+}
+
+.p-drop-header-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: rgba(255, 255, 255, 0.95); border-radius: 18px; padding: 6px 14px;
+  border: 3px solid #a29bfe; box-shadow: 0 4px 12px rgba(0,0,0,0.08); flex-shrink: 0;
+}
+.p-drop-speech-bubble {
+  display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;
+}
+.p-drop-prompt-text {
+  font-size: 15px; font-weight: 900; color: #2f3542;
+}
+.p-drop-progress-badge {
+  display: flex; align-items: center; gap: 6px; background: #f3f0ff;
+  padding: 4px 12px; border-radius: 14px; border: 2px solid #a29bfe; flex-shrink: 0;
+}
+.p-drop-progress-icon { font-size: 20px; }
+.p-drop-progress-text { font-size: 15px; font-weight: 900; color: #6c5ce7; }
+
+.p-drop-main-stage {
+  flex: 1; min-height: 0; display: flex; gap: 12px; position: relative;
+}
+
+.p-drop-side-panel {
+  width: 140px; display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-end; position: relative; flex-shrink: 0;
+}
+.p-drop-princess-avatar {
+  position: relative; width: 130px; height: 180px; transform-origin: bottom center;
+}
+.p-drop-princess-avatar.cheering {
+  animation: cheeringPrincess 0.6s ease-in-out;
+}
+.p-drop-princess-avatar .doll-layer { position: absolute; width: 100%; height: 100%; }
+.p-drop-helper-card {
+  background: #ffffff; border: 2px solid #a29bfe; border-radius: 14px;
+  padding: 6px 8px; text-align: center; margin-top: 4px; box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+.p-drop-helper-card .helper-title {
+  display: block; font-size: 12px; font-weight: 900; color: #6c5ce7;
+}
+.p-drop-helper-card .helper-desc {
+  font-size: 10px; font-weight: 700; color: #636e72; margin: 2px 0 0 0;
+}
+
+.p-drop-well-board {
+  flex: 1; min-width: 0; height: 100%; background: rgba(255, 255, 255, 0.92);
+  border-radius: 20px; border: 4px solid #a29bfe; position: relative;
+  overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  touch-action: none; user-select: none;
+}
+
+.p-drop-danger-line {
+  position: absolute; top: 18%; left: 0; right: 0;
+  border-top: 2.5px dashed #ff4757; z-index: 4;
+  display: flex; justify-content: flex-end; padding-right: 8px; pointer-events: none;
+}
+.p-drop-danger-line .danger-text {
+  font-size: 10px; font-weight: 900; color: #ff4757;
+  background: rgba(255, 255, 255, 0.92); padding: 2px 6px; border-radius: 8px;
+  border: 1px solid #ff4757; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.p-drop-lanes-matrix {
+  display: flex; width: 100%; height: 100%; position: relative; z-index: 2;
+}
+
+.p-drop-lane-col {
+  flex: 1; min-width: 0; height: 100%; display: flex; flex-direction: column;
+  justify-content: flex-end; border-right: 1px dashed rgba(162, 155, 254, 0.4);
+  cursor: pointer; position: relative; transition: background 0.15s;
+}
+.p-drop-lane-col:last-child { border-right: none; }
+.p-drop-lane-col:active, .p-drop-lane-col:hover {
+  background: rgba(162, 155, 254, 0.12);
+}
+
+.lane-stack-area {
+  flex: 1; display: flex; flex-direction: column-reverse; align-items: center;
+  justify-content: flex-start; gap: 3px; padding-bottom: 4px; overflow: hidden;
+}
+
+.lane-bottom-label {
+  height: 32px; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 900; color: #ffffff; border-radius: 6px;
+  margin: 2px 1px; text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15); flex-shrink: 0;
+}
+
+.stacked-block {
+  width: 90%; max-width: 44px; height: 34px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 14px; color: #ffffff;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2); flex-shrink: 0;
+}
+.stacked-gem {
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+.stacked-rock {
+  background: linear-gradient(135deg, #747d8c, #2f3542);
+  border: 2px solid #57606f; font-size: 20px;
+}
+.stacked-num { font-weight: 900; font-size: 13px; }
+
+.p-falling-gem-avatar {
+  position: absolute; width: 42px; height: 42px;
+  transform: translate(-50%, 0); z-index: 10; pointer-events: none;
+  transition: left 0.08s ease-out;
+}
+.falling-gem-glow {
+  position: absolute; width: 100%; height: 100%; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.8), transparent 70%);
+  animation: pulseGlow 1s infinite alternate;
+}
+.falling-gem-body {
+  position: relative; width: 100%; height: 100%; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 3px solid #fd79a8; box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+}
+.falling-gem-num {
+  font-size: 17px; font-weight: 900; color: #ffffff;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+}
+
+.p-drop-controls-bar {
+  display: flex; gap: 10px; justify-content: center; align-items: center;
+  padding: 4px 0; flex-shrink: 0;
+}
+.drop-ctrl-btn {
+  border: none; border-radius: 16px; padding: 10px 20px; font-size: 15px;
+  font-weight: 900; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: transform 0.1s, filter 0.1s; display: flex; align-items: center; gap: 6px;
+}
+.drop-ctrl-btn:active { transform: scale(0.95); }
+.drop-ctrl-btn.btn-left, .drop-ctrl-btn.btn-right {
+  background: linear-gradient(135deg, #74b9ff, #0984e3); color: #ffffff;
+}
+.drop-ctrl-btn.btn-down {
+  background: linear-gradient(135deg, #ff7675, #d63031); color: #ffffff;
+  padding: 10px 28px; font-size: 16px;
+}
+
+.p-drop-over-modal {
+  position: absolute; inset: 0; background: rgba(0, 0, 0, 0.7);
+  display: none; align-items: center; justify-content: center; z-index: 50;
+  border-radius: 20px; backdrop-filter: blur(4px);
+}
+.p-drop-over-modal.show { display: flex; }
+.p-drop-modal-card {
+  background: #ffffff; border-radius: 24px; padding: 24px; text-align: center;
+  max-width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 4px solid #e17055;
+}
+.modal-rock-icon { font-size: 40px; margin-bottom: 8px; }
+.modal-over-title { font-size: 20px; font-weight: 900; color: #d63031; margin-bottom: 8px; }
+.modal-over-desc { font-size: 13px; font-weight: 700; color: #636e72; margin-bottom: 10px; }
+.modal-over-score { font-size: 15px; font-weight: 900; color: #2d3436; margin-bottom: 16px; }
+
+
+
 
 
 

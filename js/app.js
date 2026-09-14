@@ -186,6 +186,7 @@ class GameApp {
     this.gamePrincessPuzzle = new GamePrincessPuzzle(this);
     this.gamePrincessTarget = new GamePrincessTarget(this);
     this.gamePrincessWord = new GamePrincessWord(this);
+    this.gamePrincessDrop = new GamePrincessDrop(this);
 
     this.homeCharManager = new CharacterManager('home-character-stage');
 
@@ -212,7 +213,8 @@ class GameApp {
       princess_runway: document.getElementById('view-game-princess-runway'),
       princess_puzzle: document.getElementById('view-game-princess-puzzle'),
       princess_target: document.getElementById('view-game-princess-target'),
-      princess_word: document.getElementById('view-game-princess-word')
+      princess_word: document.getElementById('view-game-princess-word'),
+      princess_drop: document.getElementById('view-game-princess-drop')
     };
 
     this.homeBtn = document.getElementById('home-btn');
@@ -328,6 +330,7 @@ class GameApp {
     bindCard('menu-card-princess-puzzle', 'praise_kitty_3', 'princess_puzzle');
     bindCard('menu-card-princess-target', 'praise_kitty_2', 'princess_target');
     bindCard('menu-card-princess-word', 'praise_kitty_3', 'princess_word');
+    bindCard('menu-card-princess-drop', 'praise_kitty_1', 'princess_drop');
 
     // もう1回遊ぶボタン
     if (this.restartBtn) {
@@ -356,6 +359,7 @@ class GameApp {
         else if (v === 'princess_puzzle') this.gamePrincessPuzzle.start();
         else if (v === 'princess_target') this.gamePrincessTarget.start();
         else if (v === 'princess_word') this.gamePrincessWord.start();
+        else if (v === 'princess_drop') this.gamePrincessDrop.start();
         else this.switchView('home');
       });
     }
@@ -407,6 +411,7 @@ class GameApp {
     this.currentView = viewName;
     this.hideCompleteModal();
     if (this.gamePrincess) this.gamePrincess.stop();
+    if (this.gamePrincessDrop) this.gamePrincessDrop.stop();
 
     // 全ビューを非表示
     if (this.viewHome) this.viewHome.classList.remove('active');
@@ -452,6 +457,7 @@ class GameApp {
       else if (viewName === 'princess_puzzle') this.gamePrincessPuzzle.start();
       else if (viewName === 'princess_target') this.gamePrincessTarget.start();
       else if (viewName === 'princess_word') this.gamePrincessWord.start();
+      else if (viewName === 'princess_drop') this.gamePrincessDrop.start();
     }
   }
 
