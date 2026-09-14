@@ -362,10 +362,12 @@ class GamePrincessDrop {
         const board = document.getElementById('p-drop-well-board');
         const boardHeight = board ? board.clientHeight : 500;
 
-        // 10個までは半分のスピード（ゆっくり）、10個を超えたら元のスピード
+        // 速度をさらに半分に調整
+        // 10個以下: 超ゆっくり（考えながら落ち着いて操作できる速度）
+        // 10個超え: スピードアップ
         const normalSpeed = (this.placedCount > 10)
-          ? Math.max(1.8, boardHeight * 0.0035)
-          : Math.max(0.9, boardHeight * 0.00175);
+          ? Math.max(0.9, boardHeight * 0.0018)
+          : Math.max(0.45, boardHeight * 0.0009);
 
         const speed = this.isDroppingFast ? Math.max(26, boardHeight * 0.05) : normalSpeed;
         this.currentPosY += speed;
@@ -445,15 +447,37 @@ class GamePrincessDrop {
       window.soundSystem.playPop();
       window.soundSystem.playRockDrop();
 
-      const promptEl = document.getElementById('p-drop-prompt-text');
-      if (promptEl) {
-        promptEl.innerHTML = `⚠️ おしい！ ${num} は <strong>${this.lanes[correctLane].label}</strong> だよ！`;
+      const errorDist = Math.abs(chosenLane - correctLane);
+      // ズレの大きさに応じた石の数:
+      // ズレ1 (隣の列): 1個
+      // ズレ2〜3: 2個
+      // ズレ4〜5: 3個
+      // ズレ6以上: 4個
+      let rockCount = 1;
+      if (errorDist >= 6) rockCount = 4;
+      else if (errorDist >= 4) rockCount = 3;
+      else if (errorDist >= 2) rockCount = 2;
+
+      // 間違えた列に1個、残りはランダムな列に落とす
+      for (let i = 0; i < rockCount; i++) {
+        let rockLane;
+        if (i === 0) {
+          rockLane = chosenLane;
+        } else {
+          rockLane = Math.floor(Math.random() * 10);
+        }
+        this.laneStacks[rockLane].push({ type: 'rock' });
+      }
+      this.renderAllStacks();
+
+      if (rockCount > 1) {
+        setTimeout(() => window.soundSystem.playRockDrop(), 150);
       }
 
-      // 邪魔する石（🪨）がランダムなレーンに落下
-      const rockLane = Math.floor(Math.random() * 10);
-      this.laneStacks[rockLane].push({ type: 'rock' });
-      this.renderAllStacks();
+      const promptEl = document.getElementById('p-drop-prompt-text');
+      if (promptEl) {
+        promptEl.innerHTML = `⚠️ おしい！ ${num} は <strong>${this.lanes[correctLane].label}</strong> だよ！ (ズレ: ${errorDist}マス ➜ 🪨×${rockCount}個)`;
+      }
 
       const board = document.getElementById('p-drop-well-board');
       if (board) {
@@ -470,7 +494,7 @@ class GamePrincessDrop {
       setTimeout(() => {
         this.isPaused = false;
         this.spawnNextNumber();
-      }, 900);
+      }, 1000);
     }
   }
 

@@ -2018,8 +2018,10 @@ html, body {
 }
 
 .p-drop-danger-line {
-  position: absolute; top: calc(14% + 8px); left: 0; right: 0;
-  border-top: 2.5px dashed #ff4757; z-index: 4;
+  position: absolute;
+  top: calc((100% - 36px) * 0.05 + 4px);
+  left: 0; right: 0;
+  border-top: 3px dashed #ff4757; z-index: 4;
   display: flex; justify-content: flex-end; padding-right: 8px; pointer-events: none;
 }
 .p-drop-danger-line .danger-text {
@@ -2055,9 +2057,8 @@ html, body {
 }
 
 .stacked-block {
-  width: 90%; max-width: 48px;
-  height: calc((100% - 24px) / 7);
-  min-height: 36px; max-height: 56px;
+  width: 90%; max-width: 52px;
+  height: calc((100% - 20px) / 6.3);
   border-radius: 9px;
   display: flex; align-items: center; justify-content: center;
   font-weight: 900; font-size: 15px; color: #ffffff;
