@@ -117,6 +117,17 @@ class GamePrincessDrop {
             <!-- 10個のレーン列 -->
             <div class="p-drop-lanes-matrix" id="p-drop-lanes-matrix"></div>
 
+            <!-- 中央強調ミス警告カード -->
+            <div class="p-drop-center-alert" id="p-drop-center-alert">
+              <div class="center-alert-card">
+                <div class="center-alert-icon">⚠️ 🪨</div>
+                <div class="center-alert-body">
+                  <div class="center-alert-title" id="center-alert-title">おしい！</div>
+                  <div class="center-alert-sub" id="center-alert-sub"></div>
+                </div>
+              </div>
+            </div>
+
             <!-- 落下中のジュエル要素 -->
             <div class="p-falling-gem-avatar" id="p-falling-gem">
               <div class="falling-gem-glow"></div>
@@ -294,6 +305,9 @@ class GamePrincessDrop {
     this.currentLane = Math.floor(Math.random() * 6) + 2; // 中央付近スタート
     this.currentPosY = 4;
     this.isDroppingFast = false;
+
+    const alertEl = document.getElementById('p-drop-center-alert');
+    if (alertEl) alertEl.classList.remove('show');
 
     const numEl = document.getElementById('p-falling-gem-num');
     const gemBody = document.getElementById('p-falling-gem-body');
@@ -474,6 +488,21 @@ class GamePrincessDrop {
         setTimeout(() => window.soundSystem.playRockDrop(), 150);
       }
 
+      // 画面中央に強調アラートポップアップを表示
+      const alertEl = document.getElementById('p-drop-center-alert');
+      const alertTitle = document.getElementById('center-alert-title');
+      const alertSub = document.getElementById('center-alert-sub');
+
+      if (alertTitle) {
+        alertTitle.innerHTML = `⚠️ おしい！ <strong>${num}</strong> は <strong>${this.lanes[correctLane].label}</strong> だよ！`;
+      }
+      if (alertSub) {
+        alertSub.innerHTML = `ズレ: <strong>${errorDist}マス</strong> ➜ 🪨×<strong>${rockCount}個</strong> 落下！`;
+      }
+      if (alertEl) {
+        alertEl.classList.add('show');
+      }
+
       const promptEl = document.getElementById('p-drop-prompt-text');
       if (promptEl) {
         promptEl.innerHTML = `⚠️ おしい！ ${num} は <strong>${this.lanes[correctLane].label}</strong> だよ！ (ズレ: ${errorDist}マス ➜ 🪨×${rockCount}個)`;
@@ -487,14 +516,15 @@ class GamePrincessDrop {
 
       // ゲームオーバー判定（いずれかの列が上限に達したか）
       if (this.laneStacks.some(s => s.length >= this.maxLaneHeight)) {
-        setTimeout(() => this.handleGameOver(), 700);
+        setTimeout(() => this.handleGameOver(), 800);
         return;
       }
 
       setTimeout(() => {
+        if (alertEl) alertEl.classList.remove('show');
         this.isPaused = false;
         this.spawnNextNumber();
-      }, 1000);
+      }, 1500);
     }
   }
 
