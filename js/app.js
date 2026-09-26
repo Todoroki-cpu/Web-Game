@@ -389,7 +389,6 @@ class GameApp {
 
   switchHomeCategory(categoryName) {
     this.currentHomeCategory = categoryName;
-    window.soundSystem.playPop();
 
     // タブのアクティブ状態
     document.querySelectorAll('.cat-tab-btn').forEach(btn => {
@@ -401,34 +400,46 @@ class GameApp {
       panel.classList.toggle('active', panel.id === `cat-panel-${categoryName}`);
     });
 
-    // カテゴリ案内ボイス ＆ キャラクター切り替え
-    const catVoices = {
-      numbers: 'cat_numbers',
-      hiragana: 'cat_hiragana',
-      clock: 'cat_clock',
-      days: 'cat_days',
-      seasons: 'cat_seasons',
-      animals: 'cat_numbers',
-      princess: 'praise_1'
-    };
-    if (catVoices[categoryName]) {
-      window.soundSystem.playVoice(catVoices[categoryName]);
+    try {
+      if (window.soundSystem) {
+        window.soundSystem.playPop();
+        const catVoices = {
+          numbers: 'cat_numbers',
+          hiragana: 'cat_hiragana',
+          clock: 'cat_clock',
+          days: 'cat_days',
+          seasons: 'cat_seasons',
+          animals: 'cat_numbers',
+          princess: 'praise_1'
+        };
+        if (catVoices[categoryName]) {
+          window.soundSystem.playVoice(catVoices[categoryName]);
+        }
+      }
+    } catch (e) {
+      console.warn('Voice play error in tab switch:', e);
     }
 
-    if (categoryName === 'princess') {
-      this.homeCharManager.setCharacter('kitty');
-    } else if (categoryName === 'animals') {
-      this.homeCharManager.setCharacter('melonpan');
-    } else if (categoryName === 'hiragana') {
-      this.homeCharManager.setCharacter('cinna');
-    } else if (categoryName === 'clock') {
-      this.homeCharManager.setCharacter('shokupan');
-    } else if (categoryName === 'days') {
-      this.homeCharManager.setCharacter('baikin');
-    } else if (categoryName === 'seasons') {
-      this.homeCharManager.setCharacter('melonpan');
-    } else {
-      this.homeCharManager.setCharacter('anpan');
+    try {
+      if (this.homeCharManager) {
+        if (categoryName === 'princess') {
+          this.homeCharManager.setCharacter('kitty');
+        } else if (categoryName === 'animals') {
+          this.homeCharManager.setCharacter('melonpan');
+        } else if (categoryName === 'hiragana') {
+          this.homeCharManager.setCharacter('cinna');
+        } else if (categoryName === 'clock') {
+          this.homeCharManager.setCharacter('shokupan');
+        } else if (categoryName === 'days') {
+          this.homeCharManager.setCharacter('baikin');
+        } else if (categoryName === 'seasons') {
+          this.homeCharManager.setCharacter('melonpan');
+        } else {
+          this.homeCharManager.setCharacter('anpan');
+        }
+      }
+    } catch (e) {
+      console.warn('Character set error in tab switch:', e);
     }
   }
 

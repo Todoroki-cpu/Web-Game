@@ -43,6 +43,22 @@
         window.app.switchView('home');
       }
     }
+
+    window.switchHomeTab = function(categoryName) {
+      if (window.app && typeof window.app.switchHomeCategory === 'function') {
+        window.app.switchHomeCategory(categoryName);
+        return;
+      }
+      document.querySelectorAll('.cat-tab-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.category === categoryName);
+      });
+      document.querySelectorAll('.home-cat-panel').forEach(function(panel) {
+        panel.classList.toggle('active', panel.id === ('cat-panel-' + categoryName));
+      });
+      if (window.soundSystem) {
+        try { window.soundSystem.playPop(); } catch(e) {}
+      }
+    };
   </script>
 
   <!-- アプリケーション全体コンテナ -->
@@ -89,13 +105,13 @@
 
       <!-- カテゴリタブ -->
       <div class="category-tabs-bar">
-        <button class="cat-tab-btn active" data-category="numbers">🔢 すうじ</button>
-        <button class="cat-tab-btn" data-category="hiragana">🔤 ひらがな</button>
-        <button class="cat-tab-btn" data-category="clock">⏰ とけい</button>
-        <button class="cat-tab-btn" data-category="days">📅 ようび</button>
-        <button class="cat-tab-btn" data-category="seasons">🌸 きせつ</button>
-        <button class="cat-tab-btn" data-category="animals">🐾 どうぶつ</button>
-        <button class="cat-tab-btn" data-category="princess">👑 プリンセス</button>
+        <button class="cat-tab-btn active" data-category="numbers" onclick="window.switchHomeTab('numbers')">🔢 すうじ</button>
+        <button class="cat-tab-btn" data-category="hiragana" onclick="window.switchHomeTab('hiragana')">🔤 ひらがな</button>
+        <button class="cat-tab-btn" data-category="clock" onclick="window.switchHomeTab('clock')">⏰ とけい</button>
+        <button class="cat-tab-btn" data-category="days" onclick="window.switchHomeTab('days')">📅 ようび</button>
+        <button class="cat-tab-btn" data-category="seasons" onclick="window.switchHomeTab('seasons')">🌸 きせつ</button>
+        <button class="cat-tab-btn" data-category="animals" onclick="window.switchHomeTab('animals')">🐾 どうぶつ</button>
+        <button class="cat-tab-btn" data-category="princess" onclick="window.switchHomeTab('princess')">👑 プリンセス</button>
       </div>
 
       <!-- パネル1: すうじ (6ゲーム) -->
