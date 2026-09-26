@@ -2386,6 +2386,326 @@ html, body {
 .modal-stars-row { font-size: 20px; margin-bottom: 18px; word-break: break-all; }
 
 
+/* ==========================================================================
+   25. しりとリズム シアター (Shirito-Rhythm Theater)
+   『シナぷしゅ』「しりとリズムジカ」風 50音知育シアター
+   ========================================================================== */
+.rhythm-theater-root {
+  display: flex; flex-direction: column; width: 100%; height: 100%;
+  padding: 8px 12px; gap: 8px; box-sizing: border-box; position: relative;
+  overflow: hidden; background: #faf6ee;
+}
+
+/* 背景のオーガニックなパステル装飾 */
+.rhythm-bg-decorations {
+  position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+}
+.decor-blob {
+  position: absolute; border-radius: 50%; filter: blur(28px); opacity: 0.35;
+  animation: blobFloat 8s ease-in-out infinite alternate;
+}
+.blob-1 { width: 280px; height: 280px; background: #ffd8a8; top: -60px; left: -60px; }
+.blob-2 { width: 340px; height: 340px; background: #ffc9c9; bottom: -80px; right: -80px; animation-delay: -3s; }
+.blob-3 { width: 240px; height: 240px; background: #b2f2bb; top: 35%; right: 10%; animation-delay: -5s; }
+
+@keyframes blobFloat {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(25px, 20px) scale(1.1); }
+}
+
+.decor-note {
+  position: absolute; font-size: 28px; opacity: 0.4; animation: noteDrift 6s linear infinite;
+}
+.note-1 { top: 18%; left: 8%; color: #ff6b6b; animation-delay: 0s; }
+.note-2 { top: 60%; left: 6%; color: #4c6ef5; animation-delay: 2s; }
+.note-3 { top: 25%; right: 8%; color: #f59f00; animation-delay: 4s; }
+.decor-star { position: absolute; font-size: 20px; opacity: 0.5; animation: starTwinkle 3s ease-in-out infinite alternate; }
+.star-1 { top: 12%; right: 22%; }
+.star-2 { bottom: 25%; left: 18%; }
+
+@keyframes noteDrift {
+  0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+  20% { opacity: 0.5; }
+  80% { opacity: 0.5; }
+  100% { transform: translateY(-40px) rotate(15deg); opacity: 0; }
+}
+@keyframes starTwinkle {
+  0% { transform: scale(0.8); opacity: 0.2; }
+  100% { transform: scale(1.2); opacity: 0.6; }
+}
+
+/* 上部ヘッダー */
+.rhythm-top-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: rgba(255, 255, 255, 0.94); border-radius: 20px; padding: 6px 14px;
+  border: 3px solid #ffd43b; box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  z-index: 5; flex-shrink: 0;
+}
+.rhythm-title-pill {
+  display: flex; align-items: center; gap: 6px;
+}
+.pill-icon { font-size: 22px; }
+.pill-text { font-size: 16px; font-weight: 900; color: #2f3542; }
+.pill-badge {
+  font-size: 10.5px; font-weight: 900; color: #ffffff; background: #ff4757;
+  padding: 2px 8px; border-radius: 10px;
+}
+
+.rhythm-controls-group {
+  display: flex; align-items: center; gap: 6px;
+}
+.rhythm-ctrl-btn {
+  background: #ffffff; border: 2.5px solid #ffa502; border-radius: 14px;
+  padding: 4px 10px; font-size: 16px; cursor: pointer; transition: all 0.12s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+.rhythm-ctrl-btn:active { transform: scale(0.92); }
+.rhythm-ctrl-btn.play-toggle-btn { background: #fff3bf; border-color: #f59f00; font-size: 18px; padding: 4px 12px; }
+
+.rhythm-speed-picker {
+  display: flex; background: #f1f2f6; border-radius: 14px; padding: 2px; gap: 2px;
+}
+.speed-btn {
+  border: none; background: transparent; font-size: 11px; font-weight: 800;
+  color: #57606f; border-radius: 10px; padding: 4px 8px; cursor: pointer;
+}
+.speed-btn.active { background: #ffffff; color: #e84118; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-weight: 900; }
+
+/* メインステージ（額縁アートカード） */
+.rhythm-main-stage {
+  flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 3;
+}
+.rhythm-art-card {
+  width: 100%; max-width: 680px; height: 100%; max-height: 480px;
+  background: #ffffff; border-radius: 32px; border: 5px solid #ff6b81;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  padding: 10px 16px; box-sizing: border-box; position: relative;
+  transition: background-color 0.4s ease, border-color 0.4s ease;
+  overflow: hidden;
+}
+
+/* 上部しりとり繋がりブリッジ */
+.rhythm-connection-bridge {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: rgba(255, 255, 255, 0.92); border-radius: 18px; padding: 4px 14px;
+  border: 2px solid #e1e8ed; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 2px; z-index: 4;
+}
+.bridge-joint-node {
+  display: flex; flex-direction: column; align-items: center;
+  background: #f1f3f5; border-radius: 12px; padding: 2px 8px; border: 2px solid #ced4da;
+  min-width: 36px;
+}
+.bridge-joint-node.head-node { border-color: #51cf66; background: #ebfbee; }
+.bridge-joint-node.tail-node { border-color: #ff6b81; background: #fff0f3; }
+.bridge-joint-node.active-spot {
+  border-color: #f59f00; background: #fff9db; animation: pulseSpot 0.6s infinite alternate;
+}
+@keyframes pulseSpot {
+  0% { transform: scale(1); box-shadow: 0 0 4px #f59f00; }
+  100% { transform: scale(1.15); box-shadow: 0 0 12px #f59f00; }
+}
+
+.bridge-tag { font-size: 8.5px; font-weight: 900; color: #868e96; }
+.bridge-char { font-size: 15px; font-weight: 900; color: #2f3542; }
+
+.bridge-arrow-flow {
+  display: flex; align-items: center; gap: 2px; color: #ffa502; font-size: 11px;
+}
+.arrow-dot { width: 4px; height: 4px; border-radius: 50%; background: #ffa502; opacity: 0.6; }
+.bridge-current-word {
+  font-size: 17px; font-weight: 900; color: #e84118; letter-spacing: 1px;
+}
+
+/* イラストエリア */
+.rhythm-illustration-box {
+  flex: 1; width: 100%; min-height: 0; display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 2;
+}
+.rhythm-svg-stage {
+  width: 170px; height: 170px; display: flex; align-items: center; justify-content: center;
+  transform-origin: center center;
+}
+@media (min-width: 768px) {
+  .rhythm-svg-stage { width: 200px; height: 200px; }
+}
+.rhythm-svg { width: 100%; height: 100%; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.12)); }
+
+.rhythm-svg-stage.item-enter-pop {
+  animation: itemPopIn 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.rhythm-svg-stage.item-happy-bounce {
+  animation: itemBounce 0.5s ease-in-out infinite alternate;
+}
+@keyframes itemPopIn {
+  0% { transform: scale(0.3) rotate(-12deg); opacity: 0; }
+  60% { transform: scale(1.18) rotate(4deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes itemBounce {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-10px) scale(1.05); }
+}
+
+/* 50音 ひらがな文字カード行 */
+.rhythm-char-blocks-row {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  margin: 4px 0; z-index: 4; flex-wrap: wrap;
+}
+.hiragana-char-card {
+  width: 54px; height: 62px; background: #ffffff; border-radius: 18px;
+  border: 3.5px solid #ced4da; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; cursor: pointer; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@media (min-width: 768px) {
+  .hiragana-char-card { width: 64px; height: 72px; border-radius: 20px; }
+}
+
+.hiragana-char-card.waiting {
+  opacity: 0.18; transform: scale(0.85);
+}
+.hiragana-char-card.pop-active {
+  opacity: 1; transform: scale(1); border-color: #ffa502;
+  animation: charCardPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes charCardPop {
+  0% { transform: scale(0.4) rotate(-10deg); }
+  70% { transform: scale(1.25) rotate(5deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.hiragana-char-card.is-head-joint {
+  border-color: #51cf66; background: linear-gradient(135deg, #ffffff 60%, #ebfbee 100%);
+}
+.hiragana-char-card.is-tail-joint {
+  border-color: #ff6b81; background: linear-gradient(135deg, #ffffff 60%, #fff0f3 100%);
+}
+.hiragana-char-card.super-glow {
+  border-color: #f59f00 !important; background: #fff9db !important;
+  box-shadow: 0 0 20px rgba(245, 159, 0, 0.8) !important;
+  transform: scale(1.18) !important; animation: tailGlowPulse 0.5s infinite alternate;
+}
+@keyframes tailGlowPulse {
+  0% { transform: scale(1.12); }
+  100% { transform: scale(1.24); }
+}
+
+.hiragana-char-card.user-tapped {
+  transform: scale(1.3) rotate(-8deg); background: #fffae6;
+}
+
+.char-main-glyph {
+  font-size: 32px; font-weight: 900; color: #2f3542; line-height: 1;
+}
+@media (min-width: 768px) {
+  .char-main-glyph { font-size: 38px; }
+}
+.joint-indicator-badge {
+  position: absolute; bottom: -6px; background: #ff4757; color: #ffffff;
+  font-size: 8.5px; font-weight: 900; padding: 1px 5px; border-radius: 6px;
+  white-space: nowrap; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.is-head-joint .joint-indicator-badge { background: #2ed573; }
+
+/* 説明文 */
+.rhythm-desc-banner {
+  font-size: 13.5px; font-weight: 800; color: #57606f; background: rgba(255, 255, 255, 0.85);
+  padding: 4px 16px; border-radius: 14px; margin-top: 2px; z-index: 3;
+}
+
+/* 次の文字への巨大スポットライトオーバーレイ */
+.rhythm-joint-spotlight {
+  position: absolute; inset: 0; background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center;
+  z-index: 10; border-radius: 28px;
+}
+.rhythm-joint-spotlight.show { display: flex; animation: fadeIn 0.25s; }
+.spotlight-char-box {
+  background: #ffffff; border-radius: 32px; border: 6px solid #f59f00;
+  padding: 16px 36px; text-align: center; box-shadow: 0 12px 36px rgba(245, 159, 0, 0.4);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  animation: spotPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes spotPop {
+  0% { transform: scale(0.4); }
+  70% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.spotlight-label { font-size: 14px; font-weight: 900; color: #e84118; }
+.spotlight-char {
+  font-size: 56px; font-weight: 900; color: #2f3542; line-height: 1;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* インタラクティブ タップレイヤー */
+.rhythm-tap-layer {
+  position: absolute; inset: 0; z-index: 5; cursor: pointer;
+}
+.tap-sparkle-emoji {
+  position: absolute; font-size: 32px; pointer-events: none;
+  animation: tapFloat 0.85s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  z-index: 15; transform: translate(-50%, -50%);
+}
+@keyframes tapFloat {
+  0% { transform: translate(-50%, -50%) scale(0.3) rotate(0deg); opacity: 1; }
+  60% { transform: translate(-50%, -80px) scale(1.4) rotate(15deg); opacity: 1; }
+  100% { transform: translate(-50%, -120px) scale(1.1) rotate(25deg); opacity: 0; }
+}
+
+/* 下部リボントラック */
+.rhythm-bottom-ribbon {
+  width: 100%; height: 50px; background: rgba(255, 255, 255, 0.92);
+  border-radius: 18px; border: 2.5px solid #ced4da; box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+  display: flex; align-items: center; padding: 4px 8px; box-sizing: border-box;
+  z-index: 4; flex-shrink: 0;
+}
+.ribbon-scroll-container {
+  display: flex; align-items: center; gap: 6px; overflow-x: auto; width: 100%;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.ribbon-scroll-container::-webkit-scrollbar { display: none; }
+
+.ribbon-chip {
+  display: flex; align-items: center; gap: 4px; background: #f1f3f5;
+  border: 2px solid #ced4da; border-radius: 12px; padding: 3px 8px;
+  cursor: pointer; flex-shrink: 0; transition: all 0.15s;
+}
+.ribbon-chip.active {
+  background: #ff4757; border-color: #ff4757; color: #ffffff;
+  transform: scale(1.08); box-shadow: 0 3px 8px rgba(255, 71, 87, 0.4);
+}
+.ribbon-chip.passed {
+  background: #d4edda; border-color: #28a745;
+}
+.chip-num { font-size: 10px; font-weight: 900; opacity: 0.8; }
+.chip-word { font-size: 12px; font-weight: 800; white-space: nowrap; }
+.chip-tail-badge {
+  font-size: 10px; font-weight: 900; background: rgba(0,0,0,0.12);
+  padding: 1px 4px; border-radius: 6px;
+}
+.ribbon-arrow { font-size: 10px; color: #a4b0be; flex-shrink: 0; }
+
+/* 20個かんせい モーダル */
+.rhythm-finish-modal {
+  position: absolute; inset: 0; background: rgba(0, 0, 0, 0.75);
+  display: none; align-items: center; justify-content: center; z-index: 60;
+  border-radius: 20px; backdrop-filter: blur(4px);
+}
+.rhythm-finish-modal.show { display: flex; }
+.rhythm-modal-box {
+  background: #ffffff; border-radius: 28px; padding: 24px; text-align: center;
+  max-width: 420px; width: 90%; box-shadow: 0 12px 36px rgba(0,0,0,0.35); border: 5px solid #f1c40f;
+}
+.modal-confetti-art { font-size: 22px; margin-bottom: 8px; word-break: break-all; line-height: 1.4; }
+.modal-finish-title { font-size: 22px; font-weight: 900; color: #e84118; margin-bottom: 6px; }
+.modal-finish-desc { font-size: 13.5px; font-weight: 700; color: #57606f; margin-bottom: 14px; line-height: 1.5; }
+.modal-star-badges { font-size: 20px; margin-bottom: 18px; }
+
+
+
 
 
 

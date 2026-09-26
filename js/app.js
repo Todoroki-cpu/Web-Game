@@ -188,6 +188,7 @@ class GameApp {
     this.gamePrincessWord = new GamePrincessWord(this);
     this.gamePrincessDrop = new GamePrincessDrop(this);
     this.gameAnimalSilhouette = new GameAnimalSilhouette(this);
+    this.gameShiritoriRhythm = new GameShiritoriRhythm(this);
 
     this.homeCharManager = new CharacterManager('home-character-stage');
 
@@ -209,6 +210,7 @@ class GameApp {
       hiragana_trace: document.getElementById('view-game-hiragana-trace'),
       hiragana_karuta: document.getElementById('view-game-hiragana-karuta'),
       hiragana_word: document.getElementById('view-game-hiragana-word'),
+      shiritori_rhythm: document.getElementById('view-game-shiritori-rhythm'),
       princess: document.getElementById('view-game-princess'),
       princess_doors: document.getElementById('view-game-princess-doors'),
       princess_runway: document.getElementById('view-game-princess-runway'),
@@ -334,6 +336,7 @@ class GameApp {
     bindCard('menu-card-princess-word', 'praise_3', 'princess_word');
     bindCard('menu-card-princess-drop', 'praise_1', 'princess_drop');
     bindCard('menu-card-animal-sil', 'praise_1', 'animal_silhouette');
+    bindCard('menu-card-shiritori-rhythm', 'cat_hiragana', 'shiritori_rhythm');
 
     // もう1回遊ぶボタン
     if (this.restartBtn) {
@@ -356,6 +359,7 @@ class GameApp {
         else if (v === 'hiragana_trace') this.gameHiraganaTrace.start();
         else if (v === 'hiragana_karuta') this.gameHiraganaKaruta.start();
         else if (v === 'hiragana_word') this.gameHiraganaWord.start();
+        else if (v === 'shiritori_rhythm') this.gameShiritoriRhythm.start();
         else if (v === 'princess') this.gamePrincess.start();
         else if (v === 'princess_doors') this.gamePrincessDoors.start();
         else if (v === 'princess_runway') this.gamePrincessRunway.start();
@@ -420,6 +424,7 @@ class GameApp {
     if (this.gamePrincess) this.gamePrincess.stop();
     if (this.gamePrincessDrop) this.gamePrincessDrop.stop();
     if (this.gameAnimalSilhouette) this.gameAnimalSilhouette.stop();
+    if (this.gameShiritoriRhythm) this.gameShiritoriRhythm.stop();
 
     // 全ビューを非表示
     if (this.viewHome) this.viewHome.classList.remove('active');
@@ -459,6 +464,7 @@ class GameApp {
       }
       else if (viewName === 'hiragana_karuta') this.gameHiraganaKaruta.start();
       else if (viewName === 'hiragana_word') this.gameHiraganaWord.start();
+      else if (viewName === 'shiritori_rhythm') this.gameShiritoriRhythm.start();
       else if (viewName === 'princess') this.gamePrincess.start();
       else if (viewName === 'princess_doors') this.gamePrincessDoors.start();
       else if (viewName === 'princess_runway') this.gamePrincessRunway.start();
