@@ -224,7 +224,7 @@ class GameShiritoriRhythm {
         themeBorder: '#feca57',
         themeAccent: '#ff9f43',
         desc: 'あわあわ シュワシュワ！ きんいろドリンク🍺',
-        svg: () => this.getBi-ruSvg()
+        svg: () => this.getBiruSvg()
       },
       {
         index: 18,
@@ -236,7 +236,7 @@ class GameShiritoriRhythm {
         themeBorder: '#1dd1a1',
         themeAccent: '#10ac84',
         desc: 'てくてく すすもう！ たのしいルート🗺️',
-        svg: () => this.getRu-toSvg()
+        svg: () => this.getRutoSvg()
       },
       {
         index: 19,
@@ -260,7 +260,7 @@ class GameShiritoriRhythm {
         themeBorder: '#ff6b6b',
         themeAccent: '#2ed573',
         desc: 'くるくる まわるよ！ にじいろルーレット🎡',
-        svg: () => this.getRu-rettoSvg()
+        svg: () => this.getRurettoSvg()
       }
     ];
 
@@ -1214,7 +1214,7 @@ class GameShiritoriRhythm {
     `;
   }
 
-  getBi-ruSvg() {
+  getBiruSvg() {
     return `
       <svg viewBox="0 0 240 240" class="rhythm-svg" width="100%" height="100%">
         <path d="M150 100 C190 100 190 170 150 170" stroke="#ced4da" stroke-width="16" fill="none" stroke-linecap="round" />
@@ -1231,7 +1231,7 @@ class GameShiritoriRhythm {
     `;
   }
 
-  getRu-toSvg() {
+  getRutoSvg() {
     return `
       <svg viewBox="0 0 240 240" class="rhythm-svg" width="100%" height="100%">
         <rect x="40" y="50" width="160" height="145" rx="18" fill="#e6fcf5" stroke="#63e6be" stroke-width="5" />
@@ -1262,7 +1262,7 @@ class GameShiritoriRhythm {
     `;
   }
 
-  getRu-rettoSvg() {
+  getRurettoSvg() {
     return `
       <svg viewBox="0 0 240 240" class="rhythm-svg" width="100%" height="100%">
         <polygon points="105,185 135,185 145,215 95,215" fill="#868e96" />
