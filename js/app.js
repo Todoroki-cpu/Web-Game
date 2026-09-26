@@ -263,15 +263,29 @@ class GameApp {
 
   initEvents() {
     // 初回スタートボタン
-    if (this.startGameBtn) {
-      this.startGameBtn.addEventListener('click', () => {
-        if (this.startScreenEl) {
-          this.startScreenEl.classList.add('hidden');
+    const handleStartApp = () => {
+      const scr = document.getElementById('start-screen');
+      if (scr) {
+        scr.classList.add('hidden');
+        setTimeout(() => { scr.style.display = 'none'; }, 400);
+      }
+      try {
+        if (window.soundSystem) {
+          window.soundSystem.initAudio();
+          window.soundSystem.startBgm();
+          window.soundSystem.playSparkle();
         }
-        window.soundSystem.initAudio();
-        window.soundSystem.startBgm();
-        window.soundSystem.playSparkle();
-        this.switchView('home');
+      } catch (e) {
+        console.warn('Audio init error:', e);
+      }
+      this.switchView('home');
+    };
+
+    if (this.startGameBtn) {
+      this.startGameBtn.addEventListener('click', handleStartApp);
+      this.startGameBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        handleStartApp();
       });
     }
 
@@ -509,6 +523,18 @@ class GameApp {
 }
 
 // アプリケーション起動
-window.addEventListener('DOMContentLoaded', () => {
-  window.app = new GameApp();
-});
+function bootstrapGameApp() {
+  if (!window.app) {
+    try {
+      window.app = new GameApp();
+    } catch (e) {
+      console.error('GameApp bootstrap error:', e);
+    }
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bootstrapGameApp);
+} else {
+  bootstrapGameApp();
+}

@@ -22,9 +22,28 @@
       <div class="start-char-icon">⭐ 🍞 ⏰ 🌸</div>
       <h1 class="start-title">わくわく まなびらんど</h1>
       <p class="start-desc">すうじ・とけい・ようび・きせつ であそぼう！</p>
-      <button class="start-play-btn" id="start-game-btn">▶ タップして あそぶ！</button>
+      <button class="start-play-btn" id="start-game-btn" onclick="dismissStartOverlay()">▶ タップして あそぶ！</button>
     </div>
   </div>
+  <script>
+    function dismissStartOverlay() {
+      var scr = document.getElementById('start-screen');
+      if (scr) {
+        scr.classList.add('hidden');
+        setTimeout(function() { scr.style.display = 'none'; }, 400);
+      }
+      if (window.soundSystem) {
+        try {
+          window.soundSystem.initAudio();
+          window.soundSystem.startBgm();
+          window.soundSystem.playSparkle();
+        } catch(e) {}
+      }
+      if (window.app && typeof window.app.switchView === 'function') {
+        window.app.switchView('home');
+      }
+    }
+  </script>
 
   <!-- アプリケーション全体コンテナ -->
   <div id="game-container">
