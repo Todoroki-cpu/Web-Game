@@ -2213,6 +2213,180 @@ html, body {
 .modal-over-score { font-size: 15px; font-weight: 900; color: #2d3436; margin-bottom: 16px; }
 
 
+/* ==========================================================================
+   どうぶつ ミニゲーム: どうぶつのシルエットあてクイズ (Animal Silhouette Quiz)
+   ========================================================================== */
+.card-animal-sil { border-color: #2ed573; }
+
+.sil-game-layout {
+  display: flex; flex-direction: column; width: 100%; height: 100%;
+  padding: 8px 12px; gap: 8px; box-sizing: border-box;
+}
+
+.sil-header-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: rgba(255, 255, 255, 0.95); border-radius: 18px; padding: 6px 14px;
+  border: 3px solid #2ed573; box-shadow: 0 4px 12px rgba(0,0,0,0.08); flex-shrink: 0;
+}
+.sil-speech-bubble {
+  display: flex; align-items: center; justify-content: center; gap: 8px; flex: 1; min-width: 0;
+}
+.sil-speech-icon { font-size: 20px; }
+.sil-speech-text {
+  font-size: 15px; font-weight: 900; color: #2f3542; text-align: center;
+}
+.sil-speech-text strong { color: #e84118; font-size: 17px; }
+.sil-voice-btn {
+  background: #fffa65; border: 2px solid #f1c40f; border-radius: 50%;
+  width: 32px; height: 32px; font-size: 14px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0;
+}
+.sil-progress-badge {
+  display: flex; align-items: center; gap: 6px; background: #e8f8f5;
+  padding: 4px 12px; border-radius: 14px; border: 2px solid #2ed573; flex-shrink: 0;
+}
+.sil-progress-icon { font-size: 18px; color: #f1c40f; }
+.sil-progress-text { font-size: 15px; font-weight: 900; color: #27ae60; }
+
+.sil-main-stage {
+  flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center;
+  position: relative; border-radius: 24px; overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12); border: 4px solid #ffffff;
+}
+
+.sil-habitat-bg {
+  position: absolute; inset: 0; z-index: 1; transition: background 0.5s ease;
+}
+.sil-habitat-bg.habitat-land {
+  background: linear-gradient(180deg, #74b9ff 0%, #ffeaa7 55%, #55efc4 85%, #00b894 100%);
+}
+.sil-habitat-bg.habitat-sea {
+  background: linear-gradient(180deg, #74b9ff 0%, #0984e3 50%, #00cec9 80%, #006266 100%);
+}
+.sil-habitat-bg.habitat-sky {
+  background: linear-gradient(180deg, #81ecec 0%, #74b9ff 45%, #a29bfe 85%, #ffeaa7 100%);
+}
+
+.sil-showcase-box {
+  position: relative; z-index: 3;
+  width: 90%; max-width: 480px; height: 90%;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 24px; border: 3.5px solid #2ed573;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15), inset 0 0 20px rgba(255,255,255,0.8);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 10px; box-sizing: border-box;
+}
+
+.sil-habitat-tag {
+  position: absolute; top: 8px; left: 12px;
+  color: #ffffff; font-size: 11px; font-weight: 900;
+  padding: 3px 12px; border-radius: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.sil-spotlight {
+  position: absolute; width: 220px; height: 220px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none; z-index: 1;
+}
+
+.sil-animal-display {
+  width: 100%; height: 75%; display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 2;
+}
+
+.animal-svg {
+  width: 100%; height: 100%; max-height: 220px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.sil-animal-display.in-silhouette .animal-svg {
+  filter: drop-shadow(0 0 12px rgba(46, 213, 115, 0.6)) drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+  animation: silFloat 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes silFloat {
+  0% { transform: translateY(0) scale(0.98); }
+  100% { transform: translateY(-8px) scale(1.02); }
+}
+
+.sil-animal-display.revealed .animal-svg {
+  animation: revealJump 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));
+}
+
+@keyframes revealJump {
+  0% { transform: scale(0.6) rotate(-10deg); }
+  50% { transform: scale(1.15) rotate(5deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.sil-reveal-banner {
+  display: none; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #ff9ff3, #feca57);
+  border: 3px solid #ffffff; border-radius: 20px;
+  padding: 6px 20px; box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  margin-top: 4px; z-index: 3; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.sil-reveal-banner.show { display: flex; }
+.reveal-name { font-size: 22px; font-weight: 900; color: #2f3542; }
+.reveal-kana { font-size: 14px; font-weight: 800; color: #57606f; }
+
+.sil-choices-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 10px; width: 100%; max-width: 650px; margin: 0 auto; flex-shrink: 0;
+}
+
+@media (min-width: 700px) {
+  .sil-choices-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.sil-choice-btn {
+  background: #ffffff; border-radius: 20px; padding: 10px 14px;
+  border: 3.5px solid #2ed573; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  cursor: pointer; position: relative; transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.sil-choice-btn:active { transform: scale(0.94); }
+
+.choice-color-0 { border-color: #ff6b81; background: linear-gradient(135deg, #ffffff 60%, #fff0f5 100%); }
+.choice-color-1 { border-color: #00cec9; background: linear-gradient(135deg, #ffffff 60%, #e0ffff 100%); }
+.choice-color-2 { border-color: #f1c40f; background: linear-gradient(135deg, #ffffff 60%, #fff9db 100%); }
+.choice-color-3 { border-color: #a29bfe; background: linear-gradient(135deg, #ffffff 60%, #f3f0ff 100%); }
+
+.choice-emoji { font-size: 28px; flex-shrink: 0; }
+.choice-text-col { display: flex; flex-direction: column; align-items: flex-start; }
+.choice-name { font-size: 17px; font-weight: 900; color: #2f3542; line-height: 1.1; }
+.choice-kana { font-size: 11px; font-weight: 800; color: #747d8c; }
+.choice-mark { font-size: 22px; position: absolute; right: 10px; }
+
+.sil-choice-btn.correct-btn {
+  background: #d4edda !important; border-color: #28a745 !important;
+  box-shadow: 0 0 16px rgba(40, 167, 69, 0.6); transform: scale(1.05);
+}
+.sil-choice-btn.wrong-btn {
+  background: #f8d7da !important; border-color: #dc3545 !important;
+  opacity: 0.6;
+}
+
+.sil-clear-modal {
+  position: absolute; inset: 0; background: rgba(0, 0, 0, 0.75);
+  display: none; align-items: center; justify-content: center; z-index: 60;
+  border-radius: 20px; backdrop-filter: blur(4px);
+}
+.sil-clear-modal.show { display: flex; }
+.sil-modal-card {
+  background: #ffffff; border-radius: 28px; padding: 28px; text-align: center;
+  max-width: 360px; box-shadow: 0 12px 36px rgba(0,0,0,0.35); border: 5px solid #f1c40f;
+}
+.modal-crown-icon { font-size: 38px; margin-bottom: 8px; }
+.modal-clear-title { font-size: 22px; font-weight: 900; color: #e84118; margin-bottom: 6px; }
+.modal-clear-desc { font-size: 13px; font-weight: 700; color: #57606f; margin-bottom: 12px; }
+.modal-stars-row { font-size: 20px; margin-bottom: 18px; word-break: break-all; }
+
+
+
 
 
 

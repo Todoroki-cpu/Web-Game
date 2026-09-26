@@ -187,6 +187,7 @@ class GameApp {
     this.gamePrincessTarget = new GamePrincessTarget(this);
     this.gamePrincessWord = new GamePrincessWord(this);
     this.gamePrincessDrop = new GamePrincessDrop(this);
+    this.gameAnimalSilhouette = new GameAnimalSilhouette(this);
 
     this.homeCharManager = new CharacterManager('home-character-stage');
 
@@ -214,7 +215,8 @@ class GameApp {
       princess_puzzle: document.getElementById('view-game-princess-puzzle'),
       princess_target: document.getElementById('view-game-princess-target'),
       princess_word: document.getElementById('view-game-princess-word'),
-      princess_drop: document.getElementById('view-game-princess-drop')
+      princess_drop: document.getElementById('view-game-princess-drop'),
+      animal_silhouette: document.getElementById('view-game-animal-silhouette')
     };
 
     this.homeBtn = document.getElementById('home-btn');
@@ -331,6 +333,7 @@ class GameApp {
     bindCard('menu-card-princess-target', 'praise_2', 'princess_target');
     bindCard('menu-card-princess-word', 'praise_3', 'princess_word');
     bindCard('menu-card-princess-drop', 'praise_1', 'princess_drop');
+    bindCard('menu-card-animal-sil', 'praise_1', 'animal_silhouette');
 
     // もう1回遊ぶボタン
     if (this.restartBtn) {
@@ -360,6 +363,7 @@ class GameApp {
         else if (v === 'princess_target') this.gamePrincessTarget.start();
         else if (v === 'princess_word') this.gamePrincessWord.start();
         else if (v === 'princess_drop') this.gamePrincessDrop.start();
+        else if (v === 'animal_silhouette') this.gameAnimalSilhouette.start();
         else this.switchView('home');
       });
     }
@@ -386,6 +390,7 @@ class GameApp {
       clock: 'cat_clock',
       days: 'cat_days',
       seasons: 'cat_seasons',
+      animals: 'cat_numbers',
       princess: 'praise_1'
     };
     if (catVoices[categoryName]) {
@@ -394,6 +399,8 @@ class GameApp {
 
     if (categoryName === 'princess') {
       this.homeCharManager.setCharacter('kitty');
+    } else if (categoryName === 'animals') {
+      this.homeCharManager.setCharacter('melonpan');
     } else if (categoryName === 'hiragana') {
       this.homeCharManager.setCharacter('cinna');
     } else if (categoryName === 'clock') {
@@ -412,6 +419,7 @@ class GameApp {
     this.hideCompleteModal();
     if (this.gamePrincess) this.gamePrincess.stop();
     if (this.gamePrincessDrop) this.gamePrincessDrop.stop();
+    if (this.gameAnimalSilhouette) this.gameAnimalSilhouette.stop();
 
     // 全ビューを非表示
     if (this.viewHome) this.viewHome.classList.remove('active');
@@ -458,6 +466,7 @@ class GameApp {
       else if (viewName === 'princess_target') this.gamePrincessTarget.start();
       else if (viewName === 'princess_word') this.gamePrincessWord.start();
       else if (viewName === 'princess_drop') this.gamePrincessDrop.start();
+      else if (viewName === 'animal_silhouette') this.gameAnimalSilhouette.start();
     }
   }
 
