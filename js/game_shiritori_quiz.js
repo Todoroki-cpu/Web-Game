@@ -176,11 +176,11 @@ class GameShiritoriQuiz {
     this.containerEl.innerHTML = `
       <div class="shiri-quiz-root" id="shiri-quiz-root">
         
-        <!-- 上部ヘッダー -->
+        <!-- 上部ヘッダー（文字を減らし、スターとアイコン中心に） -->
         <header class="shiri-quiz-top-bar">
           <div class="shiri-quiz-title-pill">
-            <span class="quiz-icon">🎴</span>
-            <span class="quiz-title-text">しりとり つなぎゲーム</span>
+            <span class="quiz-icon">🧩</span>
+            <span class="quiz-title-text">しりとり</span>
           </div>
 
           <div class="shiri-quiz-progress-badge">
@@ -192,43 +192,42 @@ class GameShiritoriQuiz {
         <!-- メインステージ -->
         <main class="shiri-quiz-main-stage">
           
-          <!-- 現在の単語＆おしり文字カード -->
-          <div class="shiri-current-card-box" id="shiri-current-card-box">
-            <div class="current-card-header">
-              <span class="current-label">いまの ことば</span>
-              <span class="current-word-title" id="shiri-current-word-text">りんご</span>
+          <!-- 現在の単語＆つなぎ文字エリア（直感的な絵と矢印の繋がり） -->
+          <div class="shiri-target-card" id="shiri-target-card" title="タップでおとをきく">
+            <div class="target-illustration-wrap" id="shiri-current-svg">
+              <!-- 現在の単語イラスト -->
             </div>
 
-            <div class="current-card-body">
-              <div class="current-illustration" id="shiri-current-svg">
-                <!-- 現在の単語イラスト -->
+            <div class="target-connection-row">
+              <!-- 言葉の表記（最後のおしり文字を特大バルーンで強調） -->
+              <div class="target-word-display" id="shiri-target-word-display">
+                <span class="word-body-part" id="shiri-target-prefix">りん</span>
+                <span class="char-bubble-tail pulse-anim" id="shiri-target-tail">ご</span>
               </div>
 
-              <!-- おしり文字の強調バブル -->
-              <div class="shiri-tail-focus-box">
-                <span class="tail-sublabel">おしりの もじ</span>
-                <div class="tail-char-bubble" id="shiri-tail-char-bubble">
-                  <span class="tail-char-glyph" id="shiri-tail-char-text">ご</span>
-                </div>
-              </div>
-            </div>
+              <!-- つなぐ矢印 -->
+              <span class="connect-flow-arrow">➔</span>
 
-            <!-- 音声ヒントバー -->
-            <div class="shiri-question-bubble">
-              <span class="question-voice-icon">📢</span>
-              <span class="question-prompt-text" id="shiri-question-prompt">「ご」から はじまる ことばは どれかな？</span>
-              <button class="icon-btn-mini" id="shiri-prompt-voice-btn" title="もういちど きく">🔊</button>
+              <!-- 次にさがす文字のターゲット枠 -->
+              <div class="target-match-bubble">
+                <span class="match-question-mark" id="shiri-next-target-char">ご</span>
+              </div>
+
+              <!-- 音声リプレイボタン -->
+              <button class="target-voice-btn" id="shiri-prompt-voice-btn" title="もういちど きく">
+                🔊
+              </button>
             </div>
           </div>
 
-          <!-- 3択の選択肢カード群 -->
+          <!-- 3択の選択肢カード（絵を最大化・文字はシンプルに頭文字バルーンを同色マッチ） -->
           <div class="shiri-choices-container" id="shiri-choices-container">
             <!-- 3枚の選択肢カードが動的に生成されます -->
           </div>
 
         </main>
 
-        <!-- 下部：つながったしりとりトレインリボン -->
+        <!-- 下部：つながった絵のトレインリボン（文字をなくして絵だけで直感表示） -->
         <footer class="shiri-bottom-train">
           <div class="train-scroll-track" id="shiri-train-track">
             <!-- つながったカードが順番に連結されます -->
@@ -238,11 +237,10 @@ class GameShiritoriQuiz {
         <!-- 10回達成 クリアモーダル -->
         <div class="shiri-finish-modal" id="shiri-finish-modal">
           <div class="shiri-modal-card pop-in">
-            <div class="finish-crown-icon">👑 🎉 🍎 🦍 🎺 🩲 🐱 🐨</div>
-            <h2 class="finish-modal-title">10かい しりとり かんせい！</h2>
-            <p class="finish-modal-desc">さいごまで ピタッと つながったよ！<br>ことばの たつじんだね！✨</p>
+            <div class="finish-crown-icon">👑 ✨ 🌈 ✨ 👑</div>
+            <h2 class="finish-modal-title">10こ つながったよ！🎉</h2>
             <div class="finish-stars-row">⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐</div>
-            <button class="primary-btn" id="shiri-retry-btn">🔄 もう１かい あそぶ！</button>
+            <button class="primary-btn" id="shiri-retry-btn">🔄 もう１かい</button>
           </div>
         </div>
 
@@ -258,35 +256,48 @@ class GameShiritoriQuiz {
     if (!track) return;
     track.innerHTML = '';
 
+    // 先頭の機関車アイコン
+    const engine = document.createElement('div');
+    engine.className = 'train-car-engine';
+    engine.textContent = '🚂';
+    track.appendChild(engine);
+
     this.historyChain.forEach((item, idx) => {
       const node = document.createElement('div');
       node.className = `train-car-node ${idx === this.historyChain.length - 1 ? 'latest' : ''}`;
+      node.title = item.word;
       node.innerHTML = `
-        <span class="train-node-num">${idx + 1}</span>
         <span class="train-node-emoji">${item.emoji}</span>
-        <span class="train-node-word">${item.word}</span>
       `;
+      // タップでその絵の言葉を発声！
+      node.addEventListener('click', () => {
+        window.soundSystem.playPop();
+        this.speakWord(item.word);
+      });
       track.appendChild(node);
 
       if (idx < this.historyChain.length - 1) {
         const link = document.createElement('span');
         link.className = 'train-connector-arrow';
-        link.textContent = '➡️';
+        link.textContent = '➔';
         track.appendChild(link);
       }
     });
 
     // 最新のカードが見えるようにスクロール
-    track.scrollLeft = track.scrollWidth;
+    setTimeout(() => {
+      track.scrollLeft = track.scrollWidth;
+    }, 50);
   }
 
   bindEvents() {
-    const voiceBtn = document.getElementById('shiri-prompt-voice-btn');
-    if (voiceBtn) {
-      voiceBtn.addEventListener('click', () => {
+    const targetCard = document.getElementById('shiri-target-card');
+    if (targetCard) {
+      targetCard.addEventListener('click', (e) => {
+        // ボタン自体のクリック以外でもカード全体タップで音声
         window.soundSystem.playSparkle();
         if (this.currentWord) {
-          this.speakQuestion(this.currentWord.tail);
+          this.speakQuestion(this.currentWord.word, this.currentWord.tail);
         }
       });
     }
@@ -309,27 +320,28 @@ class GameShiritoriQuiz {
 
     this.isLocked = false;
     const tail = this.currentWord.tail;
+    const word = this.currentWord.word;
 
     // プログレスバー
     const progText = document.getElementById('shiri-quiz-progress-text');
     if (progText) progText.textContent = `${this.currentScore + 1} / ${this.totalGoal}`;
     this.app.updateStamps(this.currentScore, this.totalGoal);
 
-    // 現在の単語表示更新
-    const wordTextEl = document.getElementById('shiri-current-word-text');
-    const tailCharEl = document.getElementById('shiri-tail-char-text');
+    // 言葉の先頭部分と末尾文字に分解（例: "りんご" -> prefix="りん", tail="ご"）
+    const prefix = word.endsWith(tail) ? word.slice(0, word.length - tail.length) : word;
+
+    const prefixEl = document.getElementById('shiri-target-prefix');
+    const tailEl = document.getElementById('shiri-target-tail');
+    const nextCharEl = document.getElementById('shiri-next-target-char');
     const svgEl = document.getElementById('shiri-current-svg');
-    const promptEl = document.getElementById('shiri-question-prompt');
 
-    if (wordTextEl) wordTextEl.textContent = this.currentWord.word;
-    if (tailCharEl) tailCharEl.textContent = tail;
+    if (prefixEl) prefixEl.textContent = prefix;
+    if (tailEl) tailEl.textContent = tail;
+    if (nextCharEl) nextCharEl.textContent = tail;
     if (svgEl) svgEl.innerHTML = this.currentWord.svg();
-    if (promptEl) {
-      promptEl.innerHTML = `「<strong style="color: #ff4757; font-size: 20px;">${tail}</strong>」から はじまる ことばは どれかな？`;
-    }
 
-    // 質問の音声読み上げ
-    this.speakQuestion(tail);
+    // 直感的な短い音声ガイダンス（「りんご！ つぎは 『ご』！」）
+    this.speakQuestion(word, tail);
 
     // 3択の候補カードを生成（正解1個 ＋ ダミー2個）
     this.renderChoices(tail);
@@ -347,7 +359,6 @@ class GameShiritoriQuiz {
     if (correctCandidates.length > 0) {
       correctWord = correctCandidates[Math.floor(Math.random() * correctCandidates.length)];
     } else {
-      // 万が一データベースにない場合はフォールバック生成
       correctWord = this.wordsDb.find(w => w.head === targetHeadChar) || this.wordsDb[0];
     }
 
@@ -363,16 +374,18 @@ class GameShiritoriQuiz {
       const card = document.createElement('div');
       const isCorrect = choice.id === correctWord.id;
       card.className = `shiri-choice-card choice-slot-${idx} pop-in`;
-      card.style.borderColor = choice.theme;
+      
+      // 頭文字と残りの文字に分解（例: "ごりら" -> head="ご", rest="りら"）
+      const rest = choice.word.startsWith(choice.head) ? choice.word.slice(choice.head.length) : '';
 
       card.innerHTML = `
-        <div class="choice-head-badge" style="background: ${choice.theme};">
-          「${choice.head}」
-        </div>
         <div class="choice-illustration">
           ${choice.svg()}
         </div>
-        <div class="choice-word-title">${choice.word}</div>
+        <div class="choice-word-bubble-row">
+          <span class="char-bubble-head ${isCorrect ? 'match-target-glow' : ''}">${choice.head}</span>
+          <span class="char-rest-text">${rest}</span>
+        </div>
         <div class="choice-check-mark" id="choice-mark-${choice.id}"></div>
       `;
 
@@ -386,6 +399,9 @@ class GameShiritoriQuiz {
   }
 
   handleChoiceSelect(selectedWord, isCorrect, cardEl) {
+    // どのカードを押してもまずその絵の名前を発声（聴覚と視覚の直感リンク）
+    this.speakWord(selectedWord.word);
+
     if (isCorrect) {
       // 🎉 大正解！
       this.isLocked = true;
@@ -399,19 +415,13 @@ class GameShiritoriQuiz {
 
       window.soundSystem.playSparkle();
       window.soundSystem.playJewelTone(this.currentScore);
-      this.speakWord(selectedWord.word);
 
       const rect = cardEl.getBoundingClientRect();
       this.app.particles.explode(rect.left + rect.width / 2, rect.top + rect.height / 2, 35);
 
-      const promptEl = document.getElementById('shiri-question-prompt');
-      if (promptEl) {
-        promptEl.innerHTML = `🎉 せいかい！「<strong>${selectedWord.word}</strong>」がつながったよ！✨`;
-      }
-
       setTimeout(() => {
         this.showRound();
-      }, 1300);
+      }, 1200);
 
     } else {
       // ❌ 不正解（やさしく揺れて再挑戦）
@@ -420,11 +430,6 @@ class GameShiritoriQuiz {
       const mark = cardEl.querySelector('.choice-check-mark');
       if (mark) mark.textContent = '❌';
 
-      const promptEl = document.getElementById('shiri-question-prompt');
-      if (promptEl) {
-        promptEl.innerHTML = `⚠️ おしい！「<strong style="color: #ff4757;">${this.currentWord.tail}</strong>」からはじまるカードを えらんでね！`;
-      }
-
       setTimeout(() => {
         cardEl.classList.remove('wrong-shake');
         if (mark) mark.textContent = '';
@@ -432,12 +437,13 @@ class GameShiritoriQuiz {
     }
   }
 
-  speakQuestion(tailChar) {
+  speakQuestion(word, tailChar) {
     if (window.soundSystem.isMuted) return;
     try {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(`「${tailChar}」から はじまる ことばは どれかな？`);
+        // 直感的に伝わるシンプルなリズム発声: 「りんご！ つぎは 『ご』！」
+        const utter = new SpeechSynthesisUtterance(`${word}！ つぎは、${tailChar}！`);
         utter.lang = 'ja-JP';
         utter.rate = 1.0;
         utter.pitch = 1.35;

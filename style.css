@@ -2707,118 +2707,148 @@ html, body {
 
 /* ==========================================================================
    26. しりとり つなぎゲーム (Shiritori Connect Game)
-   3択カード選択 ＆ 10回連続連結
+   直感的な絵と文字バルーンマッチング ＆ トレイン連結
    ========================================================================== */
 .shiri-quiz-root {
   display: flex; flex-direction: column; width: 100%; height: 100%;
-  padding: 8px 12px; gap: 8px; box-sizing: border-box; position: relative;
-  background: #fdfaf6; overflow: hidden;
+  padding: 6px 12px; gap: 6px; box-sizing: border-box; position: relative;
+  background: #fbf7f0; overflow: hidden;
 }
 
 .shiri-quiz-top-bar {
   display: flex; align-items: center; justify-content: space-between;
-  background: rgba(255, 255, 255, 0.94); border-radius: 20px; padding: 6px 14px;
-  border: 3px solid #ff7f50; box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 4px 14px;
+  border: 3px solid #ff7f50; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   flex-shrink: 0; z-index: 5;
 }
 .shiri-quiz-title-pill { display: flex; align-items: center; gap: 6px; }
 .quiz-icon { font-size: 22px; }
-.quiz-title-text { font-size: 16.5px; font-weight: 900; color: #2f3542; }
+.quiz-title-text { font-size: 16px; font-weight: 900; color: #2f3542; }
 
 .shiri-quiz-progress-badge {
   display: flex; align-items: center; gap: 4px; background: #fff5eb;
-  padding: 4px 12px; border-radius: 14px; border: 2px solid #ffa502;
+  padding: 3px 12px; border-radius: 14px; border: 2px solid #ffa502;
 }
 .progress-star { font-size: 15px; }
 .progress-text { font-size: 15px; font-weight: 900; color: #e84118; }
 
 .shiri-quiz-main-stage {
   flex: 1; min-height: 0; display: flex; flex-direction: column;
-  align-items: center; justify-content: space-between; gap: 8px;
+  align-items: center; justify-content: space-between; gap: 6px;
   z-index: 3; position: relative;
 }
 
-/* 現在の単語＆おしり文字カード */
-.shiri-current-card-box {
-  width: 100%; max-width: 640px; background: #ffffff;
-  border-radius: 26px; border: 4px solid #ff6b81; padding: 10px 16px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08); display: flex; flex-direction: column;
-  align-items: center; gap: 6px; box-sizing: border-box; flex-shrink: 0;
+/* 現在の単語＆つなぎ文字エリア（直感的な絵と矢印の繋がり） */
+.shiri-target-card {
+  width: 100%; max-width: 620px; background: #ffffff;
+  border-radius: 24px; border: 3.5px solid #ff6b81; padding: 6px 16px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06); display: flex; flex-direction: column;
+  align-items: center; gap: 4px; box-sizing: border-box; flex-shrink: 0;
+  cursor: pointer; transition: transform 0.15s;
 }
-.current-card-header {
-  display: flex; align-items: center; gap: 8px;
-}
-.current-label {
-  font-size: 11px; font-weight: 900; color: #ffffff; background: #ff4757;
-  padding: 2px 8px; border-radius: 8px;
-}
-.current-word-title {
-  font-size: 22px; font-weight: 900; color: #2f3542; letter-spacing: 1px;
-}
+.shiri-target-card:active { transform: scale(0.98); }
 
-.current-card-body {
-  display: flex; align-items: center; justify-content: center; gap: 20px; width: 100%;
-}
-.current-illustration {
-  width: 90px; height: 90px; display: flex; align-items: center; justify-content: center;
+.target-illustration-wrap {
+  width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;
 }
 @media (min-width: 768px) {
-  .current-illustration { width: 110px; height: 110px; }
+  .target-illustration-wrap { width: 95px; height: 95px; }
 }
 
-.shiri-tail-focus-box {
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
+.target-connection-row {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  width: 100%;
 }
-.tail-sublabel { font-size: 11px; font-weight: 900; color: #e84118; }
-.tail-char-bubble {
-  width: 68px; height: 68px; background: linear-gradient(135deg, #ff9ff3, #ff4757);
-  border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  border: 4px solid #ffffff; box-shadow: 0 4px 14px rgba(255, 71, 87, 0.4);
-  animation: tailPulse 1.5s ease-in-out infinite alternate;
-}
-@keyframes tailPulse {
-  0% { transform: scale(0.96); box-shadow: 0 0 6px rgba(255,71,87,0.3); }
-  100% { transform: scale(1.08); box-shadow: 0 0 16px rgba(255,71,87,0.6); }
-}
-.tail-char-glyph { font-size: 36px; font-weight: 900; color: #ffffff; line-height: 1; }
 
-.shiri-question-bubble {
-  display: flex; align-items: center; gap: 6px; background: #fff9db;
-  border: 2px solid #f1c40f; border-radius: 16px; padding: 4px 14px;
+.target-word-display {
+  display: flex; align-items: center; gap: 4px;
 }
-.question-voice-icon { font-size: 18px; }
-.question-prompt-text { font-size: 14px; font-weight: 900; color: #2f3542; }
+.word-body-part {
+  font-size: 22px; font-weight: 900; color: #747d8c;
+}
 
-/* 3択選択肢コンテナ */
+/* おしりの文字バルーン（特大・ぷるぷる強調） */
+.char-bubble-tail {
+  background: linear-gradient(135deg, #ff6b81, #ee5253);
+  color: #ffffff; font-size: 26px; font-weight: 900;
+  width: 44px; height: 44px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 10px rgba(238, 82, 83, 0.4);
+  border: 2px solid #ffffff;
+}
+.pulse-anim {
+  animation: bubblePulse 1.4s infinite ease-in-out alternate;
+}
+@keyframes bubblePulse {
+  0% { transform: scale(0.95); }
+  100% { transform: scale(1.1); box-shadow: 0 0 14px rgba(255, 107, 129, 0.7); }
+}
+
+.connect-flow-arrow {
+  font-size: 22px; color: #ffa502; font-weight: 900;
+  animation: arrowBounce 1.2s infinite ease-in-out alternate;
+}
+@keyframes arrowBounce {
+  0% { transform: translateX(-2px); opacity: 0.6; }
+  100% { transform: translateX(4px); opacity: 1; }
+}
+
+/* 次の文字ターゲット枠 */
+.target-match-bubble {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 3px dashed #ffa502; background: #fff9db;
+  display: flex; align-items: center; justify-content: center;
+}
+.match-question-mark {
+  font-size: 24px; font-weight: 900; color: #e67e22;
+}
+
+.target-voice-btn {
+  background: #fffa65; border: 2px solid #f1c40f; border-radius: 50%;
+  width: 36px; height: 36px; font-size: 16px; cursor: pointer; display: flex;
+  align-items: center; justify-content: center; margin-left: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.target-voice-btn:active { transform: scale(0.9); }
+
+/* 3択選択肢コンテナ（絵を最大化） */
 .shiri-choices-container {
   display: grid; grid-template-columns: repeat(3, 1fr);
   gap: 12px; width: 100%; max-width: 680px; flex: 1; min-height: 0;
   align-items: center; margin: 2px 0;
 }
 .shiri-choice-card {
-  background: #ffffff; border-radius: 24px; border: 4px solid #ced4da;
-  padding: 10px 8px; display: flex; flex-direction: column; align-items: center;
-  justify-content: space-between; box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  background: #ffffff; border-radius: 24px; border: 3.5px solid #e2e8f0;
+  padding: 8px 6px; display: flex; flex-direction: column; align-items: center;
+  justify-content: space-between; box-shadow: 0 6px 16px rgba(0,0,0,0.06);
   cursor: pointer; position: relative; transition: all 0.16s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  height: 100%; max-height: 175px; box-sizing: border-box;
+  height: 100%; max-height: 195px; box-sizing: border-box;
 }
 .shiri-choice-card:active { transform: scale(0.93); }
 
-.choice-head-badge {
-  color: #ffffff; font-size: 12.5px; font-weight: 900;
-  padding: 2px 10px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-}
 .choice-illustration {
-  width: 75px; height: 75px; display: flex; align-items: center; justify-content: center;
+  width: 85px; height: 85px; display: flex; align-items: center; justify-content: center;
+  flex: 1; min-height: 0;
 }
 @media (min-width: 768px) {
-  .choice-illustration { width: 90px; height: 90px; }
+  .choice-illustration { width: 105px; height: 105px; }
 }
-.quiz-card-svg { width: 100%; height: 100%; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); }
+.quiz-card-svg { width: 100%; height: 100%; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.08)); }
 
-.choice-word-title {
-  font-size: 16px; font-weight: 900; color: #2f3542; line-height: 1;
+.choice-word-bubble-row {
+  display: flex; align-items: center; gap: 3px; margin-top: 2px;
 }
+.char-bubble-head {
+  background: #ff6b81; color: #ffffff;
+  font-size: 18px; font-weight: 900;
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 6px rgba(255, 107, 129, 0.3);
+}
+.char-rest-text {
+  font-size: 16px; font-weight: 800; color: #747d8c;
+}
+
 .choice-check-mark {
   position: absolute; top: 6px; right: 8px; font-size: 22px;
 }
@@ -2835,7 +2865,7 @@ html, body {
 /* 下部しりとりトレイン */
 .shiri-bottom-train {
   width: 100%; height: 50px; background: rgba(255, 255, 255, 0.95);
-  border-radius: 18px; border: 2.5px solid #ffa502; box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+  border-radius: 18px; border: 2.5px solid #ffa502; box-shadow: 0 3px 10px rgba(0,0,0,0.05);
   display: flex; align-items: center; padding: 4px 10px; box-sizing: border-box;
   flex-shrink: 0; z-index: 4;
 }
@@ -2845,19 +2875,22 @@ html, body {
 }
 .train-scroll-track::-webkit-scrollbar { display: none; }
 
+.train-car-engine {
+  font-size: 24px; flex-shrink: 0; padding-right: 4px;
+}
 .train-car-node {
-  display: flex; align-items: center; gap: 4px; background: #f1f3f5;
-  border: 2px solid #ced4da; border-radius: 12px; padding: 3px 8px;
-  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: #ffffff; border: 2px solid #e2e8f0; border-radius: 12px;
+  width: 40px; height: 38px; flex-shrink: 0; cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06); transition: transform 0.15s;
 }
+.train-car-node:active { transform: scale(0.9); }
 .train-car-node.latest {
-  background: #ff4757; color: #ffffff; border-color: #ff4757;
-  box-shadow: 0 2px 8px rgba(255,71,87,0.4);
+  background: #fff0f3; border-color: #ff6b81;
+  box-shadow: 0 2px 8px rgba(255, 107, 129, 0.4); transform: scale(1.06);
 }
-.train-node-num { font-size: 9.5px; font-weight: 900; opacity: 0.85; }
-.train-node-emoji { font-size: 14px; }
-.train-node-word { font-size: 12px; font-weight: 800; white-space: nowrap; }
-.train-connector-arrow { font-size: 10px; color: #ff9f43; }
+.train-node-emoji { font-size: 22px; }
+.train-connector-arrow { font-size: 12px; color: #ff9f43; font-weight: 900; }
 
 /* クリアモーダル */
 .shiri-finish-modal {
@@ -2871,10 +2904,9 @@ html, body {
   max-width: 380px; width: 90%; box-shadow: 0 12px 36px rgba(0,0,0,0.35);
   border: 5px solid #f1c40f;
 }
-.finish-crown-icon { font-size: 26px; margin-bottom: 8px; word-break: break-all; }
-.finish-modal-title { font-size: 22px; font-weight: 900; color: #e84118; margin-bottom: 6px; }
-.finish-modal-desc { font-size: 13.5px; font-weight: 700; color: #57606f; margin-bottom: 14px; line-height: 1.5; }
-.finish-stars-row { font-size: 20px; margin-bottom: 18px; }
+.finish-crown-icon { font-size: 28px; margin-bottom: 8px; }
+.finish-modal-title { font-size: 22px; font-weight: 900; color: #e84118; margin-bottom: 8px; }
+.finish-stars-row { font-size: 22px; margin-bottom: 20px; }
 
 
 
