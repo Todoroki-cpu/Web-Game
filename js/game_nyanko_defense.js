@@ -360,9 +360,11 @@ class GameNyankoDefense {
           <div class="master-deck-row">
             <span class="master-deck-label">Units:</span>
             ${deckHtml}
-            <button class="master-upgrade-btn" onclick="window.gameNyankoDefenseInstance.showUpgradeShop()">
-              Upgrade
-            </button>
+            ${(this.saveData.clearedStages || 0) >= 3 ? `
+              <button class="master-upgrade-btn" onclick="window.gameNyankoDefenseInstance.showUpgradeShop()">
+                ⚡ Upgrade
+              </button>
+            ` : ''}
           </div>
 
           <!-- 中央：おさかなエネルギーカプセル -->
@@ -801,14 +803,30 @@ class GameNyankoDefense {
     window.soundSystem.playFanfare();
     this.app.particles.explode(window.innerWidth / 2, window.innerHeight / 2, 120);
 
+    const isLevel3Clear = this.currentStage === 3;
+    let unlockNoticeHtml = '';
+    if (isLevel3Clear || (this.saveData.clearedStages >= 3)) {
+      unlockNoticeHtml = `
+        <div class="result-unlock-box">
+          <div class="unlock-sparkle">✨ ⚡ 👑 ⚡ ✨</div>
+          <div class="unlock-title">【⚡ Upgrade（パワーアップ）】が 解放されたよ！</div>
+          <div class="unlock-desc">集めたコインを使って、にゃんこたちを強化しよう！</div>
+          <button class="upgrade-now-btn" onclick="window.gameNyankoDefenseInstance.showUpgradeShop()">
+            ⚡ いまスグ パワーアップする！
+          </button>
+        </div>
+      `;
+    }
+
     const modal = document.getElementById('master-result-modal');
     const card = document.getElementById('master-modal-card-inner');
     if (modal && card) {
       card.innerHTML = `
         <div class="result-crown-big">👑 ✨ 🎉 ✨ 👑</div>
-        <h2 class="result-headline win">STAGE CLEAR!</h2>
+        <h2 class="result-headline win">STAGE ${this.currentStage} CLEAR!</h2>
         <p class="result-subtext">敵の要塞を 倒したよ！<br>にゃんこ軍団の だいしょうり！</p>
         <div class="result-reward-pill">🪙 ＋50 コイン / 💰 ＋80 ゴールド</div>
+        ${unlockNoticeHtml}
         <div class="result-btn-row">
           <button class="master-modal-btn primary" onclick="window.gameNyankoDefenseInstance.startBattle(${Math.min(5, this.currentStage + 1)})">
             次へ すすむ ➔

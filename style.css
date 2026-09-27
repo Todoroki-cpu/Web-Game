@@ -3884,6 +3884,58 @@ html, body {
   border-radius: 14px;
 }
 
+/* レベル3クリア解放ボックス */
+.result-unlock-box {
+  background: linear-gradient(135deg, #fff3d1 0%, #ffeaa7 100%);
+  border: 3px solid #e67e22;
+  border-radius: 18px;
+  padding: 10px 14px;
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0 6px 16px rgba(230, 126, 34, 0.25);
+  animation: unlockGlowPulse 1.2s infinite alternate;
+}
+
+@keyframes unlockGlowPulse {
+  0% { transform: scale(0.98); box-shadow: 0 0 10px rgba(241, 196, 15, 0.5); }
+  100% { transform: scale(1.02); box-shadow: 0 0 20px rgba(243, 156, 18, 0.8); }
+}
+
+.unlock-sparkle {
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+
+.unlock-title {
+  font-size: 15px;
+  font-weight: 900;
+  color: #d35400;
+  margin-bottom: 2px;
+}
+
+.unlock-desc {
+  font-size: 12px;
+  font-weight: 700;
+  color: #57606f;
+  margin-bottom: 8px;
+}
+
+.upgrade-now-btn {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: 12px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(230, 126, 34, 0.4);
+}
+
+.upgrade-now-btn:active {
+  transform: scale(0.94);
+}
+
 .result-btn-row {
   display: flex;
   gap: 12px;
