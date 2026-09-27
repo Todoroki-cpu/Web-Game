@@ -190,6 +190,7 @@ class GameApp {
     this.gameAnimalSilhouette = new GameAnimalSilhouette(this);
     this.gameShiritoriRhythm = new GameShiritoriRhythm(this);
     this.gameShiritoriQuiz = new GameShiritoriQuiz(this);
+    this.gameNyankoDefense = new GameNyankoDefense(this);
 
     this.homeCharManager = new CharacterManager('home-character-stage');
 
@@ -220,7 +221,8 @@ class GameApp {
       princess_target: document.getElementById('view-game-princess-target'),
       princess_word: document.getElementById('view-game-princess-word'),
       princess_drop: document.getElementById('view-game-princess-drop'),
-      animal_silhouette: document.getElementById('view-game-animal-silhouette')
+      animal_silhouette: document.getElementById('view-game-animal-silhouette'),
+      nyanko_defense: document.getElementById('view-game-nyanko-defense')
     };
 
     this.homeBtn = document.getElementById('home-btn');
@@ -354,6 +356,7 @@ class GameApp {
     bindCard('menu-card-animal-sil', 'praise_1', 'animal_silhouette');
     bindCard('menu-card-shiritori-rhythm', 'cat_hiragana', 'shiritori_rhythm');
     bindCard('menu-card-shiritori-quiz', 'praise_2', 'shiritori_quiz');
+    bindCard('menu-card-nyanko-defense', 'praise_1', 'nyanko_defense');
 
     // もう1回遊ぶボタン
     if (this.restartBtn) {
@@ -378,6 +381,7 @@ class GameApp {
         else if (v === 'hiragana_word') this.gameHiraganaWord.start();
         else if (v === 'shiritori_rhythm') this.gameShiritoriRhythm.start();
         else if (v === 'shiritori_quiz') this.gameShiritoriQuiz.start();
+        else if (v === 'nyanko_defense') this.gameNyankoDefense.start();
         else if (v === 'princess') this.gamePrincess.start();
         else if (v === 'princess_doors') this.gamePrincessDoors.start();
         else if (v === 'princess_runway') this.gamePrincessRunway.start();
@@ -455,6 +459,7 @@ class GameApp {
     if (this.gameAnimalSilhouette) this.gameAnimalSilhouette.stop();
     if (this.gameShiritoriRhythm) this.gameShiritoriRhythm.stop();
     if (this.gameShiritoriQuiz) this.gameShiritoriQuiz.stop();
+    if (this.gameNyankoDefense) this.gameNyankoDefense.stop();
 
     // 全ビューを非表示
     if (this.viewHome) this.viewHome.classList.remove('active');
@@ -496,6 +501,7 @@ class GameApp {
       else if (viewName === 'hiragana_word') this.gameHiraganaWord.start();
       else if (viewName === 'shiritori_rhythm') this.gameShiritoriRhythm.start();
       else if (viewName === 'shiritori_quiz') this.gameShiritoriQuiz.start();
+      else if (viewName === 'nyanko_defense') this.gameNyankoDefense.start();
       else if (viewName === 'princess') this.gamePrincess.start();
       else if (viewName === 'princess_doors') this.gamePrincessDoors.start();
       else if (viewName === 'princess_runway') this.gamePrincessRunway.start();

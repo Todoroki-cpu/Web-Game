@@ -2909,6 +2909,406 @@ html, body {
 .finish-stars-row { font-size: 22px; margin-bottom: 20px; }
 
 
+/* ==========================================================================
+   27. とびだせ！にゃんこ大行進 (Kids Cat Line Defense)
+   iPad横画面フィット ＆ 爽快タワーディフェンス
+   ========================================================================== */
+.nyanko-root {
+  display: flex; flex-direction: column; width: 100%; height: 100%;
+  padding: 6px 10px; gap: 6px; box-sizing: border-box; position: relative;
+  overflow: hidden; touch-action: manipulation; user-select: none;
+}
+
+/* マップ・ステージ選択画面 */
+.nyanko-map-view {
+  background: linear-gradient(180deg, #70a1ff 0%, #a8d5ff 60%, #e4f2ff 100%);
+  justify-content: space-between;
+}
+
+.nyanko-header-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255, 255, 255, 0.95); border-radius: 20px; padding: 6px 14px;
+  border: 3.5px solid #ff9f43; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  flex-shrink: 0; z-index: 5;
+}
+.nyanko-title-pill { display: flex; align-items: center; gap: 8px; }
+.nyanko-main-cat-icon { font-size: 26px; }
+.nyanko-title-text { font-size: 17px; font-weight: 900; color: #2f3542; }
+
+.nyanko-star-box {
+  display: flex; align-items: center; gap: 6px; background: #fff5eb;
+  padding: 4px 10px; border-radius: 14px; border: 2.5px solid #ffa502;
+  cursor: pointer; transition: transform 0.15s;
+}
+.nyanko-star-box:active { transform: scale(0.95); }
+.star-icon { font-size: 18px; }
+.star-count { font-size: 16px; font-weight: 900; color: #e84118; margin-right: 4px; }
+.upgrade-btn-pill {
+  background: linear-gradient(135deg, #f1c40f, #e67e22);
+  color: #ffffff; border: none; border-radius: 10px; padding: 3px 8px;
+  font-size: 11.5px; font-weight: 900; cursor: pointer;
+  box-shadow: 0 2px 6px rgba(230, 126, 34, 0.35);
+}
+
+.nyanko-stage-select-stage {
+  flex: 1; min-height: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 12px; z-index: 3;
+}
+.select-prompt-banner {
+  font-size: 18px; font-weight: 900; color: #ffffff;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.3); margin: 0;
+}
+
+.nyanko-stages-scroll-row {
+  display: flex; align-items: center; gap: 14px; overflow-x: auto;
+  max-width: 95%; padding: 10px 6px; scrollbar-width: none;
+}
+.nyanko-stages-scroll-row::-webkit-scrollbar { display: none; }
+
+.nyanko-stage-card {
+  background: #ffffff; border-radius: 24px; border: 4px solid #ced6e0;
+  width: 140px; height: 165px; display: flex; flex-direction: column;
+  align-items: center; justify-content: space-between; padding: 12px 8px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12); cursor: pointer; flex-shrink: 0;
+  position: relative; transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.nyanko-stage-card.unlocked:active { transform: scale(0.92); }
+.nyanko-stage-card.unlocked {
+  border-color: #ff9f43; background: linear-gradient(180deg, #ffffff 0%, #fff9f0 100%);
+}
+.nyanko-stage-card.cleared {
+  border-color: #2ed573;
+}
+.nyanko-stage-card.locked {
+  opacity: 0.65; filter: grayscale(0.8); cursor: not-allowed;
+}
+
+.stg-badge {
+  font-size: 11px; font-weight: 900; color: #ffffff;
+  background: #ff7675; padding: 2px 8px; border-radius: 8px;
+}
+.nyanko-stage-card.cleared .stg-badge { background: #2ed573; }
+.stg-icon { font-size: 32px; margin: 4px 0; }
+.stg-title {
+  font-size: 13.5px; font-weight: 900; color: #2f3542; margin: 0;
+  text-align: center; line-height: 1.2;
+}
+.stg-lock-mask {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.35);
+  border-radius: 20px; display: flex; align-items: center; justify-content: center;
+  font-size: 32px;
+}
+
+.nyanko-march-footer {
+  height: 50px; background: rgba(255, 255, 255, 0.85); border-radius: 18px;
+  border: 2px solid #70a1ff; display: flex; align-items: center;
+  justify-content: space-around; padding: 0 16px; flex-shrink: 0;
+}
+.march-strip-cat { font-size: 26px; }
+.cat-hop { animation: catHop 1.2s infinite ease-in-out alternate; }
+.cat-hop-1 { animation: catHop 1.0s infinite ease-in-out alternate 0.2s; }
+.cat-hop-2 { animation: catHop 1.4s infinite ease-in-out alternate 0.4s; }
+.cat-hop-3 { animation: catHop 1.1s infinite ease-in-out alternate 0.1s; }
+@keyframes catHop {
+  0% { transform: translateY(2px) scale(0.95); }
+  100% { transform: translateY(-8px) scale(1.05); }
+}
+
+/* パワーアップショップモーダル */
+.nyanko-upgrade-modal-overlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center; z-index: 50;
+  border-radius: 20px; backdrop-filter: blur(4px);
+}
+.nyanko-upgrade-modal-card {
+  background: #ffffff; border-radius: 26px; border: 4.5px solid #ffa502;
+  width: 90%; max-width: 580px; max-height: 85%; display: flex;
+  flex-direction: column; padding: 14px 18px; box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+  box-sizing: border-box; gap: 10px;
+}
+.upgrade-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.upgrade-modal-title { font-size: 18px; font-weight: 900; color: #e67e22; }
+.modal-star-pill {
+  font-size: 15px; font-weight: 900; color: #ffffff;
+  background: #f39c12; padding: 3px 10px; border-radius: 12px;
+}
+.modal-close-x {
+  background: none; border: none; font-size: 20px; cursor: pointer; color: #747d8c;
+}
+
+.upgrade-cards-list {
+  flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;
+  padding-right: 4px;
+}
+.upgrade-item-card {
+  display: flex; align-items: center; gap: 10px; background: #fdfaf6;
+  border: 2px solid #e2e8f0; border-radius: 16px; padding: 8px 12px;
+}
+.upgrade-cat-thumb {
+  width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.upgrade-info-col { flex: 1; min-width: 0; }
+.upgrade-cat-title { font-size: 14px; font-weight: 900; color: #2f3542; }
+.cat-lv-badge {
+  font-size: 11px; background: #ff7675; color: #ffffff; padding: 1px 6px;
+  border-radius: 8px; margin-left: 4px;
+}
+.upgrade-cat-desc { font-size: 11px; font-weight: 700; color: #747d8c; }
+.upgrade-stats-preview { font-size: 11px; font-weight: 900; color: #2ed573; margin-top: 2px; }
+
+.upgrade-action-btn {
+  background: #2ed573; color: #ffffff; border: none; border-radius: 12px;
+  padding: 6px 12px; font-size: 13px; font-weight: 900; cursor: pointer;
+  box-shadow: 0 3px 8px rgba(46, 213, 115, 0.35); flex-shrink: 0;
+}
+.upgrade-action-btn.disabled {
+  background: #cbd5e1; cursor: not-allowed; box-shadow: none;
+}
+.upgrade-action-btn.active:active { transform: scale(0.92); }
+
+/* ==========================================
+   バトル画面
+   ========================================== */
+.nyanko-battle-view {
+  background: linear-gradient(180deg, #74b9ff 0%, #a8d5ff 60%, #c7ecee 100%);
+  justify-content: space-between;
+}
+/* ステージ別背景 */
+.stage-bg-grass { background: linear-gradient(180deg, #74b9ff 0%, #a8e6cf 70%, #dcedc1 100%); }
+.stage-bg-candy { background: linear-gradient(180deg, #ff9ff3 0%, #feca57 70%, #ffcccc 100%); }
+.stage-bg-ocean { background: linear-gradient(180deg, #48dbfb 0%, #0abde3 60%, #10ac84 100%); }
+.stage-bg-sunset { background: linear-gradient(180deg, #ff7675 0%, #fdcb6e 60%, #e17055 100%); }
+.stage-bg-space { background: linear-gradient(180deg, #130f40 0%, #30336b 60%, #535c68 100%); }
+
+/* バトルHUD */
+.nyanko-battle-hud {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255, 255, 255, 0.94); border-radius: 20px; padding: 4px 12px;
+  border: 3px solid #ff9f43; box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  flex-shrink: 0; z-index: 10;
+}
+.nyanko-hud-back-btn {
+  background: #f1f2f6; border: 2px solid #ced6e0; border-radius: 12px;
+  font-size: 18px; width: 36px; height: 36px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* おさかなエネルギーバー */
+.nyanko-fish-gauge-box {
+  display: flex; align-items: center; gap: 6px; background: #fff5eb;
+  padding: 3px 12px; border-radius: 14px; border: 2.5px solid #ffa502;
+}
+.fish-main-icon { font-size: 20px; }
+.fish-slots-row { display: flex; align-items: center; gap: 4px; }
+.fish-can-icon {
+  font-size: 18px; width: 26px; height: 26px; display: flex;
+  align-items: center; justify-content: center; border-radius: 6px;
+  background: rgba(0,0,0,0.04);
+}
+.fish-can-icon.filled {
+  animation: fishPop 0.3s ease-out;
+}
+@keyframes fishPop {
+  0% { transform: scale(0.6); }
+  70% { transform: scale(1.2); }
+  100% { transform: scale(1.0); }
+}
+.fish-num-counter { font-size: 14px; font-weight: 900; color: #e67e22; }
+
+/* にゃんこキャノンボタン */
+.nyanko-cannon-btn {
+  position: relative; background: #57606f; border: 3px solid #ced6e0;
+  border-radius: 16px; width: 95px; height: 38px; cursor: pointer;
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+}
+.cannon-btn-content {
+  position: relative; z-index: 2; display: flex; align-items: center; gap: 4px;
+}
+.cannon-icon { font-size: 16px; }
+.cannon-text { font-size: 12px; font-weight: 900; color: #ffffff; }
+
+.cannon-charge-radial {
+  position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
+  background: linear-gradient(180deg, #f1c40f, #e67e22);
+  z-index: 1; transition: height 0.1s linear;
+}
+.nyanko-cannon-btn.cannon-ready-glow {
+  border-color: #f1c40f; box-shadow: 0 0 16px rgba(241, 196, 15, 0.9);
+  animation: cannonGlow 0.8s infinite alternate;
+}
+@keyframes cannonGlow {
+  0% { transform: scale(0.97); }
+  100% { transform: scale(1.05); }
+}
+
+/* バトルフィールド */
+.nyanko-battlefield {
+  flex: 1; min-height: 0; position: relative; border-radius: 20px;
+  overflow: hidden; border: 3.5px solid #2f3542;
+  display: flex; flex-direction: column; justify-content: flex-end;
+}
+.battlefield-ground-line {
+  position: absolute; bottom: 0; left: 0; width: 100%; height: 26px;
+  background: #2ed573; border-top: 4px solid #2f3542; z-index: 2;
+}
+
+/* 城 */
+.castle-entity {
+  position: absolute; bottom: 24px; z-index: 4;
+  display: flex; flex-direction: column; align-items: center;
+}
+.player-castle-entity { left: 15px; width: 120px; }
+.enemy-castle-entity { right: 15px; width: 120px; }
+
+.castle-hp-bar-wrap { margin-bottom: 4px; }
+.castle-hearts-row { display: flex; gap: 2px; }
+.heart-icon { font-size: 13px; }
+.heart-icon.lost { opacity: 0.25; filter: grayscale(1); }
+
+.castle-svg-wrap { width: 100%; height: 140px; }
+.nyanko-castle-svg { width: 100%; height: 100%; }
+
+.castle-open-door .castle-door-leaf {
+  transform-origin: bottom center;
+  transform: scaleY(0.1);
+  transition: transform 0.2s;
+}
+
+/* ユニットレイヤー */
+.battle-units-layer {
+  position: absolute; inset: 0; pointer-events: none; z-index: 5;
+}
+.battle-unit-sprite {
+  position: absolute; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center;
+  transition: bottom 0.05s linear;
+}
+.player-unit { }
+.enemy-unit { transform: translateX(-50%) scaleX(-1); } /* 敵は左向き */
+
+.unit-svg-box { width: 65px; height: 65px; }
+.titan-cat-svg { width: 95px !important; height: 95px !important; }
+.mecha-boss-svg { width: 90px !important; height: 90px !important; }
+.nyanko-unit-svg { width: 100%; height: 100%; }
+
+.unit-mini-hp-bar {
+  width: 32px; height: 4px; background: rgba(0,0,0,0.3);
+  border-radius: 3px; overflow: hidden; margin-top: -4px;
+}
+.mini-hp-fill { height: 100%; background: #2ed573; }
+.unit-mini-hp-bar.enemy .mini-hp-fill { background: #ff4757; }
+
+.unit-attack-punch {
+  animation: attackWobble 0.25s ease-in-out;
+}
+@keyframes attackWobble {
+  0% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-40%) scale(1.18); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+/* 極太にゃんこビーム */
+.laser-beam-layer {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 6; display: none; align-items: center;
+}
+.laser-beam-layer.active { display: flex; }
+.rainbow-laser-stream {
+  width: 100%; height: 75px;
+  background: linear-gradient(180deg, #ff4757, #ffa502, #2ed573, #1e90ff, #9b59b6);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.9), 0 0 60px rgba(241, 196, 15, 0.8);
+  animation: laserBlast 0.8s ease-out forwards;
+}
+@keyframes laserBlast {
+  0% { transform: scaleY(0.1); opacity: 0.8; }
+  30% { transform: scaleY(1.4); opacity: 1; }
+  100% { transform: scaleY(0.0); opacity: 0; }
+}
+
+/* ポップアップコミックテキスト */
+.battle-fx-layer {
+  position: absolute; inset: 0; pointer-events: none; z-index: 7;
+}
+.pop-comic-text {
+  position: absolute; transform: translateX(-50%);
+  font-size: 16px; font-weight: 900; text-shadow: 0 2px 4px rgba(255,255,255,0.8);
+  pointer-events: none;
+}
+
+/* 下部出撃デッキ（大きなカード） */
+.nyanko-bottom-deck {
+  height: 95px; background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px; border: 3px solid #ffa502; box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  display: flex; align-items: center; padding: 4px 10px; box-sizing: border-box;
+  flex-shrink: 0; z-index: 8;
+}
+.deck-cards-grid {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px;
+  width: 100%; height: 100%;
+}
+.nyanko-deck-card {
+  background: #f1f2f6; border-radius: 16px; border: 3px solid #ced6e0;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: space-between; padding: 4px 2px; position: relative;
+  cursor: pointer; overflow: hidden; transition: all 0.15s;
+}
+.nyanko-deck-card:active { transform: scale(0.92); }
+.nyanko-deck-card.ready-to-spawn {
+  background: #ffffff; border-color: #2ed573;
+  box-shadow: 0 0 10px rgba(46, 213, 115, 0.5); transform: translateY(-2px);
+}
+
+.deck-cat-cost-badge {
+  font-size: 10.5px; font-weight: 900; color: #ffffff;
+  background: #ff7675; padding: 1px 6px; border-radius: 8px; z-index: 2;
+}
+.deck-cat-icon {
+  width: 42px; height: 42px; display: flex; align-items: center;
+  justify-content: center; z-index: 2;
+}
+.deck-cat-name {
+  font-size: 10px; font-weight: 900; color: #2f3542; z-index: 2;
+}
+.deck-cat-cooldown-mask {
+  position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
+  background: rgba(47, 53, 66, 0.6); z-index: 3; pointer-events: none;
+}
+
+/* 勝利・敗北モーダル */
+.nyanko-result-modal {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.75);
+  display: none; align-items: center; justify-content: center; z-index: 60;
+  border-radius: 20px; backdrop-filter: blur(4px);
+}
+.nyanko-result-modal.show { display: flex; }
+.nyanko-result-card {
+  background: #ffffff; border-radius: 28px; padding: 24px 20px; text-align: center;
+  max-width: 380px; width: 90%; box-shadow: 0 12px 36px rgba(0,0,0,0.35);
+  border: 5px solid #f1c40f; display: flex; flex-direction: column;
+  align-items: center; gap: 8px;
+}
+.result-crown-icon { font-size: 32px; }
+.result-title { font-size: 22px; font-weight: 900; margin: 0; }
+.result-title.win { color: #e84118; }
+.result-title.lose { color: #3742fa; }
+.result-desc { font-size: 13px; font-weight: 700; color: #57606f; margin: 0; line-height: 1.4; }
+.result-stars-reward {
+  font-size: 18px; font-weight: 900; color: #f39c12; background: #fff9db;
+  padding: 4px 14px; border-radius: 12px; border: 2px solid #f1c40f;
+}
+.result-action-row {
+  display: flex; gap: 10px; margin-top: 6px; width: 100%;
+}
+.result-action-row .primary-btn { flex: 1; font-size: 13px; padding: 8px 6px; }
+.upgrade-glow-btn {
+  background: linear-gradient(135deg, #f1c40f, #e67e22) !important;
+}
+
+
+
 
 
 
