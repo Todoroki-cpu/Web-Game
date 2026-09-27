@@ -40,63 +40,63 @@ class GameNyankoDefense {
     this.laserActive = false;
     this.laserTimer = 0;
 
-    // 味方にゃんこカタログ（高精細PNGスプライト対応）
+    // 味方にゃんこカタログ（高精細PNGスプライト対応・2倍サイズ）
     this.catRoster = [
       {
         id: 'cat_basic', name: 'Cat', cost: 1, cooldown: 1.5, cdTimer: 0,
-        hp: 6, atk: 1.5, spd: 55, range: 35, atkInterval: 1.0,
+        hp: 6, atk: 1.5, spd: 55, range: 45, atkInterval: 1.0,
         desc: 'しろねこ！ てくてく走る基本のなかま！',
         icon: 'assets/nyanko/sprites/cat_basic_1.png',
         sprites: ['assets/nyanko/sprites/cat_basic_1.png', 'assets/nyanko/sprites/cat_basic_2.png'],
-        width: 60, height: 60
+        width: 120, height: 120
       },
       {
         id: 'cat_hero', name: 'Hero', cost: 2, cooldown: 3.5, cdTimer: 0,
-        hp: 12, atk: 3.2, spd: 65, range: 45, atkInterval: 1.1,
+        hp: 12, atk: 3.2, spd: 65, range: 55, atkInterval: 1.1,
         desc: 'ゆうしゃねこ！ かぶと・マント・ぎんのけん！',
         icon: 'assets/nyanko/sprites/cat_hero_1.png',
         sprites: ['assets/nyanko/sprites/cat_hero_1.png', 'assets/nyanko/sprites/cat_hero_2.png'],
-        width: 70, height: 80
+        width: 140, height: 160
       },
       {
         id: 'cat_tank', name: 'Tank', cost: 3, cooldown: 4.5, cdTimer: 0,
-        hp: 25, atk: 1.2, spd: 38, range: 35, atkInterval: 1.5,
+        hp: 25, atk: 1.2, spd: 38, range: 45, atkInterval: 1.5,
         desc: 'よろいタンク！ キャタピラでみんなをガード！',
         icon: 'assets/nyanko/sprites/cat_tank_1.png',
         sprites: ['assets/nyanko/sprites/cat_tank_1.png', 'assets/nyanko/sprites/cat_tank_2.png'],
-        width: 75, height: 75
+        width: 150, height: 150
       },
       {
         id: 'cat_giraffe', name: 'Giraffe', cost: 3, cooldown: 4.0, cdTimer: 0,
-        hp: 10, atk: 2.2, spd: 110, range: 40, atkInterval: 0.6,
+        hp: 10, atk: 2.2, spd: 110, range: 50, atkInterval: 0.6,
         desc: 'キリン！ もうスピードでつっこむよ！',
         icon: 'assets/nyanko/sprites/cat_giraffe_1.png',
         sprites: ['assets/nyanko/sprites/cat_giraffe_1.png', 'assets/nyanko/sprites/cat_giraffe_2.png'],
-        width: 75, height: 100
+        width: 150, height: 200
       }
     ];
 
-    // 敵キャラカタログ（高精細PNGスプライト対応）
+    // 敵キャラカタログ（高精細PNGスプライト対応・2倍サイズ）
     this.enemyRoster = {
       puppy: {
-        id: 'enemy_puppy', name: 'こいぬ', hp: 6, atk: 1.4, spd: 48, range: 35, atkInterval: 1.2,
+        id: 'enemy_puppy', name: 'こいぬ', hp: 6, atk: 1.4, spd: 48, range: 45, atkInterval: 1.2,
         sprites: ['assets/nyanko/sprites/enemy_puppy_1.png', 'assets/nyanko/sprites/enemy_puppy_2.png'],
-        width: 60, height: 60
+        width: 120, height: 120
       },
       frog: {
-        id: 'enemy_frog', name: 'カエル', hp: 8, atk: 2.2, spd: 60, range: 80, atkInterval: 1.5,
+        id: 'enemy_frog', name: 'カエル', hp: 8, atk: 2.2, spd: 60, range: 90, atkInterval: 1.5,
         sprites: ['assets/nyanko/sprites/enemy_frog_1.png', 'assets/nyanko/sprites/enemy_frog_2.png'],
-        width: 60, height: 70
+        width: 120, height: 140
       },
       pig: {
-        id: 'enemy_pig', name: 'ブタ', hp: 14, atk: 2.8, spd: 85, range: 35, atkInterval: 1.0,
+        id: 'enemy_pig', name: 'ブタ', hp: 14, atk: 2.8, spd: 85, range: 45, atkInterval: 1.0,
         sprites: ['assets/nyanko/sprites/enemy_pig_1.png', 'assets/nyanko/sprites/enemy_pig_2.png'],
-        width: 65, height: 60
+        width: 130, height: 120
       },
       gorilla: {
-        id: 'enemy_gorilla', name: 'ゴリラ', hp: 32, atk: 4.5, spd: 42, range: 45, atkInterval: 1.4,
+        id: 'enemy_gorilla', name: 'ゴリラ', hp: 32, atk: 4.5, spd: 42, range: 55, atkInterval: 1.4,
         sprites: ['assets/nyanko/sprites/enemy_gorilla_1.png', 'assets/nyanko/sprites/enemy_gorilla_2.png'],
-        width: 80, height: 95
+        width: 160, height: 190
       }
     };
 
@@ -739,11 +739,14 @@ class GameNyankoDefense {
 
       html += `
         <div class="master-unit-sprite player ${isAttacking}"
-             style="left: ${u.x / 10}%; bottom: 25px; width: ${u.width}px; height: ${u.height}px;">
-          <img src="${spriteSrc}" alt="${u.name}" class="unit-sprite-img">
+             style="left: ${u.x / 10}%; bottom: 20px; width: ${u.width}px; height: ${u.height}px;">
           <div class="unit-health-indicator">
-            <div class="unit-health-fill" style="width: ${(u.hp / u.maxHp) * 100}%;"></div>
+            <span class="unit-hp-heart">❤️</span>
+            <div class="unit-health-track">
+              <div class="unit-health-fill" style="width: ${(u.hp / u.maxHp) * 100}%;"></div>
+            </div>
           </div>
+          <img src="${spriteSrc}" alt="${u.name}" class="unit-sprite-img">
         </div>
       `;
     });
@@ -755,11 +758,14 @@ class GameNyankoDefense {
 
       html += `
         <div class="master-unit-sprite enemy ${isAttacking}"
-             style="left: ${u.x / 10}%; bottom: 25px; width: ${u.width}px; height: ${u.height}px;">
-          <img src="${spriteSrc}" alt="${u.name}" class="unit-sprite-img flip-x">
+             style="left: ${u.x / 10}%; bottom: 20px; width: ${u.width}px; height: ${u.height}px;">
           <div class="unit-health-indicator enemy">
-            <div class="unit-health-fill" style="width: ${(u.hp / u.maxHp) * 100}%;"></div>
+            <span class="unit-hp-heart">❤️</span>
+            <div class="unit-health-track">
+              <div class="unit-health-fill" style="width: ${(u.hp / u.maxHp) * 100}%;"></div>
+            </div>
           </div>
+          <img src="${spriteSrc}" alt="${u.name}" class="unit-sprite-img flip-x">
         </div>
       `;
     });

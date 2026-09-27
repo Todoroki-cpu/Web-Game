@@ -3445,43 +3445,47 @@ html, body {
 .castle-hp-capsule {
   display: flex;
   align-items: center;
-  gap: 4px;
-  background: rgba(0, 0, 0, 0.65);
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(4px);
-  padding: 3px 8px;
-  border-radius: 12px;
+  padding: 4px 10px;
+  border-radius: 14px;
   margin-bottom: 6px;
-  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  border: 2.5px solid #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .hp-heart {
-  font-size: 13px;
+  font-size: 15px;
 }
 
 .castle-hp-track {
-  width: 90px;
-  height: 10px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 5px;
+  width: 120px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 7px;
   overflow: hidden;
 }
 
 .castle-hp-fill {
   height: 100%;
   transition: width 0.2s ease-out;
+  border-radius: 7px;
 }
 
 .castle-hp-fill.player {
-  background: linear-gradient(90deg, #2ed573, #2ecc71);
+  background: linear-gradient(90deg, #ff4757, #e84118);
+  box-shadow: 0 0 8px rgba(255, 71, 87, 0.8);
 }
 
 .castle-hp-fill.enemy {
-  background: linear-gradient(90deg, #ff4757, #e84118);
+  background: linear-gradient(90deg, #ff4757, #c0392b);
+  box-shadow: 0 0 8px rgba(255, 71, 87, 0.8);
 }
 
 .castle-artwork-wrap {
-  width: 160px;
-  height: 180px;
+  width: 180px;
+  height: 200px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -3529,28 +3533,43 @@ html, body {
 
 @keyframes unitAttackJump {
   0% { transform: translateX(-50%) translateY(0) scale(1); }
-  50% { transform: translateX(-50%) translateY(-12px) scale(1.1); }
+  50% { transform: translateX(-50%) translateY(-14px) scale(1.08); }
   100% { transform: translateX(-50%) translateY(0) scale(1); }
 }
 
+/* ユニットHPゲージ（太い赤色カプセル） */
 .unit-health-indicator {
-  width: 80%;
-  height: 6px;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  margin-bottom: 4px;
+  z-index: 5;
+}
+
+.unit-hp-heart {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.unit-health-track {
+  width: 60px;
+  height: 11px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
   overflow: hidden;
-  margin-bottom: 2px;
-  border: 1px solid rgba(255, 255, 255, 0.7);
 }
 
 .unit-health-fill {
   height: 100%;
-  background: #2ed573;
+  background: linear-gradient(90deg, #ff4757, #e84118);
+  border-radius: 6px;
+  box-shadow: 0 0 6px rgba(255, 71, 87, 0.9);
   transition: width 0.15s;
-}
-
-.unit-health-indicator.enemy .unit-health-fill {
-  background: #ff4757;
 }
 
 /* 必殺レーザーレイヤー */
