@@ -1071,19 +1071,20 @@
 
     function loadCustomMemos() {
       try {
-        const saved = localStorage.getItem('family_calendar_memos_v3');
+        const saved = localStorage.getItem('family_calendar_memos_v4');
         if (saved) return JSON.parse(saved);
       } catch (e) {}
       return {
         2026: ['👶 さくちゃん1歳！4人家族スタート'],
-        2028: ['🎒 うみちゃん 小学校入学式（ランドセル）＆ さくちゃん年少入園'],
+        2027: ['👶 さくちゃん 保育園入園（2歳児クラス）'],
+        2028: ['🎒 うみちゃん 小学校入学式（ランドセル）'],
         2037: ['⚡ W進学！うみちゃん高校入学 ＆ さくちゃん中学校入学'],
         2047: ['🏆 さくちゃん大学卒業！父65歳定年・母還暦60歳！']
       };
     }
 
     function saveCustomMemos() {
-      localStorage.setItem('family_calendar_memos_v3', JSON.stringify(customMemos));
+      localStorage.setItem('family_calendar_memos_v4', JSON.stringify(customMemos));
     }
 
     // ==========================================
@@ -1279,7 +1280,8 @@
         if (y === new Date(familyData.saku.birth).getFullYear()) {
           events.push({ text: '👶 さくちゃん 誕生！✨', type: 'life' });
         }
-        if (sStatus.cohort === 4) events.push({ text: '👶 さく 幼稚園/保育園 入園 (年少)', type: 'enter' });
+        if (sStatus.cohort === 3) events.push({ text: '👶 さく 保育園 入園！(2歳児クラス)', type: 'enter' });
+        if (sStatus.cohort === 4) events.push({ text: '👶 さく 年少 (3歳児クラス)', type: 'enter' });
         if (sStatus.cohort === 6) events.push({ text: '👶 さく 卒園', type: 'grad' });
         if (sStatus.cohort === 7) events.push({ text: '🎒 さく 小学校 入学！', type: 'enter' });
         if (sStatus.cohort === 12) events.push({ text: '👶 さく 小学校 卒業', type: 'grad' });
