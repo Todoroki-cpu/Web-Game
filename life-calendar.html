@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>家族の人生カレンダー - ライフプラン・タイムライン</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-sub: #64748b;
+      --border-color: #e2e8f0;
+      
+      --color-father: #3b82f6;
+      --color-father-bg: #eff6ff;
+      --color-mother: #ec4899;
+      --color-mother-bg: #fdf2f8;
+      --color-umi: #06b6d4;
+      --color-umi-bg: #ecfeff;
+      --color-saku: #f59e0b;
+      --color-saku-bg: #fffbeb;
+      
+      --badge-accent: #8b5cf6;
+      --badge-alert: #ef4444;
+      --badge-success: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'M PLUS Rounded 1c', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding-bottom: 80px;
+    }
+
+    /* ヘッダー */
+    header {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      color: #ffffff;
+      padding: 24px 20px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 20px rgba(79, 70, 229, 0.25);
+    }
+
+    .header-top {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .app-title-group h1 {
+      font-size: 24px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.5px;
+    }
+
+    .app-subtitle {
+      font-size: 13px;
+      opacity: 0.9;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-header {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1.5px solid rgba(255, 255, 255, 0.4);
+      color: #ffffff;
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-header:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    /* 家族プロフィールバー */
+    .family-bar-container {
+      max-width: 1200px;
+      margin: -10px auto 20px;
+      padding: 0 16px;
+      position: relative;
+      z-index: 40;
+    }
+
+    .family-bar {
+      background: var(--card-bg);
+      border-radius: 18px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .member-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1.5px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .member-card.father { background: var(--color-father-bg); border-color: rgba(59, 130, 246, 0.2); }
+    .member-card.mother { background: var(--color-mother-bg); border-color: rgba(236, 72, 153, 0.2); }
+    .member-card.umi { background: var(--color-umi-bg); border-color: rgba(6, 182, 212, 0.2); }
+    .member-card.saku { background: var(--color-saku-bg); border-color: rgba(245, 158, 11, 0.2); }
+
+    .member-avatar {
+      font-size: 32px;
+      width: 48px;
+      height: 48px;
+      background: #ffffff;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      flex-shrink: 0;
+    }
+
+    .member-info h3 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .member-info .current-age {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: rgba(0,0,0,0.06);
+    }
+
+    .member-info p {
+      font-size: 12px;
+      color: var(--text-sub);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* コントロール・フィルターバー */
+    .controls-wrapper {
+      max-width: 1200px;
+      margin: 0 auto 16px;
+      padding: 0 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .view-mode-tabs {
+      display: inline-flex;
+      background: #e2e8f0;
+      padding: 4px;
+      border-radius: 12px;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-sub);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .tab-btn.active {
+      background: #ffffff;
+      color: #4f46e5;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-chip {
+      background: #ffffff;
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-sub);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .filter-chip:hover, .filter-chip.active {
+      border-color: #7c3aed;
+      color: #7c3aed;
+      background: #f5f3ff;
+    }
+
+    /* メインコンテンツ */
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    /* ガントチャート・ステージビュー */
+    .gantt-section {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      border: 1px solid var(--border-color);
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+
+    .gantt-section h2 {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chart-container {
+      min-width: 800px;
+    }
+
+    /* 年表テーブルビュー */
+    .timeline-table-card {
+      background: var(--card-bg);
+      border-radius: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+
+    .table-responsive {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    table.timeline-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .timeline-table th {
+      background: #f1f5f9;
+      color: #475569;
+      font-weight: 800;
+      padding: 12px 14px;
+      border-bottom: 2px solid var(--border-color);
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .timeline-table td {
+      padding: 14px;
+      border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
+    }
+
+    .timeline-table tr:hover {
+      background-color: #f8fafc;
+    }
+
+    .timeline-table tr.current-year-row {
+      background-color: #fdf4ff !important;
+      border-left: 4px solid #c026d3;
+    }
+
+    .timeline-table tr.graduation-year-row {
+      background-color: #fffbeb !important;
+      border-left: 4px solid #f59e0b;
+    }
+
+    /* 列ごとのスタイル */
+    .col-year {
+      min-width: 120px;
+      white-space: nowrap;
+    }
+
+    .year-main {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .year-gengou {
+      font-size: 12px;
+      color: var(--text-sub);
+      font-weight: 700;
+    }
+
+    .badge-current-tag {
+      background: #c026d3;
+      color: #ffffff;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 800;
+    }
+
+    .badge-goal-tag {
+      background: #f59e0b;
+      color: #ffffff;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 800;
+    }
+
+    .col-member {
+      min-width: 150px;
+    }
+
+    .member-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .member-age-pill {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      font-weight: 800;
+    }
+
+    .age-num {
+      font-size: 15px;
+      color: var(--text-main);
+    }
+
+    .school-stage-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 8px;
+      display: inline-block;
+      width: fit-content;
+      margin-top: 2px;
+    }
+
+    /* ステージごとのカラーバッジ */
+    .stage-baby { background: #f1f5f9; color: #64748b; }
+    .stage-kinder { background: #fef3c7; color: #d97706; }
+    .stage-elem { background: #dcfce7; color: #15803d; }
+    .stage-junior { background: #e0e7ff; color: #4338ca; }
+    .stage-high { background: #fce7f3; color: #be185d; }
+    .stage-univ { background: #fed7aa; color: #c2410c; }
+    .stage-adult { background: #ede9fe; color: #6d28d9; }
+    .stage-retire { background: #fee2e2; color: #b91c1c; }
+
+    /* イベントセル */
+    .col-events {
+      min-width: 280px;
+    }
+
+    .event-badges-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .event-pill {
+      font-size: 11.5px;
+      font-weight: 800;
+      padding: 4px 9px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      line-height: 1.3;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .event-pill.milestone-double {
+      background: linear-gradient(135deg, #f43f5e, #fb7185);
+      color: #ffffff;
+      animation: pulseAlert 2s infinite alternate;
+    }
+
+    .event-pill.milestone-enter {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .event-pill.milestone-grad {
+      background: #fdf2f8;
+      color: #be185d;
+      border: 1px solid #fbcfe8;
+    }
+
+    .event-pill.milestone-life {
+      background: #fefce8;
+      color: #a16207;
+      border: 1px solid #fef08a;
+    }
+
+    .event-pill.milestone-parent {
+      background: #f5f3ff;
+      color: #6d28d9;
+      border: 1px solid #ddd6fe;
+    }
+
+    .custom-memo-pill {
+      background: #f8fafc;
+      color: #334155;
+      border: 1px dashed #cbd5e1;
+      cursor: pointer;
+    }
+
+    .btn-add-memo {
+      background: transparent;
+      border: 1px dashed #94a3b8;
+      color: #64748b;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .btn-add-memo:hover {
+      background: #f1f5f9;
+      color: #1e293b;
+      border-color: #64748b;
+    }
+
+    @keyframes pulseAlert {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.03); }
+    }
+
+    /* モーダル */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 900;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-close-btn {
+      background: #f1f5f9;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 800;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+      border-color: #6366f1;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-primary {
+      flex: 1;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #475569;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* 印刷スタイル */
+    @media print {
+      header, .family-bar-container, .controls-wrapper, .btn-add-memo {
+        display: none !important;
+      }
+      body {
+        background: #ffffff;
+        padding: 0;
+      }
+      .main-container {
+        max-width: 100%;
+        padding: 0;
+      }
+      .timeline-table-card {
+        box-shadow: none;
+        border: none;
+      }
+      table.timeline-table th {
+        background: #f1f5f9 !important;
+        color: #000000 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ヘッダー -->
+  <header>
+    <div class="header-top">
+      <div class="app-title-group">
+        <h1>👨‍👩‍👧‍👦 家族の人生カレンダー</h1>
+        <p class="app-subtitle">下の子が大学を卒業するまでの教育・成長・家族のライフプラン年表</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn-header" onclick="openSettingsModal()">
+          ⚙️ 家族設定・誕生日
+        </button>
+        <button class="btn-header" onclick="window.print()">
+          🖨️ 印刷 / PDF
+        </button>
+        <a href="index.html" class="btn-header" style="text-decoration: none;">
+          🎮 ゲーム広場へ
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 家族プロフィールサマリーバー -->
+  <div class="family-bar-container">
+    <div class="family-bar" id="family-summary-bar">
+      <!-- JSで動的レンダリング -->
+    </div>
+  </div>
+
+  <!-- コントロールバー（表示切り替え・絞り込み） -->
+  <div class="controls-wrapper">
+    <div class="view-mode-tabs">
+      <button class="tab-btn active" id="tab-table" onclick="switchView('table')">📋 年表一覧テーブル</button>
+      <button class="tab-btn" id="tab-chart" onclick="switchView('chart')">📊 学校ステージ・ガント</button>
+    </div>
+
+    <div class="filter-group">
+      <span style="font-size: 12px; font-weight: 800; color: var(--text-sub);">表示期間:</span>
+      <button class="filter-chip active" id="filter-all" onclick="setYearFilter('all')">全期間 (誕生〜大学卒業)</button>
+      <button class="filter-chip" id="filter-future" onclick="setYearFilter('future')">現在から先のみ</button>
+      <button class="filter-chip" id="filter-milestone" onclick="setYearFilter('milestone')">✨ 進学・重要イベントのみ</button>
+    </div>
+  </div>
+
+  <!-- メインコンテンツ -->
+  <main class="main-container">
+
+    <!-- ガントチャート / ステージビュー (タブ切り替え) -->
+    <section class="gantt-section" id="gantt-view-section" style="display: none;">
+      <h2>📊 お子さま2人の学校ステージ推移</h2>
+      <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 16px;">
+        幼稚園・小学校・中学校・高校・大学の重なりや、学費ピーク時期（W進学・W在学）が一目でわかります。
+      </p>
+      <div class="chart-container" id="gantt-chart-container">
+        <!-- JSで描画 -->
+      </div>
+    </section>
+
+    <!-- 年表テーブルビュー -->
+    <section class="timeline-table-card" id="table-view-section">
+      <div class="table-responsive">
+        <table class="timeline-table">
+          <thead>
+            <tr>
+              <th class="col-year">西暦 / 和暦 (年度)</th>
+              <th class="col-member" style="color: var(--color-father);">👨 父</th>
+              <th class="col-member" style="color: var(--color-mother);">👩 母</th>
+              <th class="col-member" style="color: var(--color-umi);">👧 うみ</th>
+              <th class="col-member" style="color: var(--color-saku);">👶 さく</th>
+              <th class="col-events">🎉 主な家族イベント・節目・メモ</th>
+            </tr>
+          </thead>
+          <tbody id="timeline-tbody">
+            <!-- JSで動的生成 -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 設定・誕生日編集モーダル -->
+  <div class="modal-backdrop" id="settings-modal">
+    <div class="modal-card">
+      <div class="modal-title">
+        <span>⚙️ 家族情報の編集</span>
+        <button class="modal-close-btn" onclick="closeSettingsModal()">✖</button>
+      </div>
+
+      <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 16px;">
+        生年月日を変更すると、全ての年齢・学年・入学卒業・定年イベントが自動で再計算されます。
+      </p>
+
+      <form id="family-settings-form" onsubmit="saveFamilySettings(event)">
+        <div class="form-group">
+          <label>👨 お父さんの生年月日</label>
+          <input type="date" class="form-control" id="input-father-birth" required>
+        </div>
+
+        <div class="form-group">
+          <label>👩 お母さんの生年月日</label>
+          <input type="date" class="form-control" id="input-mother-birth" required>
+        </div>
+
+        <div class="form-group">
+          <label>👧 うみちゃんの生年月日</label>
+          <input type="date" class="form-control" id="input-umi-birth" required>
+        </div>
+
+        <div class="form-group">
+          <label>👶 さくちゃんの生年月日</label>
+          <input type="date" class="form-control" id="input-saku-birth" required>
+          <span style="font-size: 11px; color: #64748b;">※ 2026年3月11日（または入力ミス等の場合もいつでも変更可能です）</span>
+        </div>
+
+        <div class="form-group">
+          <label>🏢 定年退職の予定年齢（父）</label>
+          <select class="form-control" id="input-retire-age">
+            <option value="60">60歳 定年</option>
+            <option value="65" selected>65歳 定年 (現在主流)</option>
+            <option value="70">70歳 定年</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeSettingsModal()">キャンセル</button>
+          <button type="submit" class="btn-primary">保存して再計算</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- カスタムイベント・メモ追加モーダル -->
+  <div class="modal-backdrop" id="memo-modal">
+    <div class="modal-card">
+      <div class="modal-title">
+        <span id="memo-modal-title">📝 年のメモ・イベント追加</span>
+        <button class="modal-close-btn" onclick="closeMemoModal()">✖</button>
+      </div>
+
+      <form id="memo-form" onsubmit="saveMemo(event)">
+        <input type="hidden" id="memo-year">
+        <div class="form-group">
+          <label>メモ・イベント内容（例：家族旅行、マイホーム購入、車買い替え、習い事など）</label>
+          <input type="text" class="form-control" id="memo-text" placeholder="メモを入力..." required>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" onclick="closeMemoModal()">キャンセル</button>
+          <button type="submit" class="btn-primary">保存する</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // データモデル・初期値
+    // ==========================================
+    const DEFAULT_FAMILY = {
+      father: { name: '父', birth: '1982-11-22', emoji: '👨' },
+      mother: { name: '母', birth: '1987-09-15', emoji: '👩' },
+      umi:    { name: 'うみ', birth: '2021-06-05', emoji: '👧' },
+      // ユーザー入力 "20263/11" を 2026-03-11 と解釈（早生まれ）
+      saku:   { name: 'さく', birth: '2026-03-11', emoji: '👶' },
+      retireAge: 65
+    };
+
+    let familyData = loadFamilyData();
+    let currentView = 'table';
+    let currentFilter = 'all'; // 'all', 'future', 'milestone'
+    let customMemos = loadCustomMemos();
+
+    function loadFamilyData() {
+      try {
+        const saved = localStorage.getItem('family_calendar_config_v1');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.error(e);
+      }
+      return DEFAULT_FAMILY;
+    }
+
+    function saveFamilyConfig(data) {
+      familyData = data;
+      localStorage.setItem('family_calendar_config_v1', JSON.stringify(data));
+    }
+
+    function loadCustomMemos() {
+      try {
+        const saved = localStorage.getItem('family_calendar_memos_v1');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+      return {
+        // デフォルトの楽しい予定サンプル
+        2026: ['👶 さくちゃん誕生の年！'],
+        2027: ['👧 うみちゃん 保育園/幼稚園 年長']
+      };
+    }
+
+    function saveCustomMemos() {
+      localStorage.setItem('family_calendar_memos_v1', JSON.stringify(customMemos));
+    }
+
+    // ==========================================
+    // 日付・年齢・日本の学年計算ロジック
+    // ==========================================
+    // 日本の学校年度：4月2日〜翌年4月1日生まれが同一学年
+    function getSchoolYear(birthDateStr) {
+      const d = new Date(birthDateStr);
+      const y = d.getFullYear();
+      const m = d.getMonth() + 1;
+      const day = d.getDate();
+      // 4月1日以前なら前年度扱い（早生まれ）
+      if (m < 4 || (m === 4 && day === 1)) {
+        return y - 1;
+      }
+      return y;
+    }
+
+    // 和暦変換（令和・平成・昭和）
+    function getWareki(year) {
+      if (year >= 2019) {
+        const r = year - 2018;
+        return `令和${r === 1 ? '元' : r}年`;
+      } else if (year >= 1989) {
+        const h = year - 1988;
+        return `平成${h === 1 ? '元' : h}年`;
+      } else if (year >= 1926) {
+        const s = year - 1925;
+        return `昭和${s === 1 ? '元' : s}年`;
+      }
+      return '';
+    }
+
+    // 指定された年度（4月〜翌年3月）における満年齢と学年・ステージ
+    function getMemberStatusAtFiscalYear(birthDateStr, fiscalYear, isChild = false) {
+      const birth = new Date(birthDateStr);
+      const birthYear = birth.getFullYear();
+      const birthMonth = birth.getMonth() + 1;
+      const birthDay = birth.getDate();
+
+      // その年度の4月1日時点での年齢（学齢）
+      const schoolBirthYear = getSchoolYear(birthDateStr);
+      const gradeAge = fiscalYear - schoolBirthYear;
+
+      // その年度中に迎える満年齢
+      const ageThisYear = fiscalYear - birthYear;
+
+      if (!isChild) {
+        // 親の場合
+        let stage = '';
+        if (ageThisYear >= 70) stage = '古希（70歳）';
+        else if (ageThisYear >= 65) stage = 'シニア期';
+        else if (ageThisYear === 60) stage = '還暦（60歳）';
+        else if (ageThisYear >= 50) stage = '50代';
+        else if (ageThisYear >= 40) stage = '40代';
+        else stage = '30代';
+        return { age: ageThisYear, gradeAge, stage, label: `${ageThisYear}歳` };
+      }
+
+      // 子どもの場合
+      if (gradeAge < 0) {
+        return { age: -1, gradeAge: -1, stage: '誕生前', label: '—', stageClass: 'stage-baby' };
+      } else if (gradeAge === 0) {
+        return { age: 0, gradeAge: 0, stage: '0歳児', label: '0歳 (乳児)', stageClass: 'stage-baby' };
+      } else if (gradeAge === 1) {
+        return { age: 1, gradeAge: 1, stage: '1歳児', label: '1歳 (幼児)', stageClass: 'stage-baby' };
+      } else if (gradeAge === 2) {
+        return { age: 2, gradeAge: 2, stage: '2歳児', label: '2歳 (幼児)', stageClass: 'stage-baby' };
+      } else if (gradeAge === 3) {
+        return { age: 3, gradeAge: 3, stage: '年少 (3歳)', label: '年少 (3歳)', stageClass: 'stage-kinder' };
+      } else if (gradeAge === 4) {
+        return { age: 4, gradeAge: 4, stage: '年中 (4歳)', label: '年中 (4歳)', stageClass: 'stage-kinder' };
+      } else if (gradeAge === 5) {
+        return { age: 5, gradeAge: 5, stage: '年長 (5歳)', label: '年長 (5歳)', stageClass: 'stage-kinder' };
+      } else if (gradeAge >= 6 && gradeAge <= 11) {
+        const grade = gradeAge - 5;
+        return { age: gradeAge, gradeAge, stage: `小${grade}`, label: `小${grade} (${gradeAge}歳)`, stageClass: 'stage-elem' };
+      } else if (gradeAge >= 12 && gradeAge <= 14) {
+        const grade = gradeAge - 11;
+        return { age: gradeAge, gradeAge, stage: `中${grade}`, label: `中${grade} (${gradeAge}歳)`, stageClass: 'stage-junior' };
+      } else if (gradeAge >= 15 && gradeAge <= 17) {
+        const grade = gradeAge - 14;
+        return { age: gradeAge, gradeAge, stage: `高${grade}`, label: `高${grade} (${gradeAge}歳)`, stageClass: 'stage-high' };
+      } else if (gradeAge >= 18 && gradeAge <= 21) {
+        const grade = gradeAge - 17;
+        return { age: gradeAge, gradeAge, stage: `大${grade}`, label: `大${grade} (${gradeAge}歳)`, stageClass: 'stage-univ' };
+      } else if (gradeAge === 22) {
+        return { age: gradeAge, gradeAge, stage: '大4 / 卒業', label: '大4 (22歳 🎓卒業)', stageClass: 'stage-univ' };
+      } else {
+        return { age: gradeAge, gradeAge, stage: '社会人', label: `社会人 (${gradeAge}歳)`, stageClass: 'stage-adult' };
+      }
+    }
+
+    // ==========================================
+    // 描画・更新処理
+    // ==========================================
+    function renderApp() {
+      renderFamilyBar();
+      renderTimelineTable();
+      renderGanttChart();
+    }
+
+    // 家族サマリーバー
+    function renderFamilyBar() {
+      const container = document.getElementById('family-summary-bar');
+      const nowYear = new Date().getFullYear();
+      
+      const members = [
+        { key: 'father', ...familyData.father, isChild: false },
+        { key: 'mother', ...familyData.mother, isChild: false },
+        { key: 'umi',    ...familyData.umi,    isChild: true },
+        { key: 'saku',   ...familyData.saku,   isChild: true }
+      ];
+
+      container.innerHTML = members.map(m => {
+        const birth = new Date(m.birth);
+        const age = nowYear - birth.getFullYear();
+        const status = getMemberStatusAtFiscalYear(m.birth, nowYear, m.isChild);
+        
+        return `
+          <div class="member-card ${m.key}">
+            <div class="member-avatar">${m.emoji}</div>
+            <div class="member-info">
+              <h3>${m.name} <span class="current-age">現在 ${age >= 0 ? age + '歳' : '0歳'}</span></h3>
+              <p>🎂 ${m.birth.replace(/-/g, '/')} 生まれ</p>
+              <p style="font-weight: 800; color: #4338ca; margin-top: 3px;">
+                ${m.isChild ? `📍 現在：${status.label}` : `📍 現在：${status.stage}`}
+              </p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // タイムライン年表
+    function renderTimelineTable() {
+      const tbody = document.getElementById('timeline-tbody');
+      const nowYear = new Date().getFullYear();
+
+      // 開始年：うみちゃん誕生年 (2021) または長子の誕生年
+      const umiBirthYear = new Date(familyData.umi.birth).getFullYear();
+      const sakuSchoolYear = getSchoolYear(familyData.saku.birth);
+      // 下の子（さくちゃん）が大学卒業する年度：sakuSchoolYear + 22年度
+      const sakuGradYear = sakuSchoolYear + 22; // 大学4年生の年度（翌年3月卒業）
+
+      const startYear = Math.min(umiBirthYear, 2021);
+      const endYear = sakuGradYear + 1; // 卒業の翌年社会人1年目まで表示
+
+      let rowsHtml = '';
+
+      for (let y = startYear; y <= endYear; y++) {
+        // フィルタリング判定
+        if (currentFilter === 'future' && y < nowYear) continue;
+
+        const fStatus = getMemberStatusAtFiscalYear(familyData.father.birth, y, false);
+        const mStatus = getMemberStatusAtFiscalYear(familyData.mother.birth, y, false);
+        const uStatus = getMemberStatusAtFiscalYear(familyData.umi.birth, y, true);
+        const sStatus = getMemberStatusAtFiscalYear(familyData.saku.birth, y, true);
+
+        // イベント抽出
+        const events = [];
+
+        // お子さまの進学・卒業・七五三イベント
+        // うみちゃん
+        if (uStatus.gradeAge === 3) events.push({ text: '👧 うみ 幼稚園/保育園 入園 (年少)', type: 'enter' });
+        if (uStatus.gradeAge === 5) events.push({ text: '👧 うみ 卒園', type: 'grad' });
+        if (uStatus.gradeAge === 6) events.push({ text: '🎒 うみ 小学校 入学！', type: 'enter' });
+        if (uStatus.gradeAge === 11) events.push({ text: '👧 うみ 小学校 卒業', type: 'grad' });
+        if (uStatus.gradeAge === 12) events.push({ text: '🏫 うみ 中学校 入学！', type: 'enter' });
+        if (uStatus.gradeAge === 14) events.push({ text: '👧 うみ 中学校 卒業', type: 'grad' });
+        if (uStatus.gradeAge === 15) events.push({ text: '📚 うみ 高校 入学！', type: 'enter' });
+        if (uStatus.gradeAge === 17) events.push({ text: '👧 うみ 高校 卒業', type: 'grad' });
+        if (uStatus.gradeAge === 18) events.push({ text: '🎓 うみ 大学 入学！ & 18歳成人', type: 'enter' });
+        if (uStatus.gradeAge === 22) events.push({ text: '🎉 うみ 大学 卒業！社会人へ', type: 'grad' });
+
+        // さくちゃん
+        if (sStatus.gradeAge === 0 && y === new Date(familyData.saku.birth).getFullYear()) {
+          events.push({ text: '👶 さくちゃん 誕生！✨', type: 'life' });
+        }
+        if (sStatus.gradeAge === 3) events.push({ text: '👶 さく 幼稚園/保育園 入園 (年少)', type: 'enter' });
+        if (sStatus.gradeAge === 5) events.push({ text: '👶 さく 卒園', type: 'grad' });
+        if (sStatus.gradeAge === 6) events.push({ text: '🎒 さく 小学校 入学！', type: 'enter' });
+        if (sStatus.gradeAge === 11) events.push({ text: '👶 さく 小学校 卒業', type: 'grad' });
+        if (sStatus.gradeAge === 12) events.push({ text: '🏫 さく 中学校 入学！', type: 'enter' });
+        if (sStatus.gradeAge === 14) events.push({ text: '👶 さく 中学校 卒業', type: 'grad' });
+        if (sStatus.gradeAge === 15) events.push({ text: '📚 さく 高校 入学！', type: 'enter' });
+        if (sStatus.gradeAge === 17) events.push({ text: '👶 さく 高校 卒業', type: 'grad' });
+        if (sStatus.gradeAge === 18) events.push({ text: '🎓 さく 大学 入学！ & 18歳成人', type: 'enter' });
+        if (sStatus.gradeAge === 22) events.push({ text: '🏆 さく 大学 卒業！【教育完了ゴール達成！】', type: 'grad', isGoal: true });
+
+        // 親のイベント
+        if (fStatus.age === 50) events.push({ text: '👨 父 50歳 節目', type: 'parent' });
+        if (fStatus.age === 60) events.push({ text: '👨 父 還暦（60歳）㊗️', type: 'parent' });
+        if (fStatus.age === familyData.retireAge) events.push({ text: `🏢 父 定年退職（${familyData.retireAge}歳）お疲れ様！`, type: 'parent' });
+        if (fStatus.age === 70) events.push({ text: '👨 父 古希（70歳）㊗️', type: 'parent' });
+
+        if (mStatus.age === 40) events.push({ text: '👩 母 40歳 節目', type: 'parent' });
+        if (mStatus.age === 50) events.push({ text: '👩 母 50歳 節目', type: 'parent' });
+        if (mStatus.age === 60) events.push({ text: '👩 母 還暦（60歳）㊗️', type: 'parent' });
+
+        // W入学・W卒業などのダブル重なりチェック
+        const enterCount = [uStatus, sStatus].filter(s => [6, 12, 15, 18].includes(s.gradeAge)).length;
+        if (enterCount >= 2) {
+          events.unshift({ text: '⚡ W入学！(うみ＆さく 同時進学)', type: 'double' });
+        }
+
+        // 大学生重なり（学費ピーク）
+        const isUmiInUniv = uStatus.gradeAge >= 18 && uStatus.gradeAge <= 22;
+        const isSakuInUniv = sStatus.gradeAge >= 18 && sStatus.gradeAge <= 22;
+        if (isUmiInUniv && isSakuInUniv) {
+          events.push({ text: '💰 2人同時に大学在学中（学費ピーク期）', type: 'double' });
+        }
+
+        // カスタムメモ追加
+        const memos = customMemos[y] || [];
+
+        // マイルストーンフィルター
+        if (currentFilter === 'milestone' && events.length === 0 && memos.length === 0) {
+          continue;
+        }
+
+        const isCurrent = (y === nowYear);
+        const isGoal = (y === sakuGradYear);
+
+        let rowClass = '';
+        if (isCurrent) rowClass = 'current-year-row';
+        if (isGoal) rowClass = 'graduation-year-row';
+
+        rowsHtml += `
+          <tr class="${rowClass}">
+            <!-- 年 / 和暦 -->
+            <td class="col-year">
+              <div class="year-main">
+                ${y}年
+                ${isCurrent ? '<span class="badge-current-tag">現在</span>' : ''}
+                ${isGoal ? '<span class="badge-goal-tag">🎓 大学卒業</span>' : ''}
+              </div>
+              <div class="year-gengou">${getWareki(y)}度</div>
+            </td>
+
+            <!-- 父 -->
+            <td class="col-member">
+              <div class="member-cell">
+                <div class="member-age-pill">
+                  <span class="age-num">${fStatus.age}</span>歳
+                </div>
+                <span class="school-stage-badge ${fStatus.age >= familyData.retireAge ? 'stage-retire' : 'stage-adult'}">
+                  ${fStatus.age >= familyData.retireAge ? '退職・セカンドライフ' : fStatus.stage}
+                </span>
+              </div>
+            </td>
+
+            <!-- 母 -->
+            <td class="col-member">
+              <div class="member-cell">
+                <div class="member-age-pill">
+                  <span class="age-num">${mStatus.age}</span>歳
+                </div>
+                <span class="school-stage-badge stage-adult">${mStatus.stage}</span>
+              </div>
+            </td>
+
+            <!-- うみ -->
+            <td class="col-member">
+              <div class="member-cell">
+                <div class="member-age-pill">
+                  <span class="age-num">${uStatus.gradeAge >= 0 ? uStatus.gradeAge : '—'}</span>${uStatus.gradeAge >= 0 ? '歳' : ''}
+                </div>
+                <span class="school-stage-badge ${uStatus.stageClass}">${uStatus.stage}</span>
+              </div>
+            </td>
+
+            <!-- さく -->
+            <td class="col-member">
+              <div class="member-cell">
+                <div class="member-age-pill">
+                  <span class="age-num">${sStatus.gradeAge >= 0 ? sStatus.gradeAge : '—'}</span>${sStatus.gradeAge >= 0 ? '歳' : ''}
+                </div>
+                <span class="school-stage-badge ${sStatus.stageClass}">${sStatus.stage}</span>
+              </div>
+            </td>
+
+            <!-- イベント・メモ -->
+            <td class="col-events">
+              <div class="event-badges-wrap">
+                ${events.map(ev => {
+                  let cls = 'milestone-life';
+                  if (ev.type === 'enter') cls = 'milestone-enter';
+                  if (ev.type === 'grad') cls = 'milestone-grad';
+                  if (ev.type === 'parent') cls = 'milestone-parent';
+                  if (ev.type === 'double') cls = 'milestone-double';
+                  return `<span class="event-pill ${cls}">${ev.text}</span>`;
+                }).join('')}
+
+                ${memos.map(memo => `
+                  <span class="event-pill custom-memo-pill" onclick="editMemo(${y})">📌 ${memo}</span>
+                `).join('')}
+
+                <button class="btn-add-memo" onclick="openMemoModal(${y})">
+                  ＋ メモ追加
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+
+      tbody.innerHTML = rowsHtml;
+    }
+
+    // ガントチャート・学校ステージ推移ビュー
+    function renderGanttChart() {
+      const container = document.getElementById('gantt-chart-container');
+      const nowYear = new Date().getFullYear();
+      const umiBirthYear = new Date(familyData.umi.birth).getFullYear();
+      const sakuSchoolYear = getSchoolYear(familyData.saku.birth);
+      const sakuGradYear = sakuSchoolYear + 22;
+
+      const years = [];
+      for (let y = umiBirthYear; y <= sakuGradYear; y++) {
+        years.push(y);
+      }
+
+      let html = `
+        <div style="display: grid; grid-template-columns: 100px repeat(${years.length}, minmax(42px, 1fr)); gap: 2px; align-items: center; font-size: 11px; text-align: center;">
+          <!-- 年ヘッダー -->
+          <div style="font-weight: 800; text-align: left; padding: 4px;">西暦</div>
+          ${years.map(y => `
+            <div style="font-weight: 800; background: ${y === nowYear ? '#c026d3' : '#f1f5f9'}; color: ${y === nowYear ? '#fff' : '#475569'}; border-radius: 4px; padding: 4px 2px;">
+              ${String(y).slice(2)}
+            </div>
+          `).join('')}
+
+          <!-- うみちゃん行 -->
+          <div style="font-weight: 800; text-align: left; padding: 6px 4px; color: var(--color-umi);">👧 うみ</div>
+          ${years.map(y => {
+            const st = getMemberStatusAtFiscalYear(familyData.umi.birth, y, true);
+            let bg = '#f8fafc';
+            let text = st.stage;
+            if (st.stageClass === 'stage-kinder') bg = '#fef3c7';
+            if (st.stageClass === 'stage-elem') bg = '#dcfce7';
+            if (st.stageClass === 'stage-junior') bg = '#e0e7ff';
+            if (st.stageClass === 'stage-high') bg = '#fce7f3';
+            if (st.stageClass === 'stage-univ') bg = '#fed7aa';
+            if (st.stage === '誕生前') { bg = '#f1f5f9'; text = ''; }
+            return `
+              <div style="background: ${bg}; padding: 6px 2px; border-radius: 4px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="うみ: ${st.label}">
+                ${text}
+              </div>
+            `;
+          }).join('')}
+
+          <!-- さくちゃん行 -->
+          <div style="font-weight: 800; text-align: left; padding: 6px 4px; color: var(--color-saku);">👶 さく</div>
+          ${years.map(y => {
+            const st = getMemberStatusAtFiscalYear(familyData.saku.birth, y, true);
+            let bg = '#f8fafc';
+            let text = st.stage;
+            if (st.stageClass === 'stage-kinder') bg = '#fef3c7';
+            if (st.stageClass === 'stage-elem') bg = '#dcfce7';
+            if (st.stageClass === 'stage-junior') bg = '#e0e7ff';
+            if (st.stageClass === 'stage-high') bg = '#fce7f3';
+            if (st.stageClass === 'stage-univ') bg = '#fed7aa';
+            if (st.stage === '誕生前') { bg = '#f1f5f9'; text = ''; }
+            return `
+              <div style="background: ${bg}; padding: 6px 2px; border-radius: 4px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="さく: ${st.label}">
+                ${text}
+              </div>
+            `;
+          }).join('')}
+
+          <!-- 父の年齢行 -->
+          <div style="font-weight: 800; text-align: left; padding: 6px 4px; color: var(--color-father);">👨 父 年齢</div>
+          ${years.map(y => {
+            const st = getMemberStatusAtFiscalYear(familyData.father.birth, y, false);
+            const isRetire = st.age >= familyData.retireAge;
+            return `
+              <div style="background: ${isRetire ? '#fee2e2' : '#eff6ff'}; padding: 4px 2px; border-radius: 4px; font-weight: 700; color: ${isRetire ? '#b91c1c' : '#1e40af'};">
+                ${st.age}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    // ==========================================
+    // UIインタラクション（タブ・フィルター）
+    // ==========================================
+    function switchView(view) {
+      currentView = view;
+      document.getElementById('tab-table').classList.toggle('active', view === 'table');
+      document.getElementById('tab-chart').classList.toggle('active', view === 'chart');
+
+      document.getElementById('table-view-section').style.display = view === 'table' ? 'block' : 'none';
+      document.getElementById('gantt-view-section').style.display = view === 'chart' ? 'block' : 'none';
+    }
+
+    function setYearFilter(filter) {
+      currentFilter = filter;
+      document.getElementById('filter-all').classList.toggle('active', filter === 'all');
+      document.getElementById('filter-future').classList.toggle('active', filter === 'future');
+      document.getElementById('filter-milestone').classList.toggle('active', filter === 'milestone');
+      renderTimelineTable();
+    }
+
+    // 設定モーダル
+    function openSettingsModal() {
+      document.getElementById('input-father-birth').value = familyData.father.birth;
+      document.getElementById('input-mother-birth').value = familyData.mother.birth;
+      document.getElementById('input-umi-birth').value = familyData.umi.birth;
+      document.getElementById('input-saku-birth').value = familyData.saku.birth;
+      document.getElementById('input-retire-age').value = familyData.retireAge || 65;
+      document.getElementById('settings-modal').classList.add('show');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settings-modal').classList.remove('show');
+    }
+
+    function saveFamilySettings(e) {
+      e.preventDefault();
+      const updated = {
+        ...familyData,
+        father: { ...familyData.father, birth: document.getElementById('input-father-birth').value },
+        mother: { ...familyData.mother, birth: document.getElementById('input-mother-birth').value },
+        umi:    { ...familyData.umi,    birth: document.getElementById('input-umi-birth').value },
+        saku:   { ...familyData.saku,   birth: document.getElementById('input-saku-birth').value },
+        retireAge: parseInt(document.getElementById('input-retire-age').value, 10)
+      };
+      saveFamilyConfig(updated);
+      closeSettingsModal();
+      renderApp();
+    }
+
+    // メモモーダル
+    function openMemoModal(year) {
+      document.getElementById('memo-year').value = year;
+      document.getElementById('memo-modal-title').textContent = `📝 ${year}年のメモ・イベント追加`;
+      document.getElementById('memo-text').value = '';
+      document.getElementById('memo-modal').classList.add('show');
+    }
+
+    function closeMemoModal() {
+      document.getElementById('memo-modal').classList.remove('show');
+    }
+
+    function saveMemo(e) {
+      e.preventDefault();
+      const year = document.getElementById('memo-year').value;
+      const text = document.getElementById('memo-text').value.trim();
+      if (!text) return;
+
+      if (!customMemos[year]) customMemos[year] = [];
+      customMemos[year].push(text);
+      saveCustomMemos();
+      closeMemoModal();
+      renderTimelineTable();
+    }
+
+    function editMemo(year) {
+      const memos = customMemos[year] || [];
+      if (memos.length === 0) return;
+      const joined = memos.join('\n');
+      const updated = prompt(`${year}年のメモを編集（改行で複数、空にしてOKで全削除）:`, joined);
+      if (updated !== null) {
+        if (updated.trim() === '') {
+          delete customMemos[year];
+        } else {
+          customMemos[year] = updated.split('\n').map(s => s.trim()).filter(Boolean);
+        }
+        saveCustomMemos();
+        renderTimelineTable();
+      }
+    }
+
+    // 初期化
+    window.addEventListener('DOMContentLoaded', () => {
+      renderApp();
+    });
+  </script>
+</body>
+</html>
