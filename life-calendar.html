@@ -111,7 +111,7 @@
     /* 家族プロフィールバー */
     .family-bar-container {
       max-width: 1200px;
-      margin: -10px auto 20px;
+      margin: -10px auto 16px;
       padding: 0 16px;
       position: relative;
       z-index: 40;
@@ -178,6 +178,116 @@
       color: var(--text-sub);
       font-weight: 600;
       margin-top: 2px;
+    }
+
+    /* 📸 節目アルバムカルーセルセクション */
+    .album-section {
+      max-width: 1200px;
+      margin: 0 auto 20px;
+      padding: 0 16px;
+    }
+
+    .album-card-wrap {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 16px 20px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+    }
+
+    .album-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .album-header h2 {
+      font-size: 16px;
+      font-weight: 900;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .album-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+
+    .photo-card {
+      background: #f8fafc;
+      border: 1.5px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .photo-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.09);
+      border-color: #6366f1;
+    }
+
+    .photo-thumb-container {
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+      position: relative;
+      background: #e2e8f0;
+    }
+
+    .photo-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 25%;
+      transition: transform 0.4s ease;
+    }
+
+    .photo-card:hover .photo-thumb-img {
+      transform: scale(1.05);
+    }
+
+    .photo-year-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(4px);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .photo-info {
+      padding: 10px 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .photo-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 4px;
+    }
+
+    .photo-desc {
+      font-size: 11.5px;
+      color: #64748b;
+      font-weight: 600;
+      line-height: 1.4;
     }
 
     /* コントロール・フィルターバー */
@@ -466,6 +576,28 @@
       border: 1px solid #ddd6fe;
     }
 
+    /* 写真付きイベントバッジ */
+    .btn-photo-link {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #ffffff;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .btn-photo-link:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4);
+    }
+
     .custom-memo-pill {
       background: #f8fafc;
       color: #334155;
@@ -502,8 +634,8 @@
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(5px);
       z-index: 100;
       display: none;
       align-items: center;
@@ -526,6 +658,58 @@
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }
 
+    /* 写真ライトボックス専用モーダル */
+    .modal-photo-card {
+      max-width: 680px;
+      padding: 16px;
+      text-align: center;
+      background: #ffffff;
+      border-radius: 24px;
+    }
+
+    .modal-photo-img-wrap {
+      width: 100%;
+      max-height: 60vh;
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 14px;
+      background: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-photo-img {
+      max-width: 100%;
+      max-height: 60vh;
+      object-fit: contain;
+    }
+
+    .modal-photo-caption {
+      text-align: left;
+      padding: 0 8px;
+    }
+
+    .modal-photo-year {
+      font-size: 13px;
+      font-weight: 900;
+      color: #6366f1;
+      margin-bottom: 2px;
+    }
+
+    .modal-photo-title {
+      font-size: 18px;
+      font-weight: 900;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+
+    .modal-photo-story {
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.6;
+    }
+
     .modal-title {
       font-size: 18px;
       font-weight: 900;
@@ -546,6 +730,11 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .modal-close-btn:hover {
+      background: #e2e8f0;
     }
 
     .form-group {
@@ -606,7 +795,7 @@
 
     /* 印刷スタイル */
     @media print {
-      header, .family-bar-container, .controls-wrapper, .btn-add-memo {
+      header, .family-bar-container, .controls-wrapper, .btn-add-memo, .album-section, .btn-photo-link {
         display: none !important;
       }
       body {
@@ -657,6 +846,19 @@
       <!-- JSで動的レンダリング -->
     </div>
   </div>
+
+  <!-- 📸 節目アルバムカルーセルセクション -->
+  <section class="album-section">
+    <div class="album-card-wrap">
+      <div class="album-header">
+        <h2>📸 家族のあゆみ・節目アルバム</h2>
+        <span style="font-size: 12px; color: var(--text-sub); font-weight: 700;">タップして拡大・ストーリーを表示</span>
+      </div>
+      <div class="album-grid" id="album-grid-container">
+        <!-- JSで動的レンダリング -->
+      </div>
+    </div>
+  </section>
 
   <!-- コントロールバー（表示切り替え・絞り込み） -->
   <div class="controls-wrapper">
@@ -710,6 +912,23 @@
 
   </main>
 
+  <!-- 📸 写真拡大ライトボックスモーダル -->
+  <div class="modal-backdrop" id="photo-modal" onclick="closePhotoModal(event)">
+    <div class="modal-card modal-photo-card" onclick="event.stopPropagation()">
+      <div class="modal-title" style="margin-bottom: 8px;">
+        <span id="photo-modal-badge" style="font-size: 13px; color: #6366f1;"></span>
+        <button class="modal-close-btn" onclick="closePhotoModal()">✖</button>
+      </div>
+      <div class="modal-photo-img-wrap">
+        <img id="photo-modal-img" src="" alt="家族写真" class="modal-photo-img">
+      </div>
+      <div class="modal-photo-caption">
+        <h3 id="photo-modal-title" class="modal-photo-title"></h3>
+        <p id="photo-modal-story" class="modal-photo-story"></p>
+      </div>
+    </div>
+  </div>
+
   <!-- 設定・誕生日編集モーダル -->
   <div class="modal-backdrop" id="settings-modal">
     <div class="modal-card">
@@ -741,7 +960,6 @@
         <div class="form-group">
           <label>👶 さくちゃんの生年月日</label>
           <input type="date" class="form-control" id="input-saku-birth" required>
-          <span style="font-size: 11px; color: #64748b;">※ 2026年3月11日（または入力ミス等の場合もいつでも変更可能です）</span>
         </div>
 
         <div class="form-group">
@@ -789,12 +1007,47 @@
     // ==========================================
     const DEFAULT_FAMILY = {
       father: { name: '父', birth: '1982-11-22', emoji: '👨' },
-      mother: { name: '母', birth: '1987-09-15', emoji: '👩' },
+      mother: { name: '母', birth: '1987-09-18', emoji: '👩' }, // 母 1987/9/18
       umi:    { name: 'うみ', birth: '2021-06-05', emoji: '👧' },
-      // ユーザー入力 "20263/11" を 2026-03-11 と解釈（早生まれ）
       saku:   { name: 'さく', birth: '2026-03-11', emoji: '👶' },
       retireAge: 65
     };
+
+    // 節目の家族写真ギャラリーデータ
+    const MILESTONE_PHOTOS = [
+      {
+        id: 'photo_2026',
+        year: 2026,
+        title: '2026年：さくちゃん誕生！4人家族のスタート',
+        src: 'assets/family/family_current_2026.png',
+        desc: '父44歳・母39歳・うみ5歳・さく0歳',
+        story: 'さくちゃんが生まれ、4人家族の新しい毎日が始まった記念のリビング写真。うみちゃんもお姉ちゃんとして寄り添い、温かな笑顔に包まれています。'
+      },
+      {
+        id: 'photo_2028',
+        year: 2028,
+        title: '2028年：うみちゃん小学校入学式！',
+        src: 'assets/family/milestone_2028_elementary.jpg',
+        desc: '父46歳・母41歳・うみ7歳（小1）・さく2歳',
+        story: '春の桜並木の下、ピカピカの赤いランドセルを背負ったうみちゃんの入学式。2歳になったさくちゃんがちょこんと手をつなぎ、見守る両親の晴れやかな笑顔です。'
+      },
+      {
+        id: 'photo_2038',
+        year: 2038,
+        title: '2038年：さくちゃん中学入学 ＆ うみちゃん高校生',
+        src: 'assets/family/milestone_2038_juniorhigh.jpg',
+        desc: '父56歳・母51歳・うみ17歳（高2）・さく12歳（中1）',
+        story: '制服のブレザーを着たさくちゃんの中学校入学。高校生になりすっかり大人びたお姉ちゃんのうみちゃんと、ロマンスグレーの髪になったお父さん、優しく微笑むお母さん。'
+      },
+      {
+        id: 'photo_2048',
+        year: 2048,
+        title: '2048年：さくちゃん大学卒業式 ＆ 父定年退職 ＆ 母還暦！',
+        src: 'assets/family/milestone_2048_graduation.jpg',
+        desc: '父65歳（定年退職）・母60歳（還暦）・うみ27歳（社会人）・さく22歳（大4卒業）',
+        story: 'さくちゃんが大学を卒業し、家族の教育目標を見事に達成した感動の日！お父さんの65歳定年退職と、お母さんの赤いスカーフをまとった還暦（60歳）の節目が重なる、家族最高のお祝い記念写真です。'
+      }
+    ];
 
     let familyData = loadFamilyData();
     let currentView = 'table';
@@ -803,7 +1056,7 @@
 
     function loadFamilyData() {
       try {
-        const saved = localStorage.getItem('family_calendar_config_v1');
+        const saved = localStorage.getItem('family_calendar_config_v2');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.error(e);
@@ -813,42 +1066,40 @@
 
     function saveFamilyConfig(data) {
       familyData = data;
-      localStorage.setItem('family_calendar_config_v1', JSON.stringify(data));
+      localStorage.setItem('family_calendar_config_v2', JSON.stringify(data));
     }
 
     function loadCustomMemos() {
       try {
-        const saved = localStorage.getItem('family_calendar_memos_v1');
+        const saved = localStorage.getItem('family_calendar_memos_v2');
         if (saved) return JSON.parse(saved);
       } catch (e) {}
       return {
-        // デフォルトの楽しい予定サンプル
-        2026: ['👶 さくちゃん誕生の年！'],
-        2027: ['👧 うみちゃん 保育園/幼稚園 年長']
+        2026: ['👶 さくちゃん誕生の年！4人家族スタート'],
+        2028: ['🎒 うみちゃん 小学校入学式（ランドセル）'],
+        2038: ['🏫 さくちゃん 中学校入学式'],
+        2048: ['🏆 さくちゃん大学卒業！父65歳定年・母還暦60歳！']
       };
     }
 
     function saveCustomMemos() {
-      localStorage.setItem('family_calendar_memos_v1', JSON.stringify(customMemos));
+      localStorage.setItem('family_calendar_memos_v2', JSON.stringify(customMemos));
     }
 
     // ==========================================
     // 日付・年齢・日本の学年計算ロジック
     // ==========================================
-    // 日本の学校年度：4月2日〜翌年4月1日生まれが同一学年
     function getSchoolYear(birthDateStr) {
       const d = new Date(birthDateStr);
       const y = d.getFullYear();
       const m = d.getMonth() + 1;
       const day = d.getDate();
-      // 4月1日以前なら前年度扱い（早生まれ）
       if (m < 4 || (m === 4 && day === 1)) {
         return y - 1;
       }
       return y;
     }
 
-    // 和暦変換（令和・平成・昭和）
     function getWareki(year) {
       if (year >= 2019) {
         const r = year - 2018;
@@ -863,25 +1114,18 @@
       return '';
     }
 
-    // 指定された年度（4月〜翌年3月）における満年齢と学年・ステージ
     function getMemberStatusAtFiscalYear(birthDateStr, fiscalYear, isChild = false) {
       const birth = new Date(birthDateStr);
       const birthYear = birth.getFullYear();
-      const birthMonth = birth.getMonth() + 1;
-      const birthDay = birth.getDate();
 
-      // その年度の4月1日時点での年齢（学齢）
       const schoolBirthYear = getSchoolYear(birthDateStr);
       const gradeAge = fiscalYear - schoolBirthYear;
-
-      // その年度中に迎える満年齢
       const ageThisYear = fiscalYear - birthYear;
 
       if (!isChild) {
-        // 親の場合
         let stage = '';
         if (ageThisYear >= 70) stage = '古希（70歳）';
-        else if (ageThisYear >= 65) stage = 'シニア期';
+        else if (ageThisYear >= 65) stage = 'シニア期（定年）';
         else if (ageThisYear === 60) stage = '還暦（60歳）';
         else if (ageThisYear >= 50) stage = '50代';
         else if (ageThisYear >= 40) stage = '40代';
@@ -889,7 +1133,6 @@
         return { age: ageThisYear, gradeAge, stage, label: `${ageThisYear}歳` };
       }
 
-      // 子どもの場合
       if (gradeAge < 0) {
         return { age: -1, gradeAge: -1, stage: '誕生前', label: '—', stageClass: 'stage-baby' };
       } else if (gradeAge === 0) {
@@ -928,6 +1171,7 @@
     // ==========================================
     function renderApp() {
       renderFamilyBar();
+      renderAlbumGrid();
       renderTimelineTable();
       renderGanttChart();
     }
@@ -964,24 +1208,40 @@
       }).join('');
     }
 
+    // アルバムグリッド
+    function renderAlbumGrid() {
+      const container = document.getElementById('album-grid-container');
+      if (!container) return;
+
+      container.innerHTML = MILESTONE_PHOTOS.map(p => `
+        <div class="photo-card" onclick="openPhotoModal('${p.id}')">
+          <div class="photo-thumb-container">
+            <img src="${p.src}" alt="${p.title}" class="photo-thumb-img" loading="lazy">
+            <span class="photo-year-badge">${p.year}年</span>
+          </div>
+          <div class="photo-info">
+            <div class="photo-title">${p.title}</div>
+            <div class="photo-desc">${p.desc}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
     // タイムライン年表
     function renderTimelineTable() {
       const tbody = document.getElementById('timeline-tbody');
       const nowYear = new Date().getFullYear();
 
-      // 開始年：うみちゃん誕生年 (2021) または長子の誕生年
       const umiBirthYear = new Date(familyData.umi.birth).getFullYear();
       const sakuSchoolYear = getSchoolYear(familyData.saku.birth);
-      // 下の子（さくちゃん）が大学卒業する年度：sakuSchoolYear + 22年度
-      const sakuGradYear = sakuSchoolYear + 22; // 大学4年生の年度（翌年3月卒業）
+      const sakuGradYear = sakuSchoolYear + 22;
 
       const startYear = Math.min(umiBirthYear, 2021);
-      const endYear = sakuGradYear + 1; // 卒業の翌年社会人1年目まで表示
+      const endYear = sakuGradYear + 1;
 
       let rowsHtml = '';
 
       for (let y = startYear; y <= endYear; y++) {
-        // フィルタリング判定
         if (currentFilter === 'future' && y < nowYear) continue;
 
         const fStatus = getMemberStatusAtFiscalYear(familyData.father.birth, y, false);
@@ -989,11 +1249,12 @@
         const uStatus = getMemberStatusAtFiscalYear(familyData.umi.birth, y, true);
         const sStatus = getMemberStatusAtFiscalYear(familyData.saku.birth, y, true);
 
-        // イベント抽出
         const events = [];
 
-        // お子さまの進学・卒業・七五三イベント
-        // うみちゃん
+        // 写真の有無チェック
+        const photo = MILESTONE_PHOTOS.find(p => p.year === y);
+
+        // イベント抽出
         if (uStatus.gradeAge === 3) events.push({ text: '👧 うみ 幼稚園/保育園 入園 (年少)', type: 'enter' });
         if (uStatus.gradeAge === 5) events.push({ text: '👧 うみ 卒園', type: 'grad' });
         if (uStatus.gradeAge === 6) events.push({ text: '🎒 うみ 小学校 入学！', type: 'enter' });
@@ -1005,7 +1266,6 @@
         if (uStatus.gradeAge === 18) events.push({ text: '🎓 うみ 大学 入学！ & 18歳成人', type: 'enter' });
         if (uStatus.gradeAge === 22) events.push({ text: '🎉 うみ 大学 卒業！社会人へ', type: 'grad' });
 
-        // さくちゃん
         if (sStatus.gradeAge === 0 && y === new Date(familyData.saku.birth).getFullYear()) {
           events.push({ text: '👶 さくちゃん 誕生！✨', type: 'life' });
         }
@@ -1020,7 +1280,6 @@
         if (sStatus.gradeAge === 18) events.push({ text: '🎓 さく 大学 入学！ & 18歳成人', type: 'enter' });
         if (sStatus.gradeAge === 22) events.push({ text: '🏆 さく 大学 卒業！【教育完了ゴール達成！】', type: 'grad', isGoal: true });
 
-        // 親のイベント
         if (fStatus.age === 50) events.push({ text: '👨 父 50歳 節目', type: 'parent' });
         if (fStatus.age === 60) events.push({ text: '👨 父 還暦（60歳）㊗️', type: 'parent' });
         if (fStatus.age === familyData.retireAge) events.push({ text: `🏢 父 定年退職（${familyData.retireAge}歳）お疲れ様！`, type: 'parent' });
@@ -1030,24 +1289,20 @@
         if (mStatus.age === 50) events.push({ text: '👩 母 50歳 節目', type: 'parent' });
         if (mStatus.age === 60) events.push({ text: '👩 母 還暦（60歳）㊗️', type: 'parent' });
 
-        // W入学・W卒業などのダブル重なりチェック
         const enterCount = [uStatus, sStatus].filter(s => [6, 12, 15, 18].includes(s.gradeAge)).length;
         if (enterCount >= 2) {
           events.unshift({ text: '⚡ W入学！(うみ＆さく 同時進学)', type: 'double' });
         }
 
-        // 大学生重なり（学費ピーク）
         const isUmiInUniv = uStatus.gradeAge >= 18 && uStatus.gradeAge <= 22;
         const isSakuInUniv = sStatus.gradeAge >= 18 && sStatus.gradeAge <= 22;
         if (isUmiInUniv && isSakuInUniv) {
           events.push({ text: '💰 2人同時に大学在学中（学費ピーク期）', type: 'double' });
         }
 
-        // カスタムメモ追加
         const memos = customMemos[y] || [];
 
-        // マイルストーンフィルター
-        if (currentFilter === 'milestone' && events.length === 0 && memos.length === 0) {
+        if (currentFilter === 'milestone' && events.length === 0 && memos.length === 0 && !photo) {
           continue;
         }
 
@@ -1060,7 +1315,6 @@
 
         rowsHtml += `
           <tr class="${rowClass}">
-            <!-- 年 / 和暦 -->
             <td class="col-year">
               <div class="year-main">
                 ${y}年
@@ -1070,7 +1324,6 @@
               <div class="year-gengou">${getWareki(y)}度</div>
             </td>
 
-            <!-- 父 -->
             <td class="col-member">
               <div class="member-cell">
                 <div class="member-age-pill">
@@ -1082,7 +1335,6 @@
               </div>
             </td>
 
-            <!-- 母 -->
             <td class="col-member">
               <div class="member-cell">
                 <div class="member-age-pill">
@@ -1092,7 +1344,6 @@
               </div>
             </td>
 
-            <!-- うみ -->
             <td class="col-member">
               <div class="member-cell">
                 <div class="member-age-pill">
@@ -1102,7 +1353,6 @@
               </div>
             </td>
 
-            <!-- さく -->
             <td class="col-member">
               <div class="member-cell">
                 <div class="member-age-pill">
@@ -1112,9 +1362,14 @@
               </div>
             </td>
 
-            <!-- イベント・メモ -->
             <td class="col-events">
               <div class="event-badges-wrap">
+                ${photo ? `
+                  <button class="btn-photo-link" onclick="openPhotoModal('${photo.id}')">
+                    📷 写真を見る (${photo.year}年)
+                  </button>
+                ` : ''}
+
                 ${events.map(ev => {
                   let cls = 'milestone-life';
                   if (ev.type === 'enter') cls = 'milestone-enter';
@@ -1140,7 +1395,7 @@
       tbody.innerHTML = rowsHtml;
     }
 
-    // ガントチャート・学校ステージ推移ビュー
+    // ガントチャート推移ビュー
     function renderGanttChart() {
       const container = document.getElementById('gantt-chart-container');
       const nowYear = new Date().getFullYear();
@@ -1155,7 +1410,6 @@
 
       let html = `
         <div style="display: grid; grid-template-columns: 100px repeat(${years.length}, minmax(42px, 1fr)); gap: 2px; align-items: center; font-size: 11px; text-align: center;">
-          <!-- 年ヘッダー -->
           <div style="font-weight: 800; text-align: left; padding: 4px;">西暦</div>
           ${years.map(y => `
             <div style="font-weight: 800; background: ${y === nowYear ? '#c026d3' : '#f1f5f9'}; color: ${y === nowYear ? '#fff' : '#475569'}; border-radius: 4px; padding: 4px 2px;">
@@ -1163,7 +1417,6 @@
             </div>
           `).join('')}
 
-          <!-- うみちゃん行 -->
           <div style="font-weight: 800; text-align: left; padding: 6px 4px; color: var(--color-umi);">👧 うみ</div>
           ${years.map(y => {
             const st = getMemberStatusAtFiscalYear(familyData.umi.birth, y, true);
@@ -1182,7 +1435,6 @@
             `;
           }).join('')}
 
-          <!-- さくちゃん行 -->
           <div style="font-weight: 800; text-align: left; padding: 6px 4px; color: var(--color-saku);">👶 さく</div>
           ${years.map(y => {
             const st = getMemberStatusAtFiscalYear(familyData.saku.birth, y, true);
@@ -1201,7 +1453,6 @@
             `;
           }).join('')}
 
-          <!-- 父の年齢行 -->
           <div style="font-weight: 800; text-align: left; padding: 6px 4px; color: var(--color-father);">👨 父 年齢</div>
           ${years.map(y => {
             const st = getMemberStatusAtFiscalYear(familyData.father.birth, y, false);
@@ -1219,7 +1470,7 @@
     }
 
     // ==========================================
-    // UIインタラクション（タブ・フィルター）
+    // UIインタラクション（タブ・フィルター・写真）
     // ==========================================
     function switchView(view) {
       currentView = view;
@@ -1236,6 +1487,22 @@
       document.getElementById('filter-future').classList.toggle('active', filter === 'future');
       document.getElementById('filter-milestone').classList.toggle('active', filter === 'milestone');
       renderTimelineTable();
+    }
+
+    // 写真モーダル
+    function openPhotoModal(photoId) {
+      const photo = MILESTONE_PHOTOS.find(p => p.id === photoId);
+      if (!photo) return;
+
+      document.getElementById('photo-modal-badge').textContent = `📅 ${photo.year}年 (${photo.desc})`;
+      document.getElementById('photo-modal-img').src = photo.src;
+      document.getElementById('photo-modal-title').textContent = photo.title;
+      document.getElementById('photo-modal-story').textContent = photo.story;
+      document.getElementById('photo-modal').classList.add('show');
+    }
+
+    function closePhotoModal(e) {
+      document.getElementById('photo-modal').classList.remove('show');
     }
 
     // 設定モーダル
