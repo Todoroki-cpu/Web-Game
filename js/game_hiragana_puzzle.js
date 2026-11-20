@@ -13,8 +13,8 @@
 class GameHiraganaPuzzle {
   constructor(app) {
     this.app = app;
-    this.rows = 6;
-    this.cols = 6;
+    this.rows = 4;
+    this.cols = 4;
     this.round = 0;
     this.maxRounds = 5;
     this.grid = []; // 2D array of { char, jewelType, r, c, isTarget }
@@ -69,13 +69,13 @@ class GameHiraganaPuzzle {
         { word: 'たいよう', emoji: '☀️', hint: 'あさから ポカポカ てらす おひさま' },
         { word: 'にじいろ', emoji: '🌈', hint: 'あめあがりの そらに かかる 7しょくの はし' }
       ],
-      // Stage 5: まほうの プリンセス（4〜5文字 - 大魔法！）
+      // Stage 5: まほうの プリンセス（3〜5文字 - 大魔法！）
       [
-        { word: 'ぷりんせす', emoji: '👑', hint: 'キラキラ ドレスの すてきなおひめさま' },
-        { word: 'ちょうちょ', emoji: '🦋', hint: 'おはなから おはなへ ひらひら まうよ' },
+        { word: 'まほう', emoji: '🪄', hint: 'キラキラ ピカッ！ まほうをとばそう' },
         { word: 'てぃあら', emoji: '💎', hint: 'あたまの うえで ひかる まほうの かんむり' },
-        { word: 'ゆにこーん', emoji: '🦄', hint: 'ツノを もった まほうの しろい おうまさん' },
-        { word: 'きらきら', emoji: '✨', hint: 'ジュエルの まほうが はじけるよ！' }
+        { word: 'きらきら', emoji: '✨', hint: 'ジュエルの まほうが はじけるよ！' },
+        { word: 'にじ', emoji: '🌈', hint: 'おそらに かかる 7しょくの はし' },
+        { word: 'ぷりんせす', emoji: '👑', hint: 'キラキラ ドレスの すてきなおひめさま' }
       ]
     ];
 
@@ -280,52 +280,52 @@ class GameHiraganaPuzzle {
   }
 
   findRandomContinuousPath(length) {
-    const visited = Array(this.rows).fill(null).map(() => Array(this.cols).fill(false));
+    // 複数回試行して自然でランダムな隣接パスを探索
+    for (let attempt = 0; attempt < 40; attempt++) {
+      const visited = Array(this.rows).fill(null).map(() => Array(this.cols).fill(false));
+      const startR = Math.floor(Math.random() * this.rows);
+      const startC = Math.floor(Math.random() * this.cols);
+      const path = [];
 
-    // ランダムなスタート位置
-    const startR = Math.floor(Math.random() * this.rows);
-    const startC = Math.floor(Math.random() * this.cols);
+      const dfs = (r, c, depth) => {
+        path.push({ r, c });
+        visited[r][c] = true;
 
-    const path = [];
+        if (depth === length) return true;
 
-    const dfs = (r, c, depth) => {
-      path.push({ r, c });
-      visited[r][c] = true;
+        // 8方向の移動（縦・横・斜め）をシャッフル
+        const dirs = [
+          [-1, -1], [-1, 0], [-1, 1],
+          [0, -1],           [0, 1],
+          [1, -1],  [1, 0],  [1, 1]
+        ].sort(() => Math.random() - 0.5);
 
-      if (depth === length) return true;
-
-      // 8方向の移動（縦・横・斜め）をシャッフル
-      const dirs = [
-        [-1, -1], [-1, 0], [-1, 1],
-        [0, -1],           [0, 1],
-        [1, -1],  [1, 0],  [1, 1]
-      ].sort(() => Math.random() - 0.5);
-
-      for (const [dr, dc] of dirs) {
-        const nr = r + dr;
-        const nc = c + dc;
-        if (nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols && !visited[nr][nc]) {
-          if (dfs(nr, nc, depth + 1)) return true;
+        for (const [dr, dc] of dirs) {
+          const nr = r + dr;
+          const nc = c + dc;
+          if (nr >= 0 && nr < this.rows && nc >= 0 && nc < this.cols && !visited[nr][nc]) {
+            if (dfs(nr, nc, depth + 1)) return true;
+          }
         }
+
+        visited[r][c] = false;
+        path.pop();
+        return false;
+      };
+
+      if (dfs(startR, startC, 1)) {
+        return path;
       }
-
-      visited[r][c] = false;
-      path.pop();
-      return false;
-    };
-
-    if (dfs(startR, startC, 1)) {
-      return path;
     }
 
-    // もし万が一見つからなければ確実な蛇行パスを返す
-    const fallbackPath = [];
-    let curR = 1;
-    let curC = 1;
-    for (let i = 0; i < length; i++) {
-      fallbackPath.push({ r: curR, c: curC + i });
-    }
-    return fallbackPath;
+    // 確実な4×4ヘビ型フォールバックパス
+    const snake = [
+      { r: 0, c: 0 }, { r: 0, c: 1 }, { r: 0, c: 2 }, { r: 0, c: 3 },
+      { r: 1, c: 3 }, { r: 1, c: 2 }, { r: 1, c: 1 }, { r: 1, c: 0 },
+      { r: 2, c: 0 }, { r: 2, c: 1 }, { r: 2, c: 2 }, { r: 2, c: 3 },
+      { r: 3, c: 3 }, { r: 3, c: 2 }, { r: 3, c: 1 }, { r: 3, c: 0 }
+    ];
+    return snake.slice(0, length);
   }
 
   renderGridCells() {
