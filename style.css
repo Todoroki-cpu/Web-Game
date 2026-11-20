@@ -4036,3 +4036,271 @@ html, body {
 
 
 
+
+/* ==========================================================================
+   ことばの まほうジュエル (Magic Word Jewel Puzzle) - スタイル定義
+   ========================================================================== */
+
+/* メニューカード特別装飾 */
+.card-hiragana-puzzle {
+  background: linear-gradient(135deg, #fff5f8 0%, #f3e8ff 100%) !important;
+  border: 3.5px solid #ff7597 !important;
+  box-shadow: 0 6px 18px rgba(255, 117, 151, 0.25) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-hiragana-puzzle:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 24px rgba(255, 117, 151, 0.4) !important;
+}
+
+.card-badge-special {
+  background: linear-gradient(135deg, #ff4757, #ff6b81) !important;
+  color: #ffffff !important;
+  font-weight: 900 !important;
+  box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4) !important;
+  animation: badgeSparkleGlow 1.5s infinite alternate;
+}
+
+@keyframes badgeSparkleGlow {
+  0% { transform: scale(1); filter: brightness(1); }
+  100% { transform: scale(1.05); filter: brightness(1.2); }
+}
+
+/* ゲーム内ヘッダーレイアウト */
+.hiragana-puzzle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 20px;
+  padding: 8px 16px;
+  border: 3px solid #ff9ff3;
+  box-shadow: 0 4px 14px rgba(255, 159, 243, 0.2);
+}
+
+.hiragana-target-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.target-round-badge {
+  background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 900;
+  padding: 4px 10px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(155, 89, 182, 0.3);
+  white-space: nowrap;
+}
+
+.target-word-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.target-word-slots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.target-char-slot {
+  width: 36px;
+  height: 38px;
+  background: #ffffff;
+  border: 2.5px solid #ffb8b8;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 900;
+  color: #ff4757;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.target-char-slot.active-matching {
+  background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+  border-color: #f39c12;
+  color: #d35400;
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
+}
+
+.target-char-slot.slot-completed {
+  animation: slotPopBounce 0.5s ease-out;
+  background: linear-gradient(135deg, #a8ff78, #78ffd6);
+  border-color: #2ecc71;
+  color: #27ae60;
+}
+
+@keyframes slotPopBounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3) rotate(-6deg); }
+  100% { transform: scale(1); }
+}
+
+.target-emoji-icon {
+  font-size: 28px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+  animation: emojiFloatWiggle 2s infinite ease-in-out;
+}
+
+@keyframes emojiFloatWiggle {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-3px) rotate(5deg); }
+}
+
+/* おたすけボタン */
+.hiragana-hint-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #f1c40f, #f39c12);
+  color: #ffffff;
+  border: none;
+  border-radius: 16px;
+  padding: 6px 14px;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(241, 196, 15, 0.4);
+  transition: all 0.15s;
+}
+
+.hiragana-hint-btn:active {
+  transform: scale(0.94);
+}
+
+.hint-icon {
+  font-size: 18px;
+  animation: hintIconTwinkle 1.2s infinite alternate;
+}
+
+@keyframes hintIconTwinkle {
+  0% { filter: drop-shadow(0 0 2px #fff); }
+  100% { filter: drop-shadow(0 0 8px #fff) brightness(1.3); }
+}
+
+.hint-label {
+  font-size: 13px;
+  font-weight: 900;
+}
+
+/* ひらがなジュエル文字スタイル */
+.jewel-char {
+  font-size: 22px;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.55), 0 0 8px rgba(0, 0, 0, 0.4);
+  user-select: none;
+  pointer-events: none;
+  font-family: 'Rounded Mplus 1c', 'Hiragino Maru Gothic ProN', sans-serif;
+  letter-spacing: -0.5px;
+}
+
+.hiragana-jewel-cell.selected .jewel-char {
+  transform: scale(1.12);
+  text-shadow: 0 0 10px #ffffff, 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+/* おたすけヒント点滅エフェクト */
+.hiragana-jewel-cell.hint-pulse .jewel-gem-body {
+  animation: hiraganaHintPulse 0.55s infinite alternate !important;
+}
+
+@keyframes hiraganaHintPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 10px #f1c40f, inset 0 0 6px #ffffff;
+    filter: brightness(1.1);
+  }
+  100% {
+    transform: scale(1.22);
+    box-shadow: 0 0 24px #ffeaa7, 0 0 40px #f1c40f, inset 0 0 12px #ffffff;
+    filter: brightness(1.4);
+  }
+}
+
+/* なぞり中のリアルタイム言葉バッジ */
+.hiragana-drag-word-badge {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  background: rgba(255, 255, 255, 0.95);
+  border: 2.5px solid #ff7597;
+  color: #2f3542;
+  font-size: 15px;
+  font-weight: 900;
+  padding: 4px 14px;
+  border-radius: 20px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.12s, transform 0.12s;
+  white-space: nowrap;
+}
+
+.hiragana-drag-word-badge.show {
+  opacity: 1;
+}
+
+.hiragana-drag-word-badge.target-match-badge {
+  background: linear-gradient(135deg, #ff7597, #ff4757);
+  border-color: #ffffff;
+  color: #ffffff;
+  transform: translate(-50%, -100%) scale(1.15);
+  box-shadow: 0 0 20px rgba(255, 71, 87, 0.7);
+  animation: badgeMatchPulse 0.3s infinite alternate;
+}
+
+.hiragana-drag-word-badge.bonus-match-badge {
+  background: linear-gradient(135deg, #f1c40f, #e67e22);
+  border-color: #ffffff;
+  color: #ffffff;
+  transform: translate(-50%, -100%) scale(1.1);
+  box-shadow: 0 0 16px rgba(241, 196, 15, 0.6);
+}
+
+@keyframes badgeMatchPulse {
+  0% { transform: translate(-50%, -100%) scale(1.12); }
+  100% { transform: translate(-50%, -100%) scale(1.22); }
+}
+
+/* 大魔法完成モーダルカード */
+.word-burst-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 24px 32px !important;
+}
+
+.word-burst-emoji {
+  font-size: 64px;
+  line-height: 1;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.25));
+  animation: wordBurstEmojiPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes wordBurstEmojiPop {
+  0% { transform: scale(0) rotate(-20deg); }
+  60% { transform: scale(1.3) rotate(10deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.word-burst-subtitle {
+  font-size: 14px;
+  font-weight: 900;
+  color: #ffeaa7;
+  letter-spacing: 1px;
+}

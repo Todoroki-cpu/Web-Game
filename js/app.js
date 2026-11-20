@@ -191,6 +191,7 @@ class GameApp {
     this.gameShiritoriRhythm = new GameShiritoriRhythm(this);
     this.gameShiritoriQuiz = new GameShiritoriQuiz(this);
     this.gameNyankoDefense = new GameNyankoDefense(this);
+    this.gameHiraganaPuzzle = new GameHiraganaPuzzle(this);
 
     this.homeCharManager = new CharacterManager('home-character-stage');
 
@@ -214,6 +215,7 @@ class GameApp {
       hiragana_word: document.getElementById('view-game-hiragana-word'),
       shiritori_rhythm: document.getElementById('view-game-shiritori-rhythm'),
       shiritori_quiz: document.getElementById('view-game-shiritori-quiz'),
+      hiragana_puzzle: document.getElementById('view-game-hiragana-puzzle'),
       princess: document.getElementById('view-game-princess'),
       princess_doors: document.getElementById('view-game-princess-doors'),
       princess_runway: document.getElementById('view-game-princess-runway'),
@@ -356,6 +358,7 @@ class GameApp {
     bindCard('menu-card-animal-sil', 'praise_1', 'animal_silhouette');
     bindCard('menu-card-shiritori-rhythm', 'cat_hiragana', 'shiritori_rhythm');
     bindCard('menu-card-shiritori-quiz', 'praise_2', 'shiritori_quiz');
+    bindCard('menu-card-hiragana-puzzle', 'praise_3', 'hiragana_puzzle');
     bindCard('menu-card-nyanko-defense', 'praise_1', 'nyanko_defense');
 
     // もう1回遊ぶボタン
@@ -381,6 +384,7 @@ class GameApp {
         else if (v === 'hiragana_word') this.gameHiraganaWord.start();
         else if (v === 'shiritori_rhythm') this.gameShiritoriRhythm.start();
         else if (v === 'shiritori_quiz') this.gameShiritoriQuiz.start();
+        else if (v === 'hiragana_puzzle') this.gameHiraganaPuzzle.start();
         else if (v === 'nyanko_defense') this.gameNyankoDefense.start();
         else if (v === 'princess') this.gamePrincess.start();
         else if (v === 'princess_doors') this.gamePrincessDoors.start();
@@ -501,6 +505,7 @@ class GameApp {
       else if (viewName === 'hiragana_word') this.gameHiraganaWord.start();
       else if (viewName === 'shiritori_rhythm') this.gameShiritoriRhythm.start();
       else if (viewName === 'shiritori_quiz') this.gameShiritoriQuiz.start();
+      else if (viewName === 'hiragana_puzzle') this.gameHiraganaPuzzle.start();
       else if (viewName === 'nyanko_defense') this.gameNyankoDefense.start();
       else if (viewName === 'princess') this.gamePrincess.start();
       else if (viewName === 'princess_doors') this.gamePrincessDoors.start();
